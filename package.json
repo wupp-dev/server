@@ -4,7 +4,9 @@
   "description": "Configuración del servidor",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:serve": "vitepress serve docs"
   },
   "repository": {
     "type": "git",
@@ -21,10 +23,5 @@
   "homepage": "https://github.com/ComicIvans/server#readme",
   "dependencies": {
     "vitepress": "^1.0.0-alpha.1"
-  },
-  "scripts": {
-    "docs:dev": "vitepress dev docs",
-    "docs:build": "vitepress build docs",
-    "docs:serve": "vitepress serve docs"
   }
 }
