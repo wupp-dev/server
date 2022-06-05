@@ -8,7 +8,7 @@ hero:
   actions:
     - theme: brand
       text: Guía del servidor
-      link: /server/guia/hardware
+      link: https://comicivans.github.io/server/guia/hardware.html
     - theme: alt
       text: Repositorio de GitHub
       link: https://github.com/ComicIvans/server

@@ -11,7 +11,7 @@ Esa guía se divide en distintas secciones:
 
 ---
 
-Puedes **consultar la guía** en ~~este enlace~~ o puedes compilarla tú mismo descargando el repositorio:
+Puedes **consultar la guía** en [este enlace](https://comicivans.github.io/server/) o puedes compilarla tú mismo descargando el repositorio:
 1. Necesitarás `npm` instalado. Puedes descargarlo [aquí](https://github.com/nodesource/distributions/blob/master/README.md).
 2. Abre una terminal en la carpeta raiz del repositorio y escribe `npm install`
 3. Ejecuta `npm run docs:build` y `npm run docs:serve`
