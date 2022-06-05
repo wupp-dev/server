@@ -6,19 +6,19 @@ export default {
   themeConfig: {
     nav: [
       { text: 'Inicio', link: '/', activeMatch: '' },
-      { text: 'Guía del servidor', link: '/guia/hardware', activeMatch: '/guia/' },
+      { text: 'Guía del servidor', link: '/equipo/hardware', activeMatch: '/(equipo)/' },
       { text: 'Archivos de configuración', link: 'https://github.com/ComicIvans/server' }
     ],
     socialLinks: [
       { icon: 'discord', link: 'https://discord.gg/YdnmG5v8' },
     ],
     sidebar: {
-      '/guia/': [
+      '/(equipo)/': [
         {
-          text: 'Guía del servidor',
+          text: 'Equipo',
           items: [
-            { text: 'Hardware', link: '/guia/hardware' },
-            { text: 'Instalación del SO, encriptado y SSH', link: '/guia/sistema-encriptado-ssh' },
+            { text: 'Hardware', link: '/equipo/hardware' },
+            { text: 'Instalación del SO, encriptado y SSH', link: '/equipo/sistema-encriptado-ssh' },
           ],
         },
       ],
