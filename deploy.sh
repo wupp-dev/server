@@ -10,7 +10,7 @@ npm run docs:build
 cd docs/.vitepress/dist
 
 git init
-git add -a
+git add -A
 git commit -m 'Actualización de la documentación'
 
 git push -f git@github.com:ComicIvans/server.git main:gh-pages
