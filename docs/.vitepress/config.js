@@ -13,9 +13,10 @@ export default {
       { icon: 'discord', link: 'https://discord.gg/YdnmG5v8' },
     ],
     sidebar: {
-      '/(equipo)/': [
+      '/equipo/': [
         {
           text: 'Equipo',
+          collapsible: true,
           items: [
             { text: 'Hardware', link: '/equipo/hardware' },
             { text: 'Instalación del SO, encriptado y SSH', link: '/equipo/sistema-encriptado-ssh' },
