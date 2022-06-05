@@ -2,6 +2,7 @@ export default {
   title: 'Servidor mamadísimo',
   description: 'Guía del servidor.',
   lang: 'es-ES',
+  base: '/server/',
   themeConfig: {
     nav: [
       { text: 'Inicio', link: '/', activeMatch: '' },
