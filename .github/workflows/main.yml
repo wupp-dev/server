@@ -1,0 +1,31 @@
+name: Build and Deplow Web
+
+on:
+  push:
+    branches: [ "main" ]
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    concurrency: ci-${{ github.ref }}
+    steps:
+      - name: Checkout 🛎️
+        uses: actions/checkout@v2
+    
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '8.11.0'
+
+      - name: Install and Build 🔧
+        run: |
+          npm ci
+          npm install
+          npm run docs:build
+
+      - name: Deploy 🚀
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          branch: gh-pages
+          folder: docs/.vitepress/dist
