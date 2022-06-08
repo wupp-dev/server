@@ -1,5 +1,6 @@
 ---
 layout: home
+title: Inicio
 
 hero:
   name: Servidor mamadísimo

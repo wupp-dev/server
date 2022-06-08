@@ -3,20 +3,20 @@ Este repositorio contiene los **archivos de configuración** que se han usado en
 
 Además, incluye una **guía detallada de todo el proceso** que se ha seguido para poner el servidor en funcionamiento.
 
-Esa guía se divide en distintas secciones:
-1. Hardware del servidor.
-2. Instalación del sistema operativo.
-3. Configuración básica.
-4. ...
+Esa guía se divide en dos partes:
+1. [Preparación del equipo](https://comicivans.github.io/server/equipo/)
+2. [Instalación de servicios específicos](https://comicivans.github.io/server/servicios/)
 
 ---
 
 Puedes **consultar la guía** en [este enlace](https://comicivans.github.io/server/) o puedes compilarla tú mismo descargando el repositorio:
 1. Necesitarás `npm` instalado. Puedes descargarlo [aquí](https://github.com/nodesource/distributions/blob/master/README.md).
 2. Abre una terminal en la carpeta raiz del repositorio y escribe `npm install`
-3. Ejecuta `npm run docs:build` y `npm run docs:serve`
-4. Conéctate a http://localhost:5000
+3. Ejecuta `npm run docs:build` y `npm run docs:serve` *(si esto no funciona, utiliza en su lugar `npm run docs:dev`)*
+4. Abre http://localhost:5000 *(si utilizaste `npm run docs:dev`, tienes que abrir http://localhost:3000)*
 
 ---
 
 La guía está hecha en Markdown con [VitePress](https://github.com/vuejs/vitepress) y está alojada en este repositorio con GitHub Pages.
+
+Además, se publica automáticamente tras cada cambio gracias a [esta guía](https://jamesiv.es/blog/github/actions/2022/01/23/deploying-to-github-pages-with-github-actions).
