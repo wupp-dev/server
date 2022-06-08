@@ -8,7 +8,7 @@ Para gestionar y ejecutar todos los servicios web, utilizaremos el maravilloso D
 
 Aquí hay una guía de cómo instalar y configurar todo, pero si te quedas con dudas o quieres ver algo más a fondo, puedes visitar la [documentación oficial de Docker](https://docs.docker.com/).
 
-**Cositas generales**: para seguir esta instalación tienes que ya haber [configurado lo básico del sistema operativo]('/equipo/sistema-encriptado-ssh') (`apt` en realidad) y tener una terminal abierta. A parte, cualquier comando de `apt` se puede sustituir por su correspondiente `apt-get` (o `apt-cache`, pero que no vamos a usar realmente).
+**Cositas generales**: para seguir esta instalación tienes que ya haber [configurado lo básico del sistema operativo](./sistema-encriptado-ssh) (`apt` en realidad) y tener una terminal abierta. A parte, cualquier comando de `apt` se puede sustituir por su correspondiente `apt-get` (o `apt-cache`, pero que no vamos a usar realmente).
 
 ## TL;DR
 
