@@ -52,7 +52,7 @@ export default defineConfig({
               link: "/servicios/dozzle",
             },
             { text: "Homarr - Dashboard", link: "/servicios/homarr" },
-            { text: "Uptime Kuma - Status", link: "servicios/uptime-kuma" },
+            { text: "Uptime Kuma - Status", link: "/servicios/uptime-kuma" },
             { text: "Authentik - Autenticación", link: "/servicios/authentik" },
             {
               text: "Nextcloud - Almacenamiento",
@@ -89,7 +89,7 @@ export default defineConfig({
               link: "/servicios/dozzle",
             },
             { text: "Homarr - Dashboard", link: "/servicios/homarr" },
-            { text: "Uptime Kuma - Status", link: "servicios/uptime-kuma" },
+            { text: "Uptime Kuma - Status", link: "/servicios/uptime-kuma" },
             { text: "Authentik - Autenticación", link: "/servicios/authentik" },
             {
               text: "Nextcloud - Almacenamiento",
