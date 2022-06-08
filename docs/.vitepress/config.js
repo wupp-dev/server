@@ -58,7 +58,7 @@ export default defineConfig({
               text: "Nextcloud - Almacenamiento",
               link: "/servicios/nextcloud",
             },
-            { text: "Gitea - Servicio git", link: "/servicios/gitea" },
+            { text: "Gitea - Servicio git", link: "/servicios/gogs" },
           ],
         },
       ],
