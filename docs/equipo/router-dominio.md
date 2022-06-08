@@ -1,3 +1,7 @@
+---
+title: Router y dominio
+lang: es-ES
+---
 # Configuración del router y del dominio
 
 ## Breve introducción sobre las IPs

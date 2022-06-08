@@ -1,3 +1,7 @@
+---
+title: Nginx y docker
+lang: es-ES
+---
 # Nginx
 
 Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ratione voluptates veritatis cumque mollitia commodi ullam atque rerum doloremque reiciendis obcaecati, excepturi dolorum illum facere possimus quisquam veniam voluptatum et beatae enim consectetur vero dolore tenetur inventore amet. Aspernatur, nulla tempora adipisci est modi ipsam laudantium. Blanditiis quidem iusto voluptate minima temporibus aperiam excepturi placeat. Quae aliquid molestiae quia autem dolore explicabo impedit necessitatibus fugit commodi placeat aspernatur suscipit atque dolorum itaque ab enim deleniti, libero asperiores tempora voluptatem hic! Consequuntur ullam quam a aliquid delectus tenetur sit earum enim, fugit ut. Laboriosam perferendis iste dolore delectus quisquam dolores quod magni!
