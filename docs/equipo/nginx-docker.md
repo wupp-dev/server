@@ -2,6 +2,7 @@
 title: Nginx y docker
 lang: es-ES
 ---
+
 # Nginx
 
 Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ratione voluptates veritatis cumque mollitia commodi ullam atque rerum doloremque reiciendis obcaecati, excepturi dolorum illum facere possimus quisquam veniam voluptatum et beatae enim consectetur vero dolore tenetur inventore amet. Aspernatur, nulla tempora adipisci est modi ipsam laudantium. Blanditiis quidem iusto voluptate minima temporibus aperiam excepturi placeat. Quae aliquid molestiae quia autem dolore explicabo impedit necessitatibus fugit commodi placeat aspernatur suscipit atque dolorum itaque ab enim deleniti, libero asperiores tempora voluptatem hic! Consequuntur ullam quam a aliquid delectus tenetur sit earum enim, fugit ut. Laboriosam perferendis iste dolore delectus quisquam dolores quod magni!
@@ -90,4 +91,12 @@ $ sudo cp ./home/docker/ /home/docker/
 
 Por fin llegamos al famoso archivo. Este archivo incluye toda la configuración de los servicios a ejecutar con Docker y nos permite cómodamente iniciar todos. En la página de cada servicio se puede encontrar un extracto del contenido del `docker-compose.yml` para ese servicio concreto. Veamos la estructura de este archivo:
 
-- **Volumes**
+- **`version`:** algo importar'a intuyo, pero no creo que mucho así que está la 2 por que lo debí de ver por ahí con el primer servicio que puse y ahí se ha quedado.
+
+- **`volumes`:** una forma integrada en docker para guardar archivos sin importar mucho donde se guardan estos, pero de forma que el programa pueda perdurar datos en forma de archivo, lo cual usaremos para caché o archivos que no sean de configuración o podramos requerir frecuentemente.
+
+- **`services`:** esto es lo importante, aquí declaramos todos los contenedores que se han de crear, en donde se especifica la imagen (el contenedor/mini-vm a utilizar), los puertos que se exponen (mapeando `<EQUIPO>:<CONTENEDOR>`), variables de entorno (environment vars para quien sepa), la política de reinicio (será siempre _always_ o _unless-stopped_) y los volúmenes y mapeo de archivos y carpetas correspondientes.
+
+Hay otro par de ajustes para este archivo (por ejemplo `networks`), pero no son relevantes para esta instalación y no se usan en ella, por tanto si quieres más información de estos lee la [documentación oficial de Docker Compose](https://docs.docker.com/compose/)
+
+Lo dicho, según vayamos viendo los diferentes servicios se irán mostrando los extractos del archivo para el correspondiente servicio para que así podáis cómodamente seleccionar que servicios queréis. El archivo también se encuentra ampliamente documentado, por tanto con leer este documento debería de ser suficiente para entenderlo.
