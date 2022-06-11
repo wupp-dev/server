@@ -32,12 +32,16 @@ export default defineConfig({
           items: [
             { text: "Hardware", link: "/equipo/hardware" },
             {
+              text: "Instalación del SO encriptado",
+              link: "/equipo/sistema-encriptado",
+            },
+            {
               text: "Configuración del router y dominio",
               link: "/equipo/router-dominio",
             },
             {
-              text: "Instalación del SO, encriptado y SSH",
-              link: "/equipo/sistema-encriptado-ssh",
+              text: "Gestión remota con SSH",
+              link: "/equipo/gestion-remota",
             },
             { text: "Nginx y docker", link: "/equipo/nginx-docker" },
           ],
@@ -69,12 +73,16 @@ export default defineConfig({
           items: [
             { text: "Hardware", link: "/equipo/hardware" },
             {
+              text: "Instalación del SO encriptado",
+              link: "/equipo/sistema-encriptado",
+            },
+            {
               text: "Configuración del router y dominio",
               link: "/equipo/router-dominio",
             },
             {
-              text: "Instalación del SO, encriptado y SSH",
-              link: "/equipo/sistema-encriptado-ssh",
+              text: "Gestión remota con SSH",
+              link: "/equipo/gestion-remota",
             },
             { text: "Nginx y docker", link: "/equipo/nginx-docker" },
           ],
