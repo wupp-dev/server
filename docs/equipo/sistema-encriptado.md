@@ -21,7 +21,7 @@ Hay varias opciones para escoger como sistema operativo:
 - [Ubuntu Server](https://ubuntu.com/download/server).
 - [Fedora Server](https://getfedora.org/en/server/).
 
-Esos solo algunos ejemplos, pero hay muchas opciones. En nuestro caso, el servidor tuvo instalado al principio Ubuntu Server, pero a Lucas le causaba un gran rechazo, así que se ha cambiado a **Debian**, que según él es mejor.
+Esos solo algunos ejemplos, pero hay muchas opciones. En nuestro caso, el servidor tuvo instalado al principio Ubuntu Server, pero Lucas se puso tonto, así que ha habido que cambiarlo a **Debian**, que según él es mejor *(**Spoiler:** No ha probado Ubuntu Server)*.
 
 ::: danger PELIGRO
 Toda persona que use Windows Server será perseguida y juzgada por sus crímenes contra la humanidad.
