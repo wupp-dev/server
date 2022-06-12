@@ -41,7 +41,7 @@ Una vez descargada la ISO, tenemos que grabarla en el pendrive:
 
 Ese pendrive lo cogemos y lo enchufamos al servidor.
 
-## Configuración básica de la BIOS del servidor
+## Configuración de la BIOS del servidor
 
 Antes de instalar el sistema operativo, tenemos que hacer unos retoques en la BIOS, así que enciende el servidor y accede a la BIOS *(si no sabes cómo, búscalo, porque cambia mucho de un ordenador a otro)*.
 
