@@ -115,7 +115,7 @@ Una vez acabe la instalación, nos tocará configurar el gestor de paquetes, ele
 Ahora nos dejará elegir unos cuantos paquetes extra que instalar, estos son los cambios que hay que hacer:
 
 ::: warning ADVERTENCIA
-Si no quieres que se te quede la cara de tonto que se me quedó a mí ya en dos ocasiones, recuerda que para desmarcar opciones hay que usar \<Space\> y no \<Intro\>, que como le des sin querer te toca repetir todo el proceso de instalación.
+Si no quieres que se te quede la cara de tonto que se me quedó a mí ya en dos ocasiones, recuerda que para desmarcar opciones hay que usar \<Espacio\> y no \<Intro\>, que como le des sin querer te toca repetir todo el proceso de instalación.
 :::
 
 - Quitar el entorno de escritorio. El servidor no lo necesitará allá donde vas a dejarlo.
