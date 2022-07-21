@@ -63,7 +63,7 @@ Así debería verse nuestro instalador:
 
 ![Instalador](../images/debian-inicio.png)
 
-La instalación gráfica y la otra son prácticamente iguales, la diferencia es que en la gráfica podrías usar el ratón.
+La instalación gráfica y la otra son prácticamente iguales, la diferencia es que en la gráfica puedes usar el ratón.
 
 Primero tocará elegir el idioma y la distribución del teclado *(nosotros hemos elegido Español para mayor comodidad)*. Después se intentará conectar a internet y tocará poner unos cuantos datos:
 1. El nombre de la máquina, como puede ser `server`
