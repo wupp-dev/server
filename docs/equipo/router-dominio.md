@@ -22,7 +22,7 @@ Lo que nos interesa aquí es la IP pública. Cuando queramos conectarnos al serv
 
 ## Dominio, ¿qué es y para qué sirve?
 
-Un dominio es un pseudónimo para la IP, que es más bonito y fácil de recordar que la propia IP. Cuando nos conectamos a cualquier web, lo hacemos mediante una URL, que se divide en:
+Un dominio es un pseudónimo para la IP, que es más bonito y fácil de recordar que la propia IP. Cuando nos conectamos a cualquier web, lo hacemos mediante el *Uniform Resource Locator (URL)*, que se divide en:
 
 ![URL](../images/url.png)
 
@@ -94,3 +94,41 @@ Donde `UpdateURL` es la URL copiada de FreeDNS, que se verá como `https://freed
 Esto hará que cada 5 minutos se compruebe si la IP pública del servidor ha cambiado y, si es así, se actualizará a la nueva. Además, el resultado se guarda en un archivo temporal en `/tmp/freedns_@_domino_com.log`.
 
 ## Toqueteando en el router
+
+Muy bien, ya tenemos el dominio apuntando a la IP pública de nuestro router y al servidor actualizándola si esta cambia. Pero queda todavía un problema externo al servidor que resolver.
+
+Por defecto, el router no deja que alguien se conecte mediante la IP pública a algún dispositivo de la red porque es algo que solo debería ocurrir si estamos ofreciendo un servicio a través de internet.
+
+### Breve introdución sobre los puertos
+
+Para que varios programas puedan conectarse a internet y hacer cosas distintas simultáneamente es necesario el uso de puertos. Los puertos son puntos de transmisión y recepción de datos, están numerados del 1 al 65535 y algunos de ellos están reservados para un uso específico, por ejemplo:
+- Los puertos 20 y 21 se utilizan para transferencia de archivos.
+- El puerto 22 se utilia para las conexiones de *Secure Shell* *(SSH)* de las que hablaremos en la siguiente sección.
+- El puerto 80 se utiliza para las conexiones de *Hypertext Transfer Protocol* *(HTTP)*, que es el protocolo por el que funcionan las páginas web.
+- El puerto 123 se utiliza para el Network Time Protocol *(NTP)* para que los relojes de los ordenadoes estén sincronizados.
+- El puerto 443 se utiliza para las conexiones *HTTP Secure* *(HTTPS)*, actuando como sustituto del puerto *HTTP*, ya que todas las conexiones deberían ir cifradas.
+- El puerto 25565 es el más común para los servidores de Minecraft.
+
+Pues bien, por defecto estos puertos no están abiertos para que un dispositivo cualquiera de internet pueda llegar y conectarse a nuestro ordenador a través de ellos. Esto está bien, porque, a no ser que tengas un servidor en tu casa, si alguien intenta conectarse a alguno de los puertos de tu ordenador no suele ser con buenas intenciones.
+
+En nuestro caso, como tenemos un servidor, sí que necesitamos que los puertos estén abiertos, así que debemos configurar el router para que permita conexiones externas a los puertos que digamos.
+
+::: info
+Esto no quiere decir que de aquí en adelante cualquier persona se vaya a poder conectar a los puertos que quiera de cualquier dispositivo de tu red. Normalmente el router permite abrir los puertos solo para una IP local *(que en este caso será nuestro servidor)*, siguiendo cerrados para los demás dispositivos. Además, los ordenadores y teléfonos suelen venir con un firewall instalado, que también bloquea por defecto las conexiones externas en cualquier puerto. De hecho, tendremos que vérnolas también con el firewall del servidor aunque los puertos estén abiertos desde el router.
+:::
+
+### Abriendo puertos en el router (tengo que poner imágenes)
+
+Lo primero es saber si tú desde tu casa puedes configurar tu router o debes contactar con el proveedor de internet para que lo haga, aunque lo más común es que sí puedas configurarlo.
+
+Para configurarlo tienes que conectarte a la IP de la puerta de enlace del router, que suele ser `192.168.1.1`. Puedes conectarte simplemente abriendo el navegador y poniendo la IP en la barra superior como si de una URL se tratara.
+
+Una vez conectado, te pedirá un nombre de usuario y una contraseña, que deberían estar escritos en el router *(no estaría mal cambiar la contraseña después de abrir los puertos)*.
+
+::: warning ADVERTENCIA
+Hay proveedores de internet como Digi, que te permiten configurar el router, pero los cambios que le hagas a los puertos no van a funcionar a no ser que contactes con ellos y les pidas que te permitan abrir puertos *(cosa por la que te cobrarán 1€ más al mes)*.
+:::
+
+*Cuando pueda poner imágenes de la interfaz terminaré esta parte porque lo único que tengo que decir es que hay que abrir los puertos que vayas a usar como 80, 443, 25565, etc y abrirlos para conexiones TCP y UDP en la IP local del servidor.*
+
+**IMPORTANTE DEJAR FIJA LA IP LOCAL DEL SERVIDOR**
