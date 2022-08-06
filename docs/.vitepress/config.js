@@ -15,7 +15,7 @@ let guideSidebar = [
         link: "/equipo/router-dominio",
       },
       {
-        text: "Gestión remota con SSH",
+        text: "Gestión remota con SSH y VNC",
         link: "/equipo/gestion-remota",
       },
       { text: "Nginx y docker", link: "/equipo/nginx-docker" },

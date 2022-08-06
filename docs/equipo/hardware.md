@@ -43,7 +43,7 @@ Además, tiene un lector de discos que no se ha usado ni se va a usar.
 
 Y de la placa base con saber que es **ATX** vamos tirando, pero no tiene ni puertos **M.2.**
 
-## Hardware externo.
+## Hardware externo
 
 A parte de tener un ordenador decente para el servidor, necesitas una buena conexión a internet. Una de las cosas **obligatorias** es tener el servidor **conectado por cable**, no por WiFi.
 
