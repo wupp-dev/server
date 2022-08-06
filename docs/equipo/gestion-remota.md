@@ -107,11 +107,26 @@ Una solución que se nos podría ocurrir es utilizar la misma clave pública y p
 
 Lo primero para esto es utilizar un puerto distinto para OpenSSH Server al que usamos para Dropbear. Para ello, editamos el archivo `/etc/ssh/sshd_config` y descomentamos la línea `#Port 22` y cambiamos el número, quedando por ejemplo `Port 2222`.
 
+Antes de reiniciar el servidor SSH, debemos asegurarnos de que:
+- El nuevo puerto está abierto en el router.
+- El nuevo puerto está permitido por el firewall, en el caso de UFW: `sudo ufw allow 2222/tcp`.
+
 *Nuevamente el puerto es de ejemplo y es recomendable cambiarlo a otro.*
 
-Si ahora nos vamos a nuestro ordenador y editamos el archivo `/home/user/.ssh/known_hosts`
+Por último, reiniciamos el servidor SSH para que los cambios tengan efecto:
+```
+sudo systemctl restart ssh
+```
+
+::: tip RELATO
+Iván mientras escribía esto *(desde un sitio lejano a la ubicación del servidor)* se olvidó de permitir el nuevo puerto en el firewall y pasaron cosas malas, si quieres leer la historia completa puedes hacerlo [aquí](../relatos/bloqueo-ssh).
+:::
+
+Si ahora nos vamos a nuestro ordenador y editamos el archivo `/home/user/.ssh/known_hosts`...
 
 ### Reforzando la seguridad
+
+---- POR HACER ----
 
 ## Virtual Network Computing (VNC)
 
