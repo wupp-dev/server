@@ -40,6 +40,14 @@ let guideSidebar = [
       { text: "Gitea - Servicio git", link: "/servicios/gogs" },
     ],
   },
+  {
+    text: "Relatos",
+    collapsible: true,
+    items: [
+      { text: "Initramfs vs Router", link: "/relatos/initramfs-vs-router" },
+      { text: "Bloqueo de SSH", link: "/relatos/bloqueo-ssh" },
+    ],
+  },
 ];
 
 export default defineConfig({
@@ -69,6 +77,7 @@ export default defineConfig({
     sidebar: {
       "/equipo/": guideSidebar,
       "/servicios/": guideSidebar,
+      "/relatos/": guideSidebar,
     },
     footer: {
       message: "Distribuido bajo la licencia CC BY.",
