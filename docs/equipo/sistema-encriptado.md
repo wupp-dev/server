@@ -123,4 +123,47 @@ Si no quieres que se te quede la cara de tonto que se me quedó a mí ya en dos 
 
 ## Configuración básica y pequeñas mejoras
 
+Encendemos el servidor, iniciamos sesión con el nombre de usuario que creamos y con su contraseña y ya estaría.
+
+Lo primero que vamos a hacer, por comodidad, es instalar el paquete `sudo`, que nos permite hacer casi todo lo que hace el usuario `root` sin necesidad de cambiarnos a ese usuario, para ello escribimos los siquientes comandos:
+```
+$ su
+Contraseña:
+$ apt install sudo
+```
+
+Ahora queda añadir al usuario que creamos durante la instalación como *sudoer*, para ello escribimos `nano /etc/sudoers` y ponemos lo siguiente:
+```bash
+#
+# This file MUST be edited with the 'visudo' command as root.
+#
+# Please consider adding local content in /etc/sudoers.d/ instead of
+# directly modifying this file.
+#
+# See the man page for details on how to write a sudoers file.
+#
+Defaults        env_reset
+Defaults        mail_badpass
+Defaults        secure_path="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+
+# Host alias specification
+
+# User alias specification
+
+# Cmnd alias specification
+
+# User privilege specification
+root    ALL=(ALL:ALL) ALL
+admin  ALL=(ALL:ALL) ALL
+
+# Allow members of group sudo to execute any command
+%sudo   ALL=(ALL:ALL) ALL
+
+# See sudoers(5) for more information on "@include" directives:
+
+@includedir /etc/sudoers.d
+```
+
+Donde `admin` será el usuario que creamos. Guardamos el archivo y ya podemos escribir `exit` para salirnos del usuario `root`. A partir de ahora lo normal será usar `sudo` para instalar cosas o editar archivos.
+
 **POR HACER:** Añadir el resto de discos, encriptarlos y configurar cryptab.
