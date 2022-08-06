@@ -67,7 +67,7 @@ DROPBEAR_OPTIONS="-I 300 -j -k -p 22 -s"
 
 Como indica el último parámetro, la autenticación por contraseña está deshabilitada, así que utilizaremos también las claves públicas que hayamos autorizado para OpenSSH Server, podemos copiarlas directamente con el comando:
 ```
-sudo cp /home/user/.ssh/authorized_keys /etc/dropbear-initramfs/
+$ sudo cp /home/user/.ssh/authorized_keys /etc/dropbear-initramfs/
 ```
 
 Por útlimo, para que los cambios tengan efecto, tenemos que escribir `sudo update-initramfs -u`. Esto guardará de nuevo los archivos de `initramfs` incluyendo los cambios que hemos hecho.
@@ -115,7 +115,7 @@ Antes de reiniciar el servidor SSH, debemos asegurarnos de que:
 
 Por último, reiniciamos el servidor SSH para que los cambios tengan efecto:
 ```
-sudo systemctl restart ssh
+$ sudo systemctl restart ssh
 ```
 
 ::: tip RELATO
