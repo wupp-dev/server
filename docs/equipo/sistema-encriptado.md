@@ -83,7 +83,7 @@ El usuario escogido en la guía es `admin`. Este nombre es de ejemplo y Debian n
 
 Después de esto toca poner una encriptación en el disco de instalación.
 
-### Encriptación en los discos
+### Encriptación del disco
 
 Para no complicarnos la vida, aquí dejaremos que Debian haga la magia de gestionar las particiones porque si no nos tocaría sufrir mucho.
 
@@ -100,7 +100,7 @@ Ahora toca lo interesante. Le decimos que use todo el disco para el particionado
 Las particiones más importantes son:
 - Una partición donde irá **el sistema operativo y todos los datos**. Por defecto aparecerá con el sistema de archivos `ext4`, uno de los más comunes en Linux.
 - Una partición de **intercambio *(SWAP)***, que se utiliza como una ampliación de la RAM.
-- Una partición `boot` para que el ordenador se pueda encender.
+- Una partición `boot` que contiene los archivos necesarios para que el ordenador se encienda.
 
 Se puede dejar tal y como está, pero nosotros hemos optado por usar `btrfs` en vez de `ext4` como sistema de archivos de la partición principal. Esto es por las grandes facilidades que da `btrfs` para hacer copias de seguridad del sistema al completo sin que ocupen casi espacio.
 
@@ -121,7 +121,7 @@ Si no quieres que se te quede la cara de tonto que se me quedó a mí ya en dos 
 
 ## Configuración básica y pequeñas mejoras
 
-Encendemos el servidor, iniciamos sesión con el nombre de usuario que creamos y con su contraseña y ya estaría.
+Encendemos el servidor, iniciamos sesión con el nombre de usuario que creamos, con su contraseña y ya estaría.
 
 Lo primero que vamos a hacer, por comodidad, es instalar el paquete `sudo`, que nos permite hacer casi todo lo que hace el usuario `root` sin necesidad de cambiarnos a ese usuario, para ello escribimos los siquientes comandos:
 ```

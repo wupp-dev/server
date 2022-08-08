@@ -6,7 +6,7 @@ lang: es-ES
 
 Aquí nuestro objetivo será no tener que preocuparnos de nada que no sea el propio servidor. Para ello, hay que preocuparse momentáneamente de dos elementos externos:
 - Configurar el router de tu casa para que deje que el servidor sea un servidor.
-- Adquirir un dominio para que sea más cómodo conectarte al servidor y despreocuparte de cambios de la IP pública.
+- Adquirir un dominio para que sea más cómodo conectarte al servidor y poder usar subdominios.
 
 ## Breve introducción sobre las IPs
 
@@ -22,11 +22,11 @@ Lo que nos interesa aquí es la IP pública. Cuando queramos conectarnos al serv
 
 ## Dominio, ¿qué es y para qué sirve?
 
-Un dominio es un pseudónimo para la IP, que es más bonito y fácil de recordar que la propia IP. Cuando nos conectamos a cualquier web, lo hacemos mediante el *Uniform Resource Locator (URL)*, que se divide en:
+Un dominio es un pseudónimo para la IP, que es más bonito y fácil de recordar que la propia IP. Cuando nos conectamos a cualquier web, lo hacemos mediante el Uniform Resource Locator *(URL)*, que se divide en:
 
 ![URL](../images/url.png)
 
-En nuestro caso, el dominio es `servermamadisimo.xyz`, y cuando te intentas conectar a esa dirección, el ordenador le pregunta qué IP es a la que apunta la dirección a unos servidoes especiales que se llaman *nameservers*. Estos servidores son una parte fundamental del DNS *(Domain Name System)*, que permite utilizar las direcciones en vez de las IPs. Normalmente los servidores DNS que se usan son los del propio proveedor de internet, pero se pueden cambiar para que sean a otros como [NextDNS](https://my.nextdns.io).
+En nuestro caso, el dominio es `servermamadisimo.xyz`, y cuando te intentas conectar a esa dirección, el ordenador le pregunta qué IP es a la que apunta la dirección a unos servidoes especiales que se llaman nameservers. Estos servidores son una parte fundamental del DNS *(Domain Name System)*, que permite utilizar las direcciones en vez de las IPs. Normalmente los nameservers que se usan son los del propio proveedor de internet, pero se pueden cambiar para que sean a otros como [NextDNS](https://my.nextdns.io).
 
 Los dominios **hay que pagarlos**, esta es la parte mala. Los más baratos suelen estar entre 10€ y 15€ anuales, aunque el primer año suele costar menos.
 
@@ -59,13 +59,13 @@ Así se ven los nameservers de nuestro dominio al cambiarlos a FreeDNS:
 
 ## Actualizando la IP pública en el domino automáticamente
 
-FreeDNS nos permite gestionar todos los subdominios y actualizar la IP a la que apuntan símplemente con un enlace, que debemos abrir desde el servidor. Esto hará que dejempos de preocuparnos por si estamos fuera de casa y de repente nuestra IP pública cambia, ya que si no se actualizara automáticamente, perderíamos acceso al servidor a través del dominio y para poder conectarnos tendríamos que averiguar la nueva IP pública, cosa que no es precisamente sencilla.
+FreeDNS nos permite gestionar todos los subdominios y actualizar la IP a la que apuntan símplemente con un enlace, que debemos abrir desde el servidor. Esto hará que dejemos de preocuparnos por si estamos fuera de casa y de repente nuestra IP pública cambia, ya que si no se actualizara automáticamente, perderíamos acceso al servidor a través del dominio y para poder conectarnos tendríamos que averiguar la nueva IP pública, cosa que no es precisamente sencilla.
 
 Teniendo una cuenta de FreDNS y el dominio con sus nameservers, podemos ir al apartado de **Dynamic DNS** y copiar la **Direct URL** para actualizar la IP de nuestro dominio.
 ![FreeDNS](../images/freedns.png)
 En este caso cualesquiera de las URLs nos serviría, ya que tanto el dominio como los subdominios apuntan a la misma IP y está activada la opción **Link updates of the same IP together**, haciendo que al actualizar un dominio o subdominio, se actualicen los demás que aputaban a la misma IP.
 
-Vayamos al servidor. Debemos tener installado `crontab`, un software para ejecutar tareas cada cierto tiempo. Escribimos `sudo crontab -e` *(importante el sudo)* y el archivo debería quedar más o menos así:
+Vayamos al servidor. Debemos tener installado `crontab`, un software para ejecutar tareas cada cierto tiempo. Escribimos `sudo crontab -e` *(importante el sudo para que se asocie al usuario root, ya que nos será cómodo para un futuro)* y el archivo debería quedar más o menos así:
 
 ```bash
 # 
@@ -101,12 +101,12 @@ Por defecto, el router no deja que alguien se conecte mediante la IP pública a 
 
 ### Breve introdución sobre los puertos
 
-Para que varios programas puedan conectarse a internet y hacer cosas distintas simultáneamente es necesario el uso de puertos. Los puertos son puntos de transmisión y recepción de datos, están numerados del 1 al 65535 y algunos de ellos están reservados para un uso específico, por ejemplo:
+Para que varios programas puedan conectarse a internet y hacer cosas distintas simultáneamente se utilizan los puertos. Los puertos son puntos de transmisión y recepción de datos *(no son nada físico, solo un número que ayuda a gestionar mejor las conexiones)*, están numerados del 1 al 65535 y algunos de ellos están reservados o son los más habituales para un uso específico, por ejemplo:
 - Los puertos 20 y 21 se utilizan para transferencia de archivos.
-- El puerto 22 se utilia para las conexiones de *Secure Shell* *(SSH)* de las que hablaremos en la siguiente sección.
-- El puerto 80 se utiliza para las conexiones de *Hypertext Transfer Protocol* *(HTTP)*, que es el protocolo por el que funcionan las páginas web.
+- El puerto 22 se utilia para las conexiones de Secure Shell *(SSH)* de las que hablaremos en la siguiente sección.
+- El puerto 80 se utiliza para las conexiones de Hypertext Transfer Protocol *(HTTP)*, que es el protocolo por el que funcionan las páginas web.
 - El puerto 123 se utiliza para el Network Time Protocol *(NTP)* para que los relojes de los ordenadoes estén sincronizados.
-- El puerto 443 se utiliza para las conexiones *HTTP Secure* *(HTTPS)*, actuando como sustituto del puerto *HTTP*, ya que todas las conexiones deberían ir cifradas.
+- El puerto 443 se utiliza para las conexiones HTTP Secure *(HTTPS)*, actuando como sustituto del puerto *HTTP*, ya que todas las conexiones deberían ir cifradas.
 - El puerto 25565 es el más común para los servidores de Minecraft.
 
 Pues bien, por defecto estos puertos no están abiertos para que un dispositivo cualquiera de internet pueda llegar y conectarse a nuestro ordenador a través de ellos. Esto está bien, porque, a no ser que tengas un servidor en tu casa, si alguien intenta conectarse a alguno de los puertos de tu ordenador no suele ser con buenas intenciones.
