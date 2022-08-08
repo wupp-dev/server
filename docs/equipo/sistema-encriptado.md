@@ -21,7 +21,7 @@ Hay varias opciones para escoger como sistema operativo:
 - [Ubuntu Server](https://ubuntu.com/download/server).
 - [Fedora Server](https://getfedora.org/en/server/).
 
-Esos solo algunos ejemplos, pero hay muchas opciones. En nuestro caso, el servidor tuvo instalado al principio Ubuntu Server, pero Lucas se puso tonto, así que ha habido que cambiarlo a **Debian**, que según él es mejor *(**Spoiler:** No ha probado Ubuntu Server)*.
+Esos son solo algunos ejemplos, pero hay muchas opciones. En nuestro caso, el servidor tuvo instalado al principio Ubuntu Server, pero Lucas se puso tonto, así que ha habido que cambiarlo a **Debian**, que según él es mejor *(**Spoiler:** No ha probado Ubuntu Server)*.
 
 ::: danger PELIGRO
 Toda persona que use Windows Server será perseguida y juzgada por sus crímenes contra la humanidad.
@@ -35,9 +35,7 @@ Actualmente la versión de Debian del servidor es la 11, también llamada Bullse
 Esa ISO de Debian necesita que el servidor se pueda conectar a internet en el momento de la instalación, así que ten preparado el cable para conectarlo.
 :::
 
-Una vez descargada la ISO, tenemos que grabarla en el pendrive:
-- Si estás en **Windows**, puedes hacerlo con [Rufus](https://rufus.ie/en/).
-- Si estás en **Linux**, puedes hacerlo con [Balena Etcher](https://www.balena.io/etcher/).
+Una vez descargada la ISO, tenemos que grabarla en el pendrive cosa que se puede hacer con [Balena Etcher](https://www.balena.io/etcher/).
 
 Ese pendrive lo cogemos y lo enchufamos al servidor.
 
@@ -59,7 +57,7 @@ Salimos guardando los cambios y el ordeandor debería reiniciarse y mostrar el i
 
 ## Instalación de Debian 11
 
-Así debería verse nuestro instalador:
+Así se verá nuestro instalador:
 
 ![Instalador](../images/debian-inicio.png)
 
@@ -68,13 +66,13 @@ La instalación gráfica y la otra son prácticamente iguales, la diferencia es 
 Primero tocará elegir el idioma y la distribución del teclado *(nosotros hemos elegido Español para mayor comodidad)*. Después se intentará conectar a internet y tocará poner unos cuantos datos:
 1. El nombre de la máquina, como puede ser `server`
 2. El nombre del dominio, que para nuestro servidor es `servermamadisimo.xyz` *(si no tienes el dominio o no sabes qué es, puedes hacerte spolier mirando la sección de [Router y dominio](./router-dominio.html#dominio-%C2%BFque-es-y-para-que-sirve))*.
-3. La contraseña para el usuario `root`. Esta contraseña tiene que ser **potente**, como de 20 caracteres, porque es la que permite hacer cualquier cambio.
+3. La contraseña para el usuario `root`. Esta contraseña tiene que ser **potente**, como de 20 caracteres, porque es la que permite hacer cualquier cambio en el sistema operativo.
 
 ::: tip TRUQUITO
 Puedes generar, guardar y gestionar contraseñas cómodamente con [Bitwarden](https://bitwarden.com/).
 :::
 
-4. El nombre del usuario administrativo, como puede ser `admin` *(tanto para el nombre completo como para el nombre de usuario)*.
+4. El nombre del usuario administrativo, por ejemplo, `admin` *(tanto para el nombre completo como para el nombre de usuario)*.
 
 ::: warning ADVERTENCIA
 El usuario escogido en la guía es `admin`. Este nombre es de ejemplo y Debian no te dejará usarlo. Intenta escoger otro distinto que no sea tan fácil de averiguar.
