@@ -12,6 +12,8 @@ Un servidor es un ordenador al que no quieres tenerle conectado ni un monitor ni
 
 Pero sí que hay que conectarse a él normalmente para instalar y desinstalar software y para configurarlo. Esto lo haremos desde otro ordenador usando el protocolo *Secure Shell (SSH)*, que nos permitirá ejecutar comandos en el servidor, transferir archivos y otras cosas más chulas que veremos después. Todo ello con una conexión cifrada :D
 
+![Conexión SSH](../images/conexion-ssh.jpg)
+
 Es aquí donde se nos plantea un gran problema: Cuando nos podemos conectar al servidor mediante SSH es cuando está encendido *(y con los discos desencriptados)*, pero ¿y si no estamos en casa y el ordenador se ha tenido que reiniciar o ha habido un apagón? Entonces el ordenador se quedaría esperando a que pusiéramos *(¡con un teclado!)* la contraseña para desencriptar los discos y así poder seguir encendiéndose. Esto no mola. Deberíamos de poder desencriptar el ordenador remotamente también para no tener miedo.
 
 Este problema lo resolveremos tras preparar el servidor para el uso habitual.
@@ -23,7 +25,7 @@ Vamos a empezar dejando lista nuestra vía para poder gestionar remotamente el s
 Como lo elegimos a la hora de instalar Debian, el servidor ya viene con OpenSSH Server instalado, que por defecto se ejecuta en el puerto `22`.
 
 ::: warning ADVERTENCIA
-Es recomendable no usar el puerto 22 para SSH, porque, al ser el puerto por defecto, muchos ataques automatizados solo intentan conectarse a ese puerto, así que cambiándolo a otro nos ahorraremos posibles problemas. Quien quiera averiguar en qué puerto tenemos el SSH podrá hacerlo con un escaneo de puertos igualmente, pero ya tendrá que querer atacarte a ti en concreto.
+Es recomendable no usar el puerto 22 para SSH, porque, al ser el puerto por defecto, muchos ataques automatizados solo intentan conectarse a ese puerto, así que cambiándolo a otro nos ahorraremos posibles problemas. Quien quiera averiguar en qué puerto tienes el SSH podrá hacerlo con un escaneo de puertos igualmente, pero ya tendrá que querer atacarte a ti en concreto.
 :::
 
 Sin embargo, si intentamos conectarnos desde otro ordenador, no nos dejará, por dos motivos:
@@ -37,21 +39,26 @@ $ sudo ufw allow 22/tcp
 $ sudo ufw enable
 ```
 
-Donde `22` es el puerto de SSH. Con esto ya tenemos el *firewall* configurado para aceptar conexiones SSH.
+Donde `22` es el puerto de SSH y `tcp` el protocolo, que puedes leer [aquí](https://nordvpn.com/es/blog/protocolo-tcp-udp/) las diferencias entre el protocolo TCP y el UDP. Con esto ya tenemos el *firewall* configurado para aceptar conexiones SSH.
 
-Con esto ya nos podríamos conectarnos al servidor desde otro ordenador, pero tendría que ser con la contraseña del usuario administrador, cosa que es poco segura, así que vamos a utilizar la autenticación por claves SSH.
+Ahora ya nos podríamos conectarnos al servidor desde otro ordenador, pero tendría que ser con la contraseña del usuario administrador, cosa que es poco segura, así que vamos a utilizar la autenticación por claves SSH.
 
-Para configurarla en el ordenador del que nos vayamos a conectar, seguiremos [este tutorial](https://www.digitalocean.com/community/tutorials/how-to-configure-ssh-key-based-authentication-on-a-linux-server). Además, tiene al final una parte de configuración que también se debe hacer e incluiremos más adelante en el tutorial.
+Para configurarla en el ordenador del que nos vayamos a conectar, seguiremos [este tutorial](https://www.digitalocean.com/community/tutorials/how-to-configure-ssh-key-based-authentication-on-a-linux-server). Además, tiene al final una parte de configuración que también se debe hacer e incluiremos más adelante en la guía.
 
 ## Reinicios y desencriptación del disco
 
 Por suerte para nosotros, existe un paquete de Debian llamado `dropbear-initramfs` que nos va a permitir hacer justo lo que queremos. **¿Qué es lo que hace?** Pues para eso hay que entender un poco cómo se enciende un ordenador con Linux y los discos encriptados.
 
-El disco duro realmente no está encriptado del todo, tiene una partición llamada *boot* que únicamente contiene la información necesaria para decirle al ordenador cuando se intenta encender cómo debe hacerlo. Es decir, le dice al ordenador, entre otras cosas, que los discos están encriptados y que hay que introducir una contraseña para desencriptarlos. A esto se le llama `initramfs`, que son los archivos básicos que se cargan en la RAM cuando el ordenador se enciende y, junto con el kernel de Linux, se ocupan de gestionar el encendido.
+El disco duro realmente no está encriptado del todo, tiene una partición llamada *boot* que únicamente contiene la información necesaria para decirle al ordenador cuando se intenta encender cómo debe hacerlo. A esto se le llama `initramfs`, que son los archivos básicos que se cargan en la RAM cuando el ordenador se enciende y, junto con el kernel de Linux, se ocupan de gestionar el encendido. Puedes ver una descripción más detallada en [esta página](https://wiki.ubuntu.com/Initramfs).
 
-Así, `dropbear-initramfs` es un software que permite que el servidor reciba conexiones SSH en esta fase del encendido, justo a tiempo para poner la contraseña para desencriptar los discos.
+Teniendo en cuenta lo anterior, `dropbear-initramfs` es un software que permite que el servidor reciba conexiones SSH en esta fase del encendido, justo a tiempo para poner la contraseña para desencriptar los discos.
 
-Y para instalarlo es muy sencillo, solo hay que irse a la terminal del servidor e instalarlo como un paquete normal y corriente escribiendo `sudo apt install dropbear-initramfs`. **¿Eso es todo?** Obviamente no, hay que configurarlo.
+E instalarlo es muy sencillo, solo hay que irse a la terminal del servidor e instalarlo como un paquete normal y corriente escribiendo
+```
+$ sudo apt install dropbear-initramfs
+```
+
+**¿Eso es todo?** Obviamente no, hay que configurarlo.
 
 Vamos a editar el archivo de configuración, que está en `/etc/dropbear-initramfs/config` y vamos a descomentar y editar la línea:
 ```
@@ -65,12 +72,13 @@ DROPBEAR_OPTIONS="-I 300 -j -k -p 22 -s"
 - `-p 22` indica que se ejecute en el puerto 22.
 - `-s` Deshabilita la autenticación por contraseña.
 
-Como indica el último parámetro, la autenticación por contraseña está deshabilitada, así que utilizaremos también las claves públicas que hayamos autorizado para OpenSSH Server, podemos copiarlas directamente con el comando:
+Como indica el último parámetro, la autenticación por contraseña está deshabilitada, así que utilizaremos también las claves públicas que hayamos autorizado para OpenSSH Server, podemos copiarlas y hacer que los cambios tengan efecto con los comandos:
 ```
 $ sudo cp /home/user/.ssh/authorized_keys /etc/dropbear-initramfs/
+$ sudo update-initramfs -u
 ```
 
-Por útlimo, para que los cambios tengan efecto, tenemos que escribir `sudo update-initramfs -u`. Esto guardará de nuevo los archivos de `initramfs` incluyendo los cambios que hemos hecho.
+Esto generará de nuevo en la partición `boot` los archivos de `initramfs` incluyendo los cambios que hemos hecho.
 
 ## Resolviendo problemas
 
@@ -95,9 +103,9 @@ Host key for servermamadisimo.xyz has changed and you have requested strict chec
 Host key verification failed.
 ```
 
-¿Qué es lo que ocurre? Pues que la IP a la que nos estamos conectando es la misma pero las claves públicas del servidor, que son las que se utilizan para verificar su identidad, son distintas. Esto el ordenador lo confunde *(por precaución)* con un intento de suplantar la identidad del servidor, cosa que sería muy peligrosa en caso de ser cierta. Por eso no nos deja conectarnos.
+¿Qué es lo que ocurre? Pues que la IP a la que nos estamos conectando es la misma pero las claves públicas del servidor, que son las que se utilizan para verificar su identidad, son distintas. Esto el ordenador lo confunde *(por precaución)* con un intento de suplantación de la identidad del servidor, cosa que sería muy peligrosa en caso de ser cierta. Por eso no nos deja conectarnos.
 
-Para que nos deje conectarnos es tan sencillo como eliminar el archivo de `known_hosts` mencionado en el error, pero entonces cada vez que reiniciásemos el servidor tendríamos que estar eliminando ese archivo para poder conectarnos de nuevo.
+Para que nos deje conectarnos es tan sencillo como eliminar el archivo de `known_hosts` mencionado en el error, pero entonces cada vez que reiniciásemos el servidor tendríamos que estar eliminando ese archivo para poder conectarnos de nuevo y, si de verdad estuviesen intentando suplantar la identidad del servidor, no nos enteraríamos.
 
 Por suerte, hay un apaño. Si ponemos Dropbear y OpenSSH Server en puertos distintos en el servidor, podemos utilizar una identidad distinta para cada puerto cuando nos conectemos.
 
@@ -122,9 +130,13 @@ $ sudo systemctl restart ssh
 Iván mientras escribía esto *(desde un sitio lejano a la ubicación del servidor)* se olvidó de permitir el nuevo puerto en el firewall y pasaron cosas malas, si quieres leer la historia completa puedes hacerlo [aquí](../relatos/bloqueo-ssh).
 :::
 
-Si ahora nos vamos a nuestro ordenador y editamos el archivo `/home/user/.ssh/known_hosts`...
+A partir de ahora ya no deberíamos tener el problema al conectarnos, lo único que hay que tener en cuenta es que, a la hora de establecer la conexión SSH, tendremos que indicar el puerto:
 
-### Reforzando la seguridad
+```
+$ ssh -p 2222 admin@servermamadisimo.xyz
+```
+
+## Reforzando la seguridad
 
 ---- POR HACER ----
 
