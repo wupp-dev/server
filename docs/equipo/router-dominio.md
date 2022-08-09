@@ -101,13 +101,15 @@ Por defecto, el router no deja que alguien se conecte mediante la IP pública a 
 
 ### Breve introdución sobre los puertos
 
-Para que varios programas puedan conectarse a internet y hacer cosas distintas simultáneamente se utilizan los puertos. Los puertos son puntos de transmisión y recepción de datos *(no son nada físico, solo un número que ayuda a gestionar mejor las conexiones)*, están numerados del 1 al 65535 y algunos de ellos están reservados o son los más habituales para un uso específico, por ejemplo:
+Para que varios programas puedan conectarse a internet y hacer cosas distintas simultáneamente se utilizan los puertos. Los puertos son puntos de transmisión y recepción de datos *(no son nada físico, solo un número que ayuda a gestionar mejor las conexiones)*, están numerados del 0 al 65535 y algunos de ellos están reservados o son los más habituales para un uso específico, por ejemplo:
 - Los puertos 20 y 21 se utilizan para transferencia de archivos.
 - El puerto 22 se utilia para las conexiones de Secure Shell *(SSH)* de las que hablaremos en la siguiente sección.
 - El puerto 80 se utiliza para las conexiones de Hypertext Transfer Protocol *(HTTP)*, que es el protocolo por el que funcionan las páginas web.
 - El puerto 123 se utiliza para el Network Time Protocol *(NTP)* para que los relojes de los ordenadoes estén sincronizados.
 - El puerto 443 se utiliza para las conexiones HTTP Secure *(HTTPS)*, actuando como sustituto del puerto *HTTP*, ya que todas las conexiones deberían ir cifradas.
 - El puerto 25565 es el más común para los servidores de Minecraft.
+
+**Nota:** Puedes ver los puertos mejor explicados [aquí](https://www.adslzone.net/como-se-hace/internet/abrir-puertos-router/).
 
 Pues bien, por defecto estos puertos no están abiertos para que un dispositivo cualquiera de internet pueda llegar y conectarse a nuestro ordenador a través de ellos. Esto está bien, porque, a no ser que tengas un servidor en tu casa, si alguien intenta conectarse a alguno de los puertos de tu ordenador no suele ser con buenas intenciones.
 
@@ -120,6 +122,8 @@ Esto no quiere decir que de aquí en adelante cualquier persona se vaya a poder 
 ### Abriendo puertos en el router (tengo que poner imágenes)
 
 Lo primero es saber si tú desde tu casa puedes configurar tu router o debes contactar con el proveedor de internet para que lo haga, aunque lo más común es que sí puedas configurarlo.
+
+**Nota:** Nuevamente, en [esta página](https://www.adslzone.net/como-se-hace/internet/abrir-puertos-router/) está mejor explicado cómo abrir los puertos.
 
 Para configurarlo tienes que conectarte a la IP de la puerta de enlace del router, que suele ser `192.168.1.1`. Puedes conectarte simplemente abriendo el navegador y poniendo la IP en la barra superior como si de una URL se tratara.
 
