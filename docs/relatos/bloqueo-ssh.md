@@ -72,3 +72,5 @@ Borrando `unset ROOT` de más arriba, ya que esa variable contenía el nombre de
 Sabiendo esto, solo hubo que esperar a que la persona encargada de reiniciar el servidor lo hiciese bajando y subiendo los plomos del piso.
 
 Lo hizo y el servidor volvió a la vida :D
+
+![Kalm](../images/kalm.png)
