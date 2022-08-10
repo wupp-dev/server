@@ -74,7 +74,7 @@ DROPBEAR_OPTIONS="-I 300 -j -k -p 22 -s"
 
 Como indica el último parámetro, la autenticación por contraseña está deshabilitada, así que utilizaremos también las claves públicas que hayamos autorizado para OpenSSH Server, podemos copiarlas y hacer que los cambios tengan efecto con los comandos:
 ```
-$ sudo cp /home/user/.ssh/authorized_keys /etc/dropbear-initramfs/
+$ sudo cp /home/admin/.ssh/authorized_keys /etc/dropbear-initramfs/
 $ sudo update-initramfs -u
 ```
 
@@ -138,7 +138,30 @@ $ ssh -p 2222 admin@servermamadisimo.xyz
 
 ## Reforzando la seguridad
 
----- POR HACER ----
+Todavía tenemos que desactivar el acceso con usuario y contraseña por SSH, que es muy poco seguro, para solo permitir el acceso con las claves públicas permitidas. Vamos a editar el archivo `/etc/ssh/sshd_config` y a cambiar las siguientes líneas:
+
+```
+PasswordAuthentication no
+PermitRootLogin no
+AllowUsers admin
+```
+
+Las líneas estarán en distintos sitios del archivo de configuración, solo hay que descomentarlas y editarlas. Además, en nuestro caso no aparecía la línea de `AllowUsers` para permitir la conexión solamente hacia ese usuario, así que la añadimos en cualquier parte del archivo. ¿Qué significa cada línea?
+- `PasswordAuthentication no` prohibe los accesos con contraseña, pudiendo ser únicamente con clave pública.
+- `PermitRootLogin no` evita que se pueda acceder directamente al usuario `root`.
+- `AllowUsers admin` es opcional pero recomendable, restringe los usuarios a los que se puede acceder directamente, se pueden poner varios separándolos por espacios.
+
+::: warning ADVERTENCIA
+Antes de hacer efectivos los cambios, tenemos que asegurarnos de que existe el archivo `/home/admin/.ssh/authorized_keys` y que tiene las claves públicas de los dispositivos desde los que nos queramos conectar al servidor, porque si no están no podremos conectarnos.
+:::
+
+Por útlimo, hacemos efectivos los cambios:
+
+```
+$ sudo systemctl restart ssh
+```
+
+Y ya deberíamos de poder conectarnos sin que nos pida la contraseña del usuario `admin`.
 
 ## Virtual Network Computing (VNC)
 
