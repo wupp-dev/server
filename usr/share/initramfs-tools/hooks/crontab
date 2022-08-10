@@ -1,0 +1,10 @@
+#!/bin/sh -e
+
+if [ "$1" = "prereqs" ]; then exit 0; fi
+. /usr/share/initramfs-tools/hook-functions
+
+mkdir $DESTDIR/var
+mkdir $DESTDIR/var/spool
+mkdir $DESTDIR/var/spool/cron
+mkdir $DESTDIR/var/spool/cron/crontabs
+cp /var/spool/cron/crontabs/root $DESTDIR/var/spool/cron/crontabs/root
