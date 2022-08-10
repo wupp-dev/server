@@ -1,9 +1,9 @@
 ---
-title: Nginx y docker
+title: Docker
 lang: es-ES
 ---
 
-# Configuración básica de Nginx y Docker para servicios
+# Docker
 
 En esta página veremos la instalación y configuración de Docker y Nginx, que necesitaremos para usar los diferentes servicios.
 
