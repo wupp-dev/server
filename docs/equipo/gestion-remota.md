@@ -80,6 +80,8 @@ $ sudo update-initramfs -u
 
 Esto generará de nuevo en la partición `boot` los archivos de `initramfs` incluyendo los cambios que hemos hecho.
 
+**POR HACER:** Cron para la IP en Initramfs.
+
 ## Resolviendo problemas
 
 Un problema con el que nos encontramos cuando intentamos conectarnos al servidor por SSH primero para desencriptar los discos y después para el uso normal, es que nos salta este error:
@@ -190,3 +192,8 @@ $ vncserver
 Es raro necesitar el servidor VNC, pero justo estoy escribiendo esta parte antes que la de configuración de servidor SSH porque necesito abrir unos puertos en el router y para eso necesito acceder con un navegador desde el servidor.
 Como era de esperar, Debian no venía con navegador instalado, así que para poder usar uno con el VNC instalamos Firefox con `sudo apt install firefox-esr`.
 :::
+<<<<<<< HEAD
+=======
+
+Importante no olvidar hacer que el servidor VNC se ejecute cada vez que el servidor se encienda, si no, tendremos que ejecutarlo manualmente antes de conectarnos.
+>>>>>>> efd50a2 (Historieta)
