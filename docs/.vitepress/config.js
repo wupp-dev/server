@@ -18,7 +18,8 @@ let guideSidebar = [
         text: "Gestión remota con SSH y VNC",
         link: "/equipo/gestion-remota",
       },
-      { text: "Nginx y docker", link: "/equipo/nginx-docker" },
+      { text: "Nginx como servidor web", link: "/equipo/nginx" },
+      { text: "Docker", link: "/equipo/docker" },
     ],
   },
   {
