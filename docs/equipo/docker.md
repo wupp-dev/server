@@ -24,9 +24,8 @@ $ echo \
   $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 $ sudo apt update
 $ sudo apt install docker-ce docker-ce-cli containerd.io docker-compose-plugin
-$ sudo adduser -m docker
-$ sudo groupadd docker
-$ sudo usermod -aG docker docker
+$ sudo adduser dockeruser
+$ sudo usermod -aG docker dockeruser
 $ sudo cp ./home/docker/ /home/docker/
 ```
 
@@ -74,18 +73,19 @@ De nuevo, si no confías lo suficiente en `apt`, comprueba que todo está bien e
 Para ejecutar el inmejorable Docker vamos a crear un diferente usuario para ejecutar Docker, así mejoramos ligeramente la seguridad. Para que un usuario pueda ejecutar Docker sin tener que hacer `sudo` y ejecutarlo como _root_, hay que añadirlo al grupo _docker_. Desde tú usuario de administración con `sudo` aún instalado, vamos a ello entonces:
 
 ```bash
-$ sudo adduser -m docker # Creación del usuario y su home en /home/docker
-$ sudo groupadd docker # Creación del grupo docker
-$ sudo usermod -aG docker docker # Añadir el usuario al grupo (sí, se llaman igual, tú confía)
+$ sudo adduser docker # Creación del usuario y su home en /home/dockeruser
+$ sudo usermod -aG docker dockeruser # Añadir el usuario al grupo
 ```
 
 ## Archivos para Docker
 
-Antes de cambiar al usuario `docker`, aún con el usuario de administrador copiaremos todos los contenidos de _\<repo_root\>/home/docker_ a la carpeta de _/home/docker_ en nuestro sistema (**importante hacerlo como el usuario administrador, con el usuario `docker` no nos dejará**). Aquí están los archivos de configuración de todos los servicios y el famoso `docker-compose.yml`. Así que, **encontrándonos en la carpeta del clon del repositorio del server**, ejecutamos:
+Antes de cambiar al usuario `dockeruser`, aún con el usuario de administrador copiaremos todos los contenidos de este repositorio _\<repo_root\>/home/dockeruser_ a la carpeta de _/home/dockeruser_ en nuestro sistema (**importante hacerlo como el usuario administrador, con el usuario `dockeruser` no nos dejará**). Aquí están los archivos de configuración de todos los servicios y el famoso `docker-compose.yml`. Así que, **encontrándonos en la carpeta del clon del repositorio del server**, ejecutamos:
 
 ```bash
-$ sudo cp ./home/docker/ /home/docker/
+$ sudo cp ./home/dockeruser/ /home/dockeruser/
 ```
+
+Donde se asume que estamos la raiz del repositorio.
 
 ## El `docker-compose.yml`
 
