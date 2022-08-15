@@ -2,7 +2,7 @@ version: "3.9"
 
 volumes:
   nextcloud:
-  nextcloud-db:
+  # nextcloud-db:
   authentik-db:
     driver: local
   authentik-geoip:
@@ -10,17 +10,28 @@ volumes:
   uptime-kuma:
 
 services:
-  nextcloud-db:
+  db:
     image: mariadb:10.5
     restart: always
-    command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
+    # command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
     volumes:
-      - nextcloud-db:/var/lib/mysql
+      - ./db:/var/lib/mysql
     environment:
-      - MYSQL_ROOT_PASSWORD=Password
-      - MYSQL_PASSWORD=Password
-      - MYSQL_DATABASE=nextcloud
-      - MYSQL_USER=nextcloud
+      - MARIADB_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}
+      - MARIADB_PASSWORD=${MARIADB_PASSWORD}
+      - MARIADB_DATABASE=${MARIADB_DATABASE}
+      - MARIADB_USER=${MARIADB_USER}
+    entrypoint: |
+      sh -c "
+        echo 'CREATE DATABASE IF NOT EXISTS ${GITEA_DATABASE};' > /docker-entrypoint-initdb.d/init.sql;
+        /usr/local/bin/docker-entrypoint.sh --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+      "
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8088:8080
 
   nextcloud:
     image: nextcloud
@@ -28,29 +39,32 @@ services:
     ports:
       - 8080:80
     links:
-      - nextcloud-db
+      - db
     volumes:
-      - nextcloud:/var/www/html
+      - ./nextcloud:/var/www/html
     environment:
-      - MYSQL_PASSWORD=Password
-      - MYSQL_DATABASE=nextcloud
-      - MYSQL_USER=nextcloud
-      - MYSQL_HOST=nextcloud-db
+      - MYSQL_PASSWORD=${MARIADB_PASSWORD}
+      - MYSQL_DATABASE=${NEXTCLOUD_DATABASE}
+      - MYSQL_USER=${MARIADB_USER}
+      - MYSQL_HOST=db
+
+  dash:
+    image: mauricenino/dashdot:latest
+    restart: unless-stopped
+    privileged: true
+    ports:
+      - "7676:3001"
+    volumes:
+      - /:/mnt/host:ro
 
   homarr:
-    image: ghcr.io/ajnart/homarr:latest
+    image: ghcr.io/ajnart/homarr:0.9.2
     restart: unless-stopped
     volumes:
       - ./homarr/configs:/app/data/configs
       - ./homarr/icons:/app/public/icons
     ports:
       - "7575:7575"
-
-  # web:
-  #   image: server
-  #   restart: always
-  #   ports:
-  #     - 80:8000
 
   authentik-db:
     image: postgres:12-alpine
@@ -69,6 +83,7 @@ services:
       - POSTGRES_DB=${PG_DB:-authentik}
     # env_file:
     #   - .env
+
   authentik-redis:
     image: redis:alpine
     restart: unless-stopped
@@ -78,6 +93,7 @@ services:
       interval: 30s
       retries: 5
       timeout: 3s
+
   authentik-server:
     image: ${AUTHENTIK_IMAGE:-ghcr.io/goauthentik/server}:${AUTHENTIK_TAG:-2022.6.1}
     restart: unless-stopped
@@ -100,6 +116,7 @@ services:
     ports:
       - 9000:9000
       - 9443:9443
+
   authentik-worker:
     image: ${AUTHENTIK_IMAGE:-ghcr.io/goauthentik/server}:${AUTHENTIK_TAG:-2022.6.1}
     restart: unless-stopped
@@ -123,6 +140,7 @@ services:
       - authentik-geoip:/geoip
     # env_file:
     #   - .env
+
   authentik-geoipupdate:
     image: "maxmindinc/geoipupdate:latest"
     volumes:
@@ -144,15 +162,20 @@ services:
     image: louislam/uptime-kuma:1
     restart: always
     volumes:
-      - uptime-kuma:/app/data
+      - ./uptime-kuma:/app/data
     ports:
       - 3001:3001
 
   gitea:
     image: gitea/gitea:1.16.8
     environment:
-      - USER_UID=1000
-      - USER_GID=1000
+      - USER_UID=${GITEA_USER_UID}
+      - USER_GID=${GITEA_USER_GID}
+      - GITEA__database__DB_TYPE=mysql
+      - GITEA__database__HOST=db:3306
+      - GITEA__database__NAME=${GITEA_DATABASE}
+      - GITEA__database__USER=${MARIADB_USER}
+      - GITEA__database__PASSWD=${MARIADB_PASSWORD}
     restart: always
     volumes:
       - ./gitea:/data
@@ -161,3 +184,19 @@ services:
     ports:
       - "3000:3000"
       - "222:22"
+    depends_on:
+      - db
+    # env_file:
+    #   - .env
+
+  navidrome:
+    image: deluan/navidrome:latest
+    user: 1000:1000
+    restart: always
+    volumes:
+      - /home/hipy/Music:/music
+      - /home/hipy/navidrom/data:/data:rw
+    ports:
+      - "4533:4533"
+    environment:
+      - ND_LOGLEVEL=info
