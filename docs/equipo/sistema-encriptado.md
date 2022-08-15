@@ -164,4 +164,77 @@ admin  ALL=(ALL:ALL) ALL
 
 Donde `admin` será el usuario que creamos. Guardamos el archivo y ya podemos escribir `exit` para salirnos del usuario `root`. A partir de ahora lo normal será usar `sudo` para instalar cosas o editar archivos.
 
-**POR HACER:** Añadir el resto de discos, encriptarlos y configurar cryptab.
+### Optimizando el disco SSD
+
+**Si tenemos el sistema operativo en un disco SSD**, como es el caso, hay unos cambios que podemos hacer para mejorar el rendimiento y la durabilidad del disco, tenemos que editar `/etc/fstab`, concretamente la primera línea sin comentar, que debería ser la correspondiente al sistema de archivos `root`, añadiendo unas opciones extra para cuando se monte la partición:
+
+```
+# /etc/fstab: static file system information.
+#
+# Use 'blkid' to print the universally unique identifier for a
+# device; this may be used with UUID= as a more robust way to name devices
+# that works even if disks are added and removed. See fstab(5).
+#
+# systemd generates mount units based on this file, see systemd.mount(5).
+# Please run 'systemctl daemon-reload' after making changes here.
+#
+# <file system> <mount point>   <type>  <options>       <dump>  <pass>
+/dev/mapper/server--vg-root /               btrfs   defaults,subvol=@rootfs,ssd,noatime,space_cache,commit=120,compress=zstd,discard=async 0       0
+```
+
+El resto de líneas que haya debajo las dejamos intactas.
+
+### Montando el disco tocho en el encendido
+
+Como que tenemos un disco duro de 4TB que vamos a usar para almacenar archivos, necesitamos que se desencripte también y se monte al encenderse el servidor, así que vamos a ello.
+
+Lo primero es que se desencripte, para ello tendremos que añadir el disco a  `/etc/crypttab`, pero como ese queremos que se desencripte solo sin tener que ponerle nosotros la contraseña, tendremos que crear un archivo que servirá como contraseña para desencriptar el disco. Localizamos el disco, que en este caso es `sdb1`:
+
+```
+$ lsblk
+NAME                    MAJ:MIN RM   SIZE RO TYPE  MOUNTPOINT
+sda                       8:0    0 447,1G  0 disk  
+├─sda1                    8:1    0   512M  0 part  /boot/efi
+├─sda2                    8:2    0   488M  0 part  /boot
+└─sda3                    8:3    0 446,2G  0 part  
+  └─sda3_crypt          254:0    0 446,1G  0 crypt 
+    ├─server--vg-root   254:1    0 445,1G  0 lvm   /var/lib/docker/btrfs
+    └─server--vg-swap_1 254:2    0   976M  0 lvm   [SWAP]
+sdb                       8:16   0   3,6T  0 disk  
+└─sdb1                    8:17   0   3,6T  0 part  
+sr0                      11:0    1  1024M  0 rom  
+```
+
+Ahora hay que buscar su UUID:
+
+```
+$ ls -l /dev/disk/by-uuid
+total 0
+lrwxrwxrwx 1 root root 10 ago 10 17:47 0053a965-9146-4e52-b842-0ba1a756c4c5 -> ../../sda3
+lrwxrwxrwx 1 root root 10 ago 10 17:47 1e28c433-5bf5-41e5-9708-5730bb18d0ef -> ../../dm-2
+lrwxrwxrwx 1 root root 10 ago 10 17:47 60e8d58f-cb05-47f1-85bc-38e5b0a05505 -> ../../sdb1
+lrwxrwxrwx 1 root root 10 ago 10 17:47 a3313b2a-fe80-4f3c-a384-bbce92fd4301 -> ../../dm-1
+lrwxrwxrwx 1 root root 10 ago 10 17:47 E283-990E -> ../../sda1
+lrwxrwxrwx 1 root root 10 ago 10 17:47 eb777051-9d3a-4bf9-a186-fdfcc9d5c9c0 -> ../../sda2
+```
+ Que en este caso es `60e8d58f-cb05-47f1-85bc-38e5b0a05505`, lo guardamos y vamos a crear el archivo que servirá de clave:
+
+ ```
+$ sudo dd if=/dev/urandom of=/root/hdd_key bs=1024 count=4
+$ sudo chmod 0400 /root/hdd_key
+$ sudo cryptsetup luksAddKey /dev/sdb1 /root/hdd_key
+ ```
+
+ Lo que acabamos de hacer es crear un archivo con carácteres aleatorios *(como una contraseña básicamente pero mucho más larga)* y añadirlo como clave para desencriptar el disco duro, ya que LUKS nos permite tener varias claves. Ahora sí, hay que editar `/etc/fstab` añadiendo esta línea al final:
+ ```
+vault UUID=60e8d58f-cb05-47f1-85bc-38e5b0a05505 /root/hdd_key luks
+ ```
+
+ Donde lo primero es el nombre que tendrá el volumen, lo segundo su UUID *(no olvidar comprobar que sea el correcto)*, lo tercero el archivo donde está la clave y lo cuarto especifica que utiliza LUKS.
+
+ Muy bien, con esto el disco se desencriptará al encenderse el servidor, solo nos queda añadirlo a `/etc/fstab` para que también se monte. Añadimos esta línea al final del archivo:
+ ```
+/dev/mapper/vault /mnt/vault btrfs defaults,nofail 0 0
+ ```
+
+ Que hará que el disco se monte en `/mnt/vault` cuando se encienda el servidor. La opción `nofail` hace que, aunque no se pueda montar el disco, el ordenador se siga encendiendo en vez de fallar.
