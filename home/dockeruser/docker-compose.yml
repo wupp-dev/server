@@ -9,23 +9,38 @@ volumes:
     driver: local
   uptime-kuma:
 
+secrets:
+  mariadb_root_password:
+    external: true
+  nextcloud_db_user:
+    external: true
+  nextcloud_db_password:
+    external: true
+  authetik_db_user:
+    external: true
+  authentik_db_password:
+    external: true
+
 services:
   db:
     image: mariadb:10.5
     restart: always
-    # command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
     volumes:
       - ./db:/var/lib/mysql
+    secrets:
+      - mariadb_root_password
+      - nextcloud_db_user
+      - nextcloud_db_password
     environment:
-      - MARIADB_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}
-      - MARIADB_PASSWORD=${MARIADB_PASSWORD}
-      - MARIADB_DATABASE=${MARIADB_DATABASE}
-      - MARIADB_USER=${MARIADB_USER}
-    entrypoint: |
-      sh -c "
-        echo 'CREATE DATABASE IF NOT EXISTS ${GITEA_DATABASE};' > /docker-entrypoint-initdb.d/init.sql;
-        /usr/local/bin/docker-entrypoint.sh --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
-      "
+      - MARIADB_ROOT_PASSWORD_FILE=/run/secrets/mariadb_root_password
+      - MARIADB_USER_FILE=/run/secrets/nextcloud_db_user
+      - MARIADB_PASSWORD_FILE=/run/secrets/nextcloud_db_password
+      - MARIADB_DATABASE=${NEXTCLOUD_DB_NAME:?nextcloud database name required}
+    # entrypoint: |
+    #   sh -c "
+    #     echo 'CREATE DATABASE IF NOT EXISTS ${GITEA_DATABASE};' > /docker-entrypoint-initdb.d/init.sql;
+    #     /usr/local/bin/docker-entrypoint.sh --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    #   "
 
   adminer:
     image: adminer
@@ -42,10 +57,13 @@ services:
       - db
     volumes:
       - ./nextcloud:/var/www/html
+    secrets:
+      - nextcloud_db_password
+      - nextcloud_db_user
     environment:
-      - MYSQL_PASSWORD=${MARIADB_PASSWORD}
-      - MYSQL_DATABASE=${NEXTCLOUD_DATABASE}
-      - MYSQL_USER=${MARIADB_USER}
+      - MYSQL_PASSWORD=/run/secrets/nextcloud_db_password
+      - MYSQL_USER=/run/secrets/nextcloud_db_user
+      - MYSQL_DATABASE=${NEXTCLOUD_DB_NAME:?nextcloud database name required}
       - MYSQL_HOST=db
 
   dash:
@@ -78,9 +96,9 @@ services:
     volumes:
       - authentik-db:/var/lib/postgresql/data
     environment:
-      - POSTGRES_PASSWORD=${PG_PASS:?database password required}
-      - POSTGRES_USER=${PG_USER:-authentik}
-      - POSTGRES_DB=${PG_DB:-authentik}
+      - POSTGRES_PASSWORD=/run/secrets/authentik_db_password
+      - POSTGRES_USER=/run/secrets/authentik_db_user
+      - POSTGRES_DB=${AUTHENTIK_DB_NAME:?authentik database name required}
     # env_file:
     #   - .env
 
@@ -111,8 +129,8 @@ services:
       - ./media:/media
       - ./custom-templates:/templates
       - authentik-geoip:/geoip
-    env_file:
-      - .env
+    # env_file:
+    #   - .env
     ports:
       - 9000:9000
       - 9443:9443
