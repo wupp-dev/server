@@ -26,8 +26,8 @@ Lo recomendable, a parte de ampliar la cantidad de RAM, sería cambiarla a **DDR
 
 Al principio, el servidor contaba únicamente con un disco duro mecánico de **1TB** a **7200 RPM**, pero se ha actualizado a:
 - Un disco duro **SSD de 480GB** para almacenar el sistema operativo y el servidor de Minecraft, ya que en los foros dicen que mejora mucho el rendimiento del mundo.
-- El disco duro de **1TB** para guardar copias de seguridad tanto del sistema como del servidor de Minecraft.
-- Un disco duro mecánico de **4TB WD Red Plus de 5400 RPM** para almacenar todos los demás archivos: *Correo, Nextcloud, páginas web (incluyendo los mapas de Minecraft)...*
+- El disco duro inicial de **1TB** para guardar copias de seguridad tanto del sistema como del servidor de Minecraft.
+- Otro disco duro mecánico de **4TB WD Red Plus de 5400 RPM** para almacenar todos los demás archivos: *Correo, Nextcloud, páginas web (incluyendo los mapas de Minecraft)...*
 ::: info
 La velocidad a la que funcionan los discos duros mecánicos es importante, ya que **uno de 7200 RMP será más rápido que uno de 5400 RPM, pero se calentará más y tendrá una vida más corta.** Por eso, para el almacenamiento de archivos como los de Nextcloud y los mapas de Minecraft, es más recomendable usar un disco de 5400 RPM, ya que no necesitas una gran velocidad *(te limita normalmente la de transferencia de internet)* y te interesa que el disco duro dure más tiempo.
 :::
@@ -43,7 +43,7 @@ Además, tiene un lector de discos que no se ha usado ni se va a usar.
 
 Y de la placa base con saber que es **ATX** vamos tirando, pero no tiene ni puertos **M.2.**
 
-## Hardware externo.
+## Hardware externo
 
 A parte de tener un ordenador decente para el servidor, necesitas una buena conexión a internet. Una de las cosas **obligatorias** es tener el servidor **conectado por cable**, no por WiFi.
 

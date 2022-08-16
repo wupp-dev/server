@@ -15,10 +15,11 @@ let guideSidebar = [
         link: "/equipo/router-dominio",
       },
       {
-        text: "Gestión remota con SSH",
+        text: "Gestión remota con SSH y VNC",
         link: "/equipo/gestion-remota",
       },
-      { text: "Nginx y docker", link: "/equipo/nginx-docker" },
+      { text: "Nginx como servidor web", link: "/equipo/nginx" },
+      { text: "Docker", link: "/equipo/docker" },
     ],
   },
   {
@@ -38,6 +39,14 @@ let guideSidebar = [
         link: "/servicios/nextcloud",
       },
       { text: "Gitea - Servicio git", link: "/servicios/gogs" },
+    ],
+  },
+  {
+    text: "Relatos",
+    collapsible: true,
+    items: [
+      { text: "Initramfs vs Router", link: "/relatos/initramfs-vs-router" },
+      { text: "Bloqueo de SSH", link: "/relatos/bloqueo-ssh" },
     ],
   },
 ];
@@ -69,6 +78,7 @@ export default defineConfig({
     sidebar: {
       "/equipo/": guideSidebar,
       "/servicios/": guideSidebar,
+      "/relatos/": guideSidebar,
     },
     footer: {
       message: "Distribuido bajo la licencia CC BY.",

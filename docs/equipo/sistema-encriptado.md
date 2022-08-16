@@ -21,7 +21,7 @@ Hay varias opciones para escoger como sistema operativo:
 - [Ubuntu Server](https://ubuntu.com/download/server).
 - [Fedora Server](https://getfedora.org/en/server/).
 
-Esos solo algunos ejemplos, pero hay muchas opciones. En nuestro caso, el servidor tuvo instalado al principio Ubuntu Server, pero Lucas se puso tonto, así que ha habido que cambiarlo a **Debian**, que según él es mejor *(**Spoiler:** No ha probado Ubuntu Server)*.
+Esos son solo algunos ejemplos, pero hay muchas opciones. En nuestro caso, el servidor tuvo instalado al principio Ubuntu Server, pero Lucas se puso tonto, así que ha habido que cambiarlo a **Debian**, que según él es mejor *(**Spoiler:** No ha probado Ubuntu Server)*.
 
 ::: danger PELIGRO
 Toda persona que use Windows Server será perseguida y juzgada por sus crímenes contra la humanidad.
@@ -35,9 +35,7 @@ Actualmente la versión de Debian del servidor es la 11, también llamada Bullse
 Esa ISO de Debian necesita que el servidor se pueda conectar a internet en el momento de la instalación, así que ten preparado el cable para conectarlo.
 :::
 
-Una vez descargada la ISO, tenemos que grabarla en el pendrive:
-- Si estás en **Windows**, puedes hacerlo con [Rufus](https://rufus.ie/en/).
-- Si estás en **Linux**, puedes hacerlo con [Balena Etcher](https://www.balena.io/etcher/).
+Una vez descargada la ISO, tenemos que grabarla en el pendrive cosa que se puede hacer con [Balena Etcher](https://www.balena.io/etcher/).
 
 Ese pendrive lo cogemos y lo enchufamos al servidor.
 
@@ -59,22 +57,22 @@ Salimos guardando los cambios y el ordeandor debería reiniciarse y mostrar el i
 
 ## Instalación de Debian 11
 
-Así debería verse nuestro instalador:
+Así se verá nuestro instalador:
 
 ![Instalador](../images/debian-inicio.png)
 
-La instalación gráfica y la otra son prácticamente iguales, la diferencia es que en la gráfica podrías usar el ratón.
+La instalación gráfica y la otra son prácticamente iguales, la diferencia es que en la gráfica puedes usar el ratón.
 
 Primero tocará elegir el idioma y la distribución del teclado *(nosotros hemos elegido Español para mayor comodidad)*. Después se intentará conectar a internet y tocará poner unos cuantos datos:
 1. El nombre de la máquina, como puede ser `server`
 2. El nombre del dominio, que para nuestro servidor es `servermamadisimo.xyz` *(si no tienes el dominio o no sabes qué es, puedes hacerte spolier mirando la sección de [Router y dominio](./router-dominio.html#dominio-%C2%BFque-es-y-para-que-sirve))*.
-3. La contraseña para el usuario `root`. Esta contraseña tiene que ser **potente**, como de 20 caracteres, porque es la que permite hacer cualquier cambio.
+3. La contraseña para el usuario `root`. Esta contraseña tiene que ser **potente**, como de 20 caracteres, porque es la que permite hacer cualquier cambio en el sistema operativo.
 
 ::: tip TRUQUITO
 Puedes generar, guardar y gestionar contraseñas cómodamente con [Bitwarden](https://bitwarden.com/).
 :::
 
-4. El nombre del usuario administrativo, como puede ser `admin` *(tanto para el nombre completo como para el nombre de usuario)*.
+4. El nombre del usuario administrativo, por ejemplo, `admin` *(tanto para el nombre completo como para el nombre de usuario)*.
 
 ::: warning ADVERTENCIA
 El usuario escogido en la guía es `admin`. Este nombre es de ejemplo y Debian no te dejará usarlo. Intenta escoger otro distinto que no sea tan fácil de averiguar.
@@ -85,7 +83,7 @@ El usuario escogido en la guía es `admin`. Este nombre es de ejemplo y Debian n
 
 Después de esto toca poner una encriptación en el disco de instalación.
 
-### Encriptación en los discos
+### Encriptación del disco
 
 Para no complicarnos la vida, aquí dejaremos que Debian haga la magia de gestionar las particiones porque si no nos tocaría sufrir mucho.
 
@@ -102,7 +100,7 @@ Ahora toca lo interesante. Le decimos que use todo el disco para el particionado
 Las particiones más importantes son:
 - Una partición donde irá **el sistema operativo y todos los datos**. Por defecto aparecerá con el sistema de archivos `ext4`, uno de los más comunes en Linux.
 - Una partición de **intercambio *(SWAP)***, que se utiliza como una ampliación de la RAM.
-- Una partición `boot` para que el ordenador se pueda encender.
+- Una partición `boot` que contiene los archivos necesarios para que el ordenador se encienda.
 
 Se puede dejar tal y como está, pero nosotros hemos optado por usar `btrfs` en vez de `ext4` como sistema de archivos de la partición principal. Esto es por las grandes facilidades que da `btrfs` para hacer copias de seguridad del sistema al completo sin que ocupen casi espacio.
 
@@ -123,4 +121,120 @@ Si no quieres que se te quede la cara de tonto que se me quedó a mí ya en dos 
 
 ## Configuración básica y pequeñas mejoras
 
-**POR HACER:** Añadir el resto de discos, encriptarlos y configurar cryptab.
+Encendemos el servidor, iniciamos sesión con el nombre de usuario que creamos, con su contraseña y ya estaría.
+
+Lo primero que vamos a hacer, por comodidad, es instalar el paquete `sudo`, que nos permite hacer casi todo lo que hace el usuario `root` sin necesidad de cambiarnos a ese usuario, para ello escribimos los siquientes comandos:
+```
+$ su
+Contraseña:
+$ apt install sudo
+```
+
+Ahora queda añadir al usuario que creamos durante la instalación como *sudoer*, para ello escribimos `nano /etc/sudoers` y ponemos lo siguiente:
+```bash
+#
+# This file MUST be edited with the 'visudo' command as root.
+#
+# Please consider adding local content in /etc/sudoers.d/ instead of
+# directly modifying this file.
+#
+# See the man page for details on how to write a sudoers file.
+#
+Defaults        env_reset
+Defaults        mail_badpass
+Defaults        secure_path="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+
+# Host alias specification
+
+# User alias specification
+
+# Cmnd alias specification
+
+# User privilege specification
+root    ALL=(ALL:ALL) ALL
+admin  ALL=(ALL:ALL) ALL
+
+# Allow members of group sudo to execute any command
+%sudo   ALL=(ALL:ALL) ALL
+
+# See sudoers(5) for more information on "@include" directives:
+
+@includedir /etc/sudoers.d
+```
+
+Donde `admin` será el usuario que creamos. Guardamos el archivo y ya podemos escribir `exit` para salirnos del usuario `root`. A partir de ahora lo normal será usar `sudo` para instalar cosas o editar archivos.
+
+### Optimizando el disco SSD
+
+**Si tenemos el sistema operativo en un disco SSD**, como es el caso, hay unos cambios que podemos hacer para mejorar el rendimiento y la durabilidad del disco, tenemos que editar `/etc/fstab`, concretamente la primera línea sin comentar, que debería ser la correspondiente al sistema de archivos `root`, añadiendo unas opciones extra para cuando se monte la partición:
+
+```
+# /etc/fstab: static file system information.
+#
+# Use 'blkid' to print the universally unique identifier for a
+# device; this may be used with UUID= as a more robust way to name devices
+# that works even if disks are added and removed. See fstab(5).
+#
+# systemd generates mount units based on this file, see systemd.mount(5).
+# Please run 'systemctl daemon-reload' after making changes here.
+#
+# <file system> <mount point>   <type>  <options>       <dump>  <pass>
+/dev/mapper/server--vg-root /               btrfs   defaults,subvol=@rootfs,ssd,noatime,space_cache,commit=120,compress=zstd,discard=async 0       0
+```
+
+El resto de líneas que haya debajo las dejamos intactas.
+
+### Montando el disco tocho en el encendido
+
+Como que tenemos un disco duro de 4TB que vamos a usar para almacenar archivos, necesitamos que se desencripte también y se monte al encenderse el servidor, así que vamos a ello.
+
+Lo primero es que se desencripte, para ello tendremos que añadir el disco a  `/etc/crypttab`, pero como ese queremos que se desencripte solo sin tener que ponerle nosotros la contraseña, tendremos que crear un archivo que servirá como contraseña para desencriptar el disco. Localizamos el disco, que en este caso es `sdb1`:
+
+```
+$ lsblk
+NAME                    MAJ:MIN RM   SIZE RO TYPE  MOUNTPOINT
+sda                       8:0    0 447,1G  0 disk  
+├─sda1                    8:1    0   512M  0 part  /boot/efi
+├─sda2                    8:2    0   488M  0 part  /boot
+└─sda3                    8:3    0 446,2G  0 part  
+  └─sda3_crypt          254:0    0 446,1G  0 crypt 
+    ├─server--vg-root   254:1    0 445,1G  0 lvm   /var/lib/docker/btrfs
+    └─server--vg-swap_1 254:2    0   976M  0 lvm   [SWAP]
+sdb                       8:16   0   3,6T  0 disk  
+└─sdb1                    8:17   0   3,6T  0 part  
+sr0                      11:0    1  1024M  0 rom  
+```
+
+Ahora hay que buscar su UUID:
+
+```
+$ ls -l /dev/disk/by-uuid
+total 0
+lrwxrwxrwx 1 root root 10 ago 10 17:47 0053a965-9146-4e52-b842-0ba1a756c4c5 -> ../../sda3
+lrwxrwxrwx 1 root root 10 ago 10 17:47 1e28c433-5bf5-41e5-9708-5730bb18d0ef -> ../../dm-2
+lrwxrwxrwx 1 root root 10 ago 10 17:47 60e8d58f-cb05-47f1-85bc-38e5b0a05505 -> ../../sdb1
+lrwxrwxrwx 1 root root 10 ago 10 17:47 a3313b2a-fe80-4f3c-a384-bbce92fd4301 -> ../../dm-1
+lrwxrwxrwx 1 root root 10 ago 10 17:47 E283-990E -> ../../sda1
+lrwxrwxrwx 1 root root 10 ago 10 17:47 eb777051-9d3a-4bf9-a186-fdfcc9d5c9c0 -> ../../sda2
+```
+ Que en este caso es `60e8d58f-cb05-47f1-85bc-38e5b0a05505`, lo guardamos y vamos a crear el archivo que servirá de clave:
+
+ ```
+$ sudo dd if=/dev/urandom of=/root/hdd_key bs=1024 count=4
+$ sudo chmod 0400 /root/hdd_key
+$ sudo cryptsetup luksAddKey /dev/sdb1 /root/hdd_key
+ ```
+
+ Lo que acabamos de hacer es crear un archivo con carácteres aleatorios *(como una contraseña básicamente pero mucho más larga)* y añadirlo como clave para desencriptar el disco duro, ya que LUKS nos permite tener varias claves. Ahora sí, hay que editar `/etc/fstab` añadiendo esta línea al final:
+ ```
+vault UUID=60e8d58f-cb05-47f1-85bc-38e5b0a05505 /root/hdd_key luks
+ ```
+
+ Donde lo primero es el nombre que tendrá el volumen, lo segundo su UUID *(no olvidar comprobar que sea el correcto)*, lo tercero el archivo donde está la clave y lo cuarto especifica que utiliza LUKS.
+
+ Muy bien, con esto el disco se desencriptará al encenderse el servidor, solo nos queda añadirlo a `/etc/fstab` para que también se monte. Añadimos esta línea al final del archivo:
+ ```
+/dev/mapper/vault /mnt/vault btrfs defaults,nofail 0 0
+ ```
+
+ Que hará que el disco se monte en `/mnt/vault` cuando se encienda el servidor. La opción `nofail` hace que, aunque no se pueda montar el disco, el ordenador se siga encendiendo en vez de fallar.
