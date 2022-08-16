@@ -20,6 +20,10 @@ let guideSidebar = [
       },
       { text: "Nginx como servidor web", link: "/equipo/nginx" },
       { text: "Docker", link: "/equipo/docker" },
+      {
+        text: "Configurando MariaDB con Docker",
+        link: "/equipo/mariadb-docker",
+      },
     ],
   },
   {
