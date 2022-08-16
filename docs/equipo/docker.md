@@ -70,10 +70,16 @@ De nuevo, si no confías lo suficiente en `apt`, comprueba que todo está bien e
 
 ## Usuario para Docker
 
+::: tip RELATO
+
+Cuando estaba en esto, que parecía muy simple, Debian decidió que se iba a poner en mi contra y no funcionar, así que tenéis la historia de como colapsé en [un relato](../relatos/usuario-docker) (si veis que la guía y los comandos han cambiado, es por lo ocurrido en ese relato).
+:::
+
 Para ejecutar el inmejorable Docker vamos a crear un diferente usuario para ejecutar Docker, así mejoramos ligeramente la seguridad. Para que un usuario pueda ejecutar Docker sin tener que hacer `sudo` y ejecutarlo como _root_, hay que añadirlo al grupo _docker_. Desde tú usuario de administración con `sudo` aún instalado, vamos a ello entonces:
 
 ```bash
-$ sudo adduser docker # Creación del usuario y su home en /home/dockeruser
+$ sudo adduser dockeruser # Creación del usuario y su home en /home/dockeruser
+$ sudo passwd dockeruser # Tenemos que asignarle una contraseña (recomendación: que sea larga)
 $ sudo usermod -aG docker dockeruser # Añadir el usuario al grupo
 ```
 
@@ -85,13 +91,13 @@ Antes de cambiar al usuario `dockeruser`, aún con el usuario de administrador c
 $ sudo cp ./home/dockeruser/ /home/dockeruser/
 ```
 
-Donde se asume que estamos la raiz del repositorio.
+Donde se asume que estamos la raíz del repositorio.
 
 ## El `docker-compose.yml`
 
 Por fin llegamos al famoso archivo. Este archivo incluye toda la configuración de los servicios a ejecutar con Docker y nos permite cómodamente iniciar todos. En la página de cada servicio se puede encontrar un extracto del contenido del `docker-compose.yml` para ese servicio concreto. Veamos la estructura de este archivo:
 
-- **`version`:** algo importar'a intuyo, pero no creo que mucho así que está la 2 por que lo debí de ver por ahí con el primer servicio que puse y ahí se ha quedado.
+- **`version`:** algo importará intuyo, pero no creo que mucho así que está la 2 por que lo debí de ver por ahí con el primer servicio que puse y ahí se ha quedado.
 
 - **`volumes`:** una forma integrada en docker para guardar archivos sin importar mucho donde se guardan estos, pero de forma que el programa pueda perdurar datos en forma de archivo, lo cual usaremos para caché o archivos que no sean de configuración o podramos requerir frecuentemente.
 
