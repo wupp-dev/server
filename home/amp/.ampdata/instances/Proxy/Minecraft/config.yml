@@ -1,0 +1,92 @@
+enforce_secure_profile: false
+listeners:
+- query_port: 25565
+  motd: '&1Just another &3ESTOY MAMADISIMO HIJO DE TU P&4**&3ISIMA MADRE &0&l&k|&r&b&l1.9&9&l-&6&l1.17.1&0&l&k|'
+  tab_list: GLOBAL_PING
+  query_enabled: false
+  proxy_protocol: false
+  forced_hosts:
+    pvp.md-5.net: pvp
+  ping_passthrough: false
+  priorities:
+  - lobby
+  bind_local_address: true
+  host: 0.0.0.0:25565
+  max_players: 69
+  tab_size: 60
+  force_default_server: true
+remote_ping_cache: -1
+network_compression_threshold: 256
+permissions:
+  default:
+  - bungeecord.command.server
+  - bungeecord.command.list
+  admin:
+  - bungeecord.command.alert
+  - bungeecord.command.end
+  - bungeecord.command.ip
+  - bungeecord.command.reload
+  - bungeecord.command.kick
+log_pings: true
+connection_throttle_limit: 3
+server_connect_timeout: 10000
+timeout: 50000
+stats: f5309ffa-17cf-4185-8317-2933f31bede5
+player_limit: -1
+ip_forward: true
+groups:
+  md_5:
+  - admin
+remote_ping_timeout: 10000
+connection_throttle: 10000
+log_commands: false
+prevent_proxy_connections: false
+online_mode: false
+forge_support: true
+disabled_commands:
+- bungee
+- find
+- ping
+- server
+servers:
+  Lobby:
+    motd: '&4&lAmistad: &1Bienvenido a nunca jamás &3HIJO DE TU P&4**&3ISIMA MADRE
+      &0&l&k|&r&b&l1.9&9&l-&6&l1.19.2&0&l&k|'
+    address: 127.0.0.1:25566
+    restricted: false
+  Survival0:
+    motd: '&1Just another &3ESTOY MAMADISIMO HIJO DE TU P&4**&3ISIMA MADRE'
+    address: 127.0.0.1:25567
+    restricted: false
+  Creativo:
+    motd: '&1Just another &3ESTOY MAMADISIMO HIJO DE TU P&4**&3ISIMA MADRE'
+    address: 127.0.0.1:25568
+    restricted: false
+  Pruebas:
+    motd: '&1Just another &3ESTOY MAMADISIMO HIJO DE TU P&4**&3ISIMA MADRE'
+    address: 127.0.0.1:25569
+    restricted: false
+  UHC:
+    motd: '&1Just another &3ESTOY MAMADISIMO HIJO DE TU P&4**&3ISIMA MADRE'
+    address: 127.0.0.1:25570
+    restricted: false
+  Forge0:
+    motd: '&1Just another &3ESTOY MAMADISIMO HIJO DE TU P&4**&3ISIMA MADRE'
+    address: 127.0.0.1:25571
+    restricted: false
+  Nexo:
+    motd: '&1Just another &3ESTOY MAMADISIMO HIJO DE TU P&4**&3ISIMA MADRE'
+    address: 127.0.0.1:25572
+    restricted: false
+  Privado0:
+    motd: '&1Just another &3ESTOY MAMADISIMO HIJO DE TU P&4**&3ISIMA MADRE'
+    address: 127.0.0.1:25573
+    restricted: false
+  Survival1:
+    motd: '&1Just another &3ESTOY MAMADISIMO HIJO DE TU P&4**&3ISIMA MADRE'
+    address: 127.0.0.1:25574
+    restricted: false
+  Privado1:
+    motd: '&1Just another &3ESTOY MAMADISIMO HIJO DE TU P&4**&3ISIMA MADRE'
+    address: 127.0.0.1:25575
+    restricted: false

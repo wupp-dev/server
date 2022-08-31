@@ -1,0 +1,8 @@
+hub: 'default' # 'default' to use the default server in bungeecord config
+alreadyInHub: Bro ya estás aquí.
+disabledServersError: No puedes hacer eso bro.
+
+disabled-servers: []
+
+# Do not touch pls. Internal Use
+config-version: 2
