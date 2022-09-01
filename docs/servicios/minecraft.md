@@ -71,6 +71,8 @@ A parte de los cambios hechos que voy a escribir a continuación, los archivos m
 - `Java.MaxHeapSizeMB=1024`
 - `Java.CustomOpts=-Xms512M -Xmx512M -XX:+UseG1GC -XX:G1HeapRegionSize=4M -XX:+UnlockExperimentalVMOptions -XX:+ParallelRefProcEnabled -XX:+AlwaysPreTouch`
 
+Estos argumentos de java, a parte de establecer la cantidad de memoria RAM que puede usar el proxy, se supone que ayudan a que rinda mejor.
+
 Además, esta es la lista de plugins:
 - [BungeeTabListPlus](https://www.spigotmc.org/resources/bungeetablistplus.313/)
 - [Bungee Chat](https://www.spigotmc.org/resources/bungee-chat.12592/)
@@ -79,3 +81,24 @@ Además, esta es la lista de plugins:
 - [SkinsRestorer](https://www.spigotmc.org/resources/skinsrestorer.2124/)
 - [ViaVersion](https://www.spigotmc.org/resources/viaversion.19254/)
 - [ViaBackwards](https://www.spigotmc.org/resources/viabackwards.27448/)
+
+## El primer servidor
+
+Muy bien, tenemos un proxy y si añadimos el servidor a la pantalla de multijugador de minecraft aparecerá como en línea. Pero si intentamos conectarnos no podremos, porque no tenenemos ningún mundo al que unirnos.
+
+Vamos a crear el primer servidor, que será el que tenga el mundo donde aparezcan los jugadores que se conecten.
+
+Este servidor será el **Lobby**, y desde aquí los jugadores podrán moverse entre los demás servidores.
+
+![AMP Creación Lobby](../images/amp-creacion-lobby.png)
+
+Dependiendo del tipo de servidor que queramos hacer tendremos que elegir si tener mods o plugins. Lo más común es querer tener plugins, así que vamos a usar Purpur.
+
+Igual que antes, a parte de los cambios escritos a continuación, los archivos modificados están en [el repositorio de GitHub](https://github.com/ComicIvans/server).
+- `Java.MaxHeapSizeMB=2048`
+- `Java.CustomOpts=-Xms2G -Xmx2G -XX:+UseG1GC -XX:+ParallelRefProcEnabled -XX:MaxGCPauseMillis=200 -XX:+UnlockExperimentalVMOptions -XX:+DisableExplicitGC -XX:+AlwaysPreTouch -XX:G1NewSizePercent=30 -XX:G1MaxNewSizePercent=40 -XX:G1HeapRegionSize=8M -XX:G1ReservePercent=20 -XX:G1HeapWastePercent=5 -XX:G1MixedGCCountTarget=4 -XX:InitiatingHeapOccupancyPercent=15 -XX:G1MixedGCLiveThresholdPercent=90 -XX:G1RSetUpdatingPauseTimePercent=5 -XX:SurvivorRatio=32 -XX:+PerfDisableSharedMem -XX:MaxTenuringThreshold=1 -Dusing.aikars.flags=https://mcflags.emc.gs -Daikars.new.flags=true`
+
+Nuevamente, estos argumentos de java aumentan el rendmiento, de servidor y están sacados de [aquí](https://docs.papermc.io/paper/aikars-flags).
+
+Esta es la lista de plugins:
+- as
