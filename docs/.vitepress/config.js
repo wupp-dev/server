@@ -43,6 +43,7 @@ let guideSidebar = [
         link: "/servicios/nextcloud",
       },
       { text: "Gitea - Servicio git", link: "/servicios/gogs" },
+      { text: "Navidrome - Streaming de música", link: "/servicios/navidrome" },
     ],
   },
   {
