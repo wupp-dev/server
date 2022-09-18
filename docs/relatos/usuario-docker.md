@@ -37,7 +37,7 @@ Contraseñas largas para los usuarios por favor y gracias
 Normalmente las herramientas base del sistema de Debian y todas estas distros, GNU utils vamos, no suelen cambiar la API, así que realmente desconozco por completo que ha podido ocurrir con `adduser` para que no me funcionase una opción que se supone que existe.
 :::
 
-# Nos queda el grupo
+## Nos queda el grupo
 
 Por si crear el usuario no hubiese sido ya difícil, toca gestionar el añadir el usuario al grupo de Docker. Quiero que veáis lo que pone en la documentación oficial de Docker antes de nada:
 
@@ -46,3 +46,7 @@ Por si crear el usuario no hubiese sido ya difícil, toca gestionar el añadir e
 Se puede observar que Docker te dice que crees el grupo _docker_. Pues procedo a crear el grupo docker con `sudo groupadd docker` y obtengo lo siguiente (después de entender por qué fallaba lo del usuario, esto tiene lógica): `groupadd: group 'docker' already exists`.
 
 Así que lo dicho, lo que ocurrió es que al **contrario de lo que dice la documentación oficial de Docker**, el grupo _docker_ ya se crea al instalar Docker y por tanto no es necesario crearlo, solo añadir el resultado con `sudo usermod -aG docker dockeruser`.
+
+## Secrets: ¿funcionarán o no?
+
+De cuando los `secret: external: true` no fué
