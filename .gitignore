@@ -2,3 +2,20 @@ node_modules/
 docs/.vitepress/dist/
 **/.env
 # !**/*.example
+
+# Docker FS volume mappings (just for testing)
+db/
+gitea/
+homarr/
+media/
+nextcloud/
+nhost-test/
+onlyoffice/
+send/
+uptime-kuma/
+custom-templates/
+certs/
+navidrome/
+
+# Test files (docker compose e.g.)
+*.test.*
