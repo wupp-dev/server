@@ -59,14 +59,14 @@ $ sudo ufw allow 443
 
 Estos son los puertos de HTTP y HTTPS respectivamente.
 
-Vamos a hacer retocar un poco la configuración para las partes venideras de la guía. La configuración de Nginx se estructura en bloques. Concretamente la parte que tocaremos son los bloques `server`, que serán la configuración de cada uno de nuestros subdominios. Estos archvios de configuración se guardan en `/etc/nginx/conf.d/` y, por defecto, solo habrá un archivo llamado `default.conf`, vamos a cambiarle el nombre a `servermamadisimo.xyz`, ya que tendrá el bloque encargado de gestionar las conexiones con esa URL.
+Vamos a hacer retocar un poco la configuración para las partes venideras de la guía. La configuración de Nginx se estructura en bloques. Concretamente la parte que tocaremos son los bloques `server`, que serán la configuración de cada uno de nuestros subdominios. Estos archvios de configuración se guardan en `/etc/nginx/conf.d/` y, por defecto, solo habrá un archivo llamado `default.conf`, vamos a cambiarle el nombre a `wupp.dev`, ya que tendrá el bloque encargado de gestionar las conexiones con esa URL.
 ```
-$ mv /etc/nginx/conf.d/default.conf /etc/nginx/conf.d/servermamadisimo.xyz.conf
+$ mv /etc/nginx/conf.d/default.conf /etc/nginx/conf.d/wupp.dev.conf
 ```
 
 Editamos el archivo y buscamos una línea que empiece por `server_name`:
 ```
-server_name servermamadisimo.xyz www.servermamadisimo.xyz;
+server_name wupp.dev www.wupp.dev;
 ```
 
 Ahora verificamos que el archivo modificado verifique la sintáxis y reiniciamos el servicio de Nginx:
@@ -79,7 +79,7 @@ $ sudo systemctl reload nginx
 
 ## Habilitando *(y forzando)* HTTPS
 
-Ahora mismo podemos poner en el navegador [servermamadisimo.xyz](http://servermamadisimo.xyz/), pero la conexión no es segura :(
+Ahora mismo podemos poner en el navegador [wupp.dev](http://wupp.dev/), pero la conexión no es segura :(
 
 Eso es inadmisible, así que vamos a forzar a que todas las conexiones HTTP se redirijan a HTTPS. Hemos seguido [este tutorial](https://www.digitalocean.com/community/tutorials/how-to-secure-nginx-with-let-s-encrypt-on-ubuntu-20-04-es).
 
@@ -90,10 +90,10 @@ $ sudo apt install certbot python3-certbot-nginx
 
 Generamos el certificado para nuestro dominio:
 ```
-$ sudo certbot --nginx -d servermamadisimo.xyz -d www.servermamadisimo.xyz
+$ sudo certbot --nginx -d wupp.dev -d www.wupp.dev
 ```
 
-Y ya está, certbot se encarga de modificar la configuración del archivo `/etc/nginx/conf.d/servermamadisimo.xyz.conf` para forzar el uso de HTTPS y para renovar automáticamente los certificados cuando vayan a expirar.
+Y ya está, certbot se encarga de modificar la configuración del archivo `/etc/nginx/conf.d/wupp.dev.conf` para forzar el uso de HTTPS y para renovar automáticamente los certificados cuando vayan a expirar.
 
 ## Otras mejoras de seguridad
 
