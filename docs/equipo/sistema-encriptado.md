@@ -65,7 +65,7 @@ La instalación gráfica y la otra son prácticamente iguales, la diferencia es 
 
 Primero tocará elegir el idioma y la distribución del teclado *(nosotros hemos elegido Español para mayor comodidad)*. Después se intentará conectar a internet y tocará poner unos cuantos datos:
 1. El nombre de la máquina, como puede ser `server`
-2. El nombre del dominio, que para nuestro servidor es `servermamadisimo.xyz` *(si no tienes el dominio o no sabes qué es, puedes hacerte spolier mirando la sección de [Router y dominio](./router-dominio.html#dominio-%C2%BFque-es-y-para-que-sirve))*.
+2. El nombre del dominio, que para nuestro servidor es `wupp.dev` *(si no tienes el dominio o no sabes qué es, puedes hacerte spolier mirando la sección de [Router y dominio](./router-dominio.html#dominio-%C2%BFque-es-y-para-que-sirve))*.
 3. La contraseña para el usuario `root`. Esta contraseña tiene que ser **potente**, como de 20 caracteres, porque es la que permite hacer cualquier cambio en el sistema operativo.
 
 ::: tip TRUQUITO
