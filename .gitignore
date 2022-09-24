@@ -16,6 +16,7 @@ uptime-kuma/
 custom-templates/
 certs/
 navidrome/
+/docker-compose.yml
 
 # Test files (docker compose e.g.)
 *.test.*
