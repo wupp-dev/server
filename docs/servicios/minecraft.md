@@ -67,6 +67,8 @@ AMP ejecuta un servidor SFTP *(SSH File Transfer Protocol)* para poder gestionar
 
 Una vez esté el archivo, volvemos a la instancia, a *Configuration*, *Server Settings* y en *Server JAR* elegimos el archivo de waterfall. También vamos a cambiar la versión de Java a la última, en este caso la 18, así que vamos a *Java and Memory* y editamos *Java Version*. Ahora podemos iniciarlo y ya editar los archivos de configuración manualmente.
 
+Para modificar los archivos de configuración como `waterfall.yml` podemos usar [esta página](https://docs.papermc.io/waterfall/configuration) y para `config.yml` [esta otra](https://www.spigotmc.org/wiki/bungeecord-configuration-guide/). Lo único que he hecho ha sido comprobar qué significa cada opción y valorar qué poner.
+
 A parte de los cambios hechos que voy a escribir a continuación, los archivos modificados están en [el repositorio de GitHub](https://github.com/ComicIvans/server).
 - `Java.MaxHeapSizeMB=1024`
 - `Java.CustomOpts=-Xms512M -Xmx512M -XX:+UseG1GC -XX:G1HeapRegionSize=4M -XX:+UnlockExperimentalVMOptions -XX:+ParallelRefProcEnabled -XX:+AlwaysPreTouch`
@@ -74,9 +76,11 @@ A parte de los cambios hechos que voy a escribir a continuación, los archivos m
 Estos argumentos de java, a parte de establecer la cantidad de memoria RAM que puede usar el proxy, se supone que ayudan a que rinda mejor.
 
 Además, esta es la lista de plugins:
+- [AdvancedNMotd](https://www.spigotmc.org/resources/advancednmotd-let-your-motd-smile.58677/)
 - [BungeeTabListPlus](https://www.spigotmc.org/resources/bungeetablistplus.313/)
 - [Bungee Chat](https://www.spigotmc.org/resources/bungee-chat.12592/)
 - [Hub Command](https://www.spigotmc.org/resources/hub-command.57584/)
+- [LockLogin](https://www.spigotmc.org/resources/rd-locklogin.75156/)
 - [LuckPerms](https://luckperms.net/download)
 - [SkinsRestorer](https://www.spigotmc.org/resources/skinsrestorer.2124/)
 - [ViaVersion](https://www.spigotmc.org/resources/viaversion.19254/)
@@ -92,7 +96,9 @@ Este servidor será el **Lobby**, y desde aquí los jugadores podrán moverse en
 
 ![AMP Creación Lobby](../images/amp-creacion-lobby.png)
 
-Dependiendo del tipo de servidor que queramos hacer tendremos que elegir si tener mods o plugins. Lo más común es querer tener plugins, así que vamos a usar Purpur.
+Dependiendo del tipo de servidor que queramos hacer tendremos que elegir si tener mods o plugins. Lo más común es querer tener plugins, así que vamos a usar Purpur. **¿Por qué Purpur concretamente?** La otra opción es usar [PaperMC](https://papermc.io/downloads#Paper-1.19), que es una modificación de [SpigotMC](https://www.spigotmc.org/) que mejora notablemente el rendimiento del servidor y arregla varios bugs. Pero Purpur es una modificación de PaperMC que, además de mejorar todavía un poco más el rendimiento, da más libertad de configuración.
+
+Para configurar los archivos como `server.properties`, `bukkit.yml`, `pufferfish.yml`, `purpur.yml`, `spigot.yml` y los de la carpeta `config` usamos [esta página](https://purpurmc.org/docs/Configuration/#format), donde vienen las opciones de cada archivo descritas.
 
 Igual que antes, a parte de los cambios escritos a continuación, los archivos modificados están en [el repositorio de GitHub](https://github.com/ComicIvans/server).
 - `Java.MaxHeapSizeMB=2048`
@@ -101,4 +107,6 @@ Igual que antes, a parte de los cambios escritos a continuación, los archivos m
 Nuevamente, estos argumentos de java aumentan el rendmiento, de servidor y están sacados de [aquí](https://docs.papermc.io/paper/aikars-flags).
 
 Esta es la lista de plugins:
-- as
+- [BungeeTabListPlus](https://www.spigotmc.org/resources/bungeetablistplus.313/)
+- [DeluxeHub](https://www.spigotmc.org/resources/deluxehub-3-professional-hub-management.49425/)
+- 
