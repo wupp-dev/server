@@ -87,7 +87,7 @@ Esto generará de nuevo en la partición `boot` los archivos de `initramfs` incl
 Un problema con el que nos encontramos cuando intentamos conectarnos al servidor por SSH primero para desencriptar los discos y después para el uso normal, es que nos salta este error:
 
 ```
-$ ssh server@servermamadisimo.xyz
+$ ssh admin@wupp.dev.xyz
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 @    WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED!     @
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -100,8 +100,8 @@ Please contact your system administrator.
 Add correct host key in /home/user/.ssh/known_hosts to get rid of this message.
 Offending ECDSA key in /home/user/.ssh/known_hosts:2
   remove with:
-  ssh-keygen -f "/home/user/.ssh/known_hosts" -R "servermamadisimo.xyz"
-Host key for servermamadisimo.xyz has changed and you have requested strict checking.
+  ssh-keygen -f "/home/user/.ssh/known_hosts" -R "wupp.dev"
+Host key for wupp.dev has changed and you have requested strict checking.
 Host key verification failed.
 ```
 
@@ -135,7 +135,7 @@ Iván mientras escribía esto *(desde un sitio lejano a la ubicación del servid
 A partir de ahora ya no deberíamos tener el problema al conectarnos, lo único que hay que tener en cuenta es que, a la hora de establecer la conexión SSH, tendremos que indicar el puerto:
 
 ```
-$ ssh -p 2222 admin@servermamadisimo.xyz
+$ ssh -p 2222 admin@wupp.dev
 ```
 
 ## Reforzando la seguridad
@@ -175,7 +175,7 @@ Como detalles, no hemos establecido una contraseña para solo vista.
 
 Aquí da igual cambiar o no el puerto por defecto, ya que no estará expuesto directamente a internet.
 
-En nuestro ordenador podemos instalar `xtightvncviewer` para conectarnos. Solo tendremos que conectarnos mediante SSH al servidor indicando que queremos redirigir el puerto 5901 de nuestro ordenador al 5901 del del servidor. Esto lo podemos hacer con `ssh -L 5901:127.0.0.1:5901 server@servermamadisimo.xyz`. Una vez estemos conectados, podemos ejecutar `xtightvncviewer` desde la terminal, conectarnos a `localhost:5901` y poner la contraseña del VNC.
+En nuestro ordenador podemos instalar `xtightvncviewer` para conectarnos. Solo tendremos que conectarnos mediante SSH al servidor indicando que queremos redirigir el puerto 5901 de nuestro ordenador al 5901 del del servidor. Esto lo podemos hacer con `ssh -L 5901:127.0.0.1:5901 admin@wupp.dev`. Una vez estemos conectados, podemos ejecutar `xtightvncviewer` desde la terminal, conectarnos a `localhost:5901` y poner la contraseña del VNC.
 
 En nuestro caso, al intentar conectarnos nos encontramos con el siguiente error:
 

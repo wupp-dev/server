@@ -43,6 +43,9 @@ let guideSidebar = [
         link: "/servicios/nextcloud",
       },
       { text: "Gitea - Servicio git", link: "/servicios/gogs" },
+      { text: "Navidrome - Streaming de música", link: "/servicios/navidrome" },
+      { text: "Modoboa - Servidor de correo", link: "/servicios/modoboa" },
+      { text: "Overleaf - Editor de LaTeX", link: "/servicios/sharelatex" },
     ],
   },
   {
