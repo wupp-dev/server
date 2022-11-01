@@ -226,3 +226,169 @@ services:
     environment:
       - ND_LOGLEVEL=info
       - ND_CONFIGFILE=/data/navidrome.toml
+  immich-server:
+    image: altran1502/immich-server:release
+    container_name: immich-server
+    entrypoint: ["/bin/sh", "./start-server.sh"]
+    volumes:
+      - ${UPLOAD_LOCATION}:/usr/src/app/upload
+    environment:
+      - NODE_ENV=production
+      - DB_USERNAME=${DB_USERNAME:?immich server db username not set}
+      - DB_PASSWORD=${DB_PASSWORD:?immich server db password not set}
+      - DB_DATABASE_NAME=${DB_DATABASE_NAME:?server db name not set}
+      - JWT_SECRET=${JWT_SECRET}
+      - ENABLE_MAPBOX=${ENABLE_MAPBOX}
+      - MAPBOX_KEY=${MAPBOX_KEY}
+    depends_on:
+      - immich-redis
+      - immich-database
+    restart: unless-stopped
+
+  immich-microservices:
+    image: altran1502/immich-server:release
+    entrypoint: ["/bin/sh", "./start-microservices.sh"]
+    volumes:
+      - ${UPLOAD_LOCATION}:/usr/src/app/upload
+    environment:
+      - NODE_ENV=production
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_DATABASE_NAME=${DB_DATABASE_NAME}
+      - JWT_SECRET=${JWT_SECRET}
+      - ENABLE_MAPBOX=${ENABLE_MAPBOX}
+      - MAPBOX_KEY=${MAPBOX_KEY}
+    depends_on:
+      - immich-redis
+      - immich-database
+    restart: unless-stopped
+
+  immich-machine-learning:
+    image: altran1502/immich-machine-learning:release
+    entrypoint: ["/bin/sh", "./entrypoint.sh"]
+    volumes:
+      - ${UPLOAD_LOCATION}:/usr/src/app/upload
+    environment:
+      - NODE_ENV=production
+    depends_on:
+      - immich-database
+    restart: unless-stopped
+
+  immich-web:
+    image: altran1502/immich-web:release
+    entrypoint: ["/bin/sh", "./entrypoint.sh"]
+    environment:
+      - PUBLIC_TZ=${TZ}
+    restart: unless-stopped
+
+  immich-redis:
+    container_name: immich_redis
+    image: redis:6.2
+    restart: unless-stopped
+    mem_limit: 2G
+
+  immich-database:
+    container_name: immich_postgres
+    image: postgres:14
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_DB: ${DB_DATABASE_NAME}
+      PG_DATA: /var/lib/postgresql/data
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  immich-proxy:
+    container_name: immich_proxy
+    image: altran1502/immich-proxy:release
+    ports:
+      - 8080:8080
+    logging:
+      driver: none
+    depends_on:
+      - immich-server
+    restart: unless-stopped
+  sharelatex:
+    restart: always
+    image: sharelatex/sharelatex
+    container_name: sharelatex
+    depends_on:
+      sharelatex-mongo:
+        condition: service_healthy
+      sharelatex-redis:
+        condition: service_started
+    ports:
+      - 80:80
+    links:
+      - sharelatex-mongo
+      - sharelatex-redis
+    volumes:
+      - ~/sharelatex_data:/mnt/vault/sharelatex
+    environment:
+      SHARELATEX_APP_NAME: Overleaf Community Edition
+      SHARELATEX_MONGO_URL: mongodb://sharelatex-mongo/sharelatex
+      SHARELATEX_REDIS_HOST: sharelatex-redis
+      REDIS_HOST: sharelatex-redis
+      ENABLED_LINKED_FILE_TYPES: 'project_file,project_output_file'
+      ENABLE_CONVERSIONS: 'true'
+      EMAIL_CONFIRMATION_DISABLED: 'true'
+      TEXMFVAR: /var/lib/sharelatex/tmp/texmf-var
+      SHARELATEX_SITE_URL: https://tex.wupp.dev
+      SHARELATEX_NAV_TITLE: LaTeX MAMADÍSIMO
+      SHARELATEX_HEADER_IMAGE_URL: https://cdn.overleaf.com/img/ol-brand/overleaf_og_logo.png
+      SHARELATEX_ADMIN_EMAIL: soporte@wupp.dev
+      SHARELATEX_LEFT_FOOTER: '[{"text": "<a href=\"https://www.sharelatex.com\">ShareLaTeX</a>"},{"text": "Más información <a href=\"github.com/ComicIvans/server\">aquí</a>"} ]'
+      SHARELATEX_RIGHT_FOOTER: '[{"text": "WTF! Una polla con peluca"} ]'
+  sharelatex-mongo:
+    restart: always
+    image: mongo:4.4
+    container_name: sharelatex_mongo
+    expose:
+      - 27017
+    volumes:
+      - ~/mongo_data:/mnt/vault/sharelatex-db
+    healthcheck:
+      test: echo 'db.stats().ok' | mongo localhost:27017/test --quiet
+      interval: 10s
+      timeout: 10s
+      retries: 5
+  sharelatex-redis:
+    restart: always
+    image: redis:5
+    container_name: sharelatex_redis
+    expose:
+      - 6379
+    volumes:
+      - ~/redis_data:/data
+  mailserver:
+    image: docker.io/mailserver/docker-mailserver:latest
+    container_name: mailserver
+    # If the FQDN for your mail-server is only two labels (eg: example.com),
+    # you can assign this entirely to `hostname` and remove `domainname`.
+    hostname: mail
+    domainname: wupp.dev
+    env_file: mailserver.env
+    # More information about the mail-server ports:
+    # https://docker-mailserver.github.io/docker-mailserver/edge/config/security/understanding-the-ports/
+    # To avoid conflicts with yaml base-60 float, DO NOT remove the quotation marks.
+    ports:
+      - "25:25"    # SMTP  (explicit TLS => STARTTLS)
+      - "143:143"  # IMAP4 (explicit TLS => STARTTLS)
+      - "465:465"  # ESMTP (implicit TLS)
+      - "587:587"  # ESMTP (explicit TLS => STARTTLS)
+      - "993:993"  # IMAP4 (implicit TLS)
+    volumes:
+      - ./docker-data/dms/mail-data/:/var/mail/
+      - ./docker-data/dms/mail-state/:/var/mail-state/
+      - ./docker-data/dms/mail-logs/:/var/log/mail/
+      - ./docker-data/dms/config/:/tmp/docker-mailserver/
+      - /etc/localtime:/etc/localtime:ro
+    restart: always
+    stop_grace_period: 1m
+    cap_add:
+      - NET_ADMIN
+    healthcheck:
+      test: "ss --listening --tcp | grep -P 'LISTEN.+:smtp' || exit 1"
+      timeout: 3s
+      retries: 0
