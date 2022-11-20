@@ -40,7 +40,7 @@ Pero el hecho de tener un dominio no solo ayuda a la comodidad de recordarlo y e
 
 ### Adquiriendo el dominio
 
-Para comprar un dominio, primero debes buscar un proveedor, hay muchas elecciones. La nuestra fue [OnlyDomains](https://www.onlydomains.com/account/login), aunque [Namecheap](https://www.namecheap.com/) también puede ser una buena opción. Después, tendrás que pensar en qué nombre quieres para tu dominio y comprobar que esté disponible.
+Para comprar un dominio, primero debes buscar un proveedor, hay muchas elecciones. La nuestra fue [OnlyDomains](https://www.onlydomains.com/account/login) para `servermamadisimo.xyz`, aunque después nos pasamos a [Namecheap](https://www.namecheap.com/) para `wupp.dev`. Después, tendrás que pensar en qué nombre quieres para tu dominio y comprobar que esté disponible.
 
 Una cosa muy importante a la hora de registrar un dominio es tener la protección **Whois**, porque así evitará que cualquiera que busque quién ha registrado el dominio pueda saber tus datos personales como el número de teléfono y el correo electrónico. Puede llegarte mucho spam por no tener esta protección. Por suerte, suele costar poco o incluso estar incluído con el pago del dominio, como es nuestro caso.
 
@@ -129,10 +129,14 @@ Para configurarlo tienes que conectarte a la IP de la puerta de enlace del route
 
 Una vez conectado, te pedirá un nombre de usuario y una contraseña, que deberían estar escritos en el router *(no estaría mal cambiar la contraseña después de abrir los puertos)*.
 
+![Router LogIn](../images/router-login.png)
+
 ::: warning ADVERTENCIA
 Hay proveedores de internet como Digi, que te permiten configurar el router, pero los cambios que le hagas a los puertos no van a funcionar a no ser que contactes con ellos y les pidas que te permitan abrir puertos *(cosa por la que te cobrarán 1€ más al mes)*.
 :::
 
-*Cuando pueda poner imágenes de la interfaz terminaré esta parte porque lo único que tengo que decir es que hay que abrir los puertos que vayas a usar como 80, 443, 25565, etc y abrirlos para conexiones TCP y UDP en la IP local del servidor.*
+Vamos a abrir los puertos necesarios, un ejemplo pueden ser los de HTTP, HTTPS, Minecraft y SSH, podemos habrirlos tanto para TCP como para UDP especificando la IP local del servidor o su direcicón MAC para que se abran solo para el servidor y quedaría así:
 
-**IMPORTANTE DEJAR FIJA LA IP LOCAL DEL SERVIDOR**
+![Router Port Fowarding](../images/router-puertos.png)
+
+Si, para abrir los puertos, eliges usar la IP local del servidor en vez de la dirección MAC, es importante que dejes fija esa IP local al servidor, ya sea desde la configuración del router o desde el propio servidor, porque si no, en algún momento cambiará y los puertos dejarán de estar abiertos para el servidor.
