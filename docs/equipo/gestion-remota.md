@@ -94,11 +94,7 @@ Esto generará de nuevo en la partición `boot` los archivos de `initramfs` incl
 Un problema con el que nos encontramos cuando intentamos conectarnos al servidor por SSH primero para desencriptar los discos y después para el uso normal, es que nos salta este error:
 
 ```
-<<<<<<< HEAD
-$ ssh admin@servermamadisimo.xyz
-=======
-$ ssh admin@wupp.dev.xyz
->>>>>>> 19e6119 (Cafeína)
+$ ssh admin@wupp.dev
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 @    WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED!     @
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -189,12 +185,7 @@ Como detalles, no hemos establecido una contraseña para solo vista.
 
 Aquí da igual cambiar o no el puerto por defecto, ya que no estará expuesto directamente a internet.
 
-<<<<<<< HEAD
-En nuestro ordenador podemos instalar `xtightvncviewer` para conectarnos. Solo tendremos que conectarnos mediante SSH al servidor indicando que queremos redirigir el puerto 5901 de nuestro ordenador al 5901 del del servidor. Esto lo podemos hacer con `ssh -L 5901:127.0.0.1:5901 admin@servermamadisimo.xyz`. Una vez estemos conectados, podemos ejecutar `xtightvncviewer` desde la terminal, conectarnos a `localhost:5901` y poner la contraseña del VNC.
-=======
 En nuestro ordenador podemos instalar `xtightvncviewer` para conectarnos. Solo tendremos que conectarnos mediante SSH al servidor indicando que queremos redirigir el puerto 5901 de nuestro ordenador al 5901 del del servidor. Esto lo podemos hacer con `ssh -L 5901:127.0.0.1:5901 admin@wupp.dev`. Una vez estemos conectados, podemos ejecutar `xtightvncviewer` desde la terminal, conectarnos a `localhost:5901` y poner la contraseña del VNC.
-
-> > > > > > > b5da05e (Cafeína)
 
 En nuestro caso, al intentar conectarnos nos encontramos con el siguiente error:
 
@@ -212,11 +203,5 @@ $ vncserver
 Es raro necesitar el servidor VNC, pero justo estoy escribiendo esta parte antes que la de configuración de servidor SSH porque necesito abrir unos puertos en el router y para eso necesito acceder con un navegador desde el servidor.
 Como era de esperar, Debian no venía con navegador instalado, así que para poder usar uno con el VNC instalamos Firefox con `sudo apt install firefox-esr`.
 :::
-<<<<<<< HEAD
-=======
-
-Importante no olvidar hacer que el servidor VNC se ejecute cada vez que el servidor se encienda, si no, tendremos que ejecutarlo manualmente antes de conectarnos.
-
-> > > > > > > efd50a2 (Historieta)
 
 Importante no olvidar hacer que el servidor VNC se ejecute cada vez que el servidor se encienda, si no, tendremos que ejecutarlo manualmente antes de conectarnos.
