@@ -17,6 +17,8 @@ custom-templates/
 certs/
 navidrome/
 /docker-compose.yml
+amat-strapi
 
 # Test files (docker compose e.g.)
 *.test.*
+*-test
