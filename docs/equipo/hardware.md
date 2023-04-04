@@ -15,11 +15,11 @@ En un principio, los procesadores Xeon están pensados para servidores, porque t
 
 ## Memoria RAM
 
-En cuanto a memoria RAM, necesitas tener mucha, sobretodo si vas a tener un servidor de Minecraft *(ya no hablemos si quieres meterle mods)*. Java devora RAM.
+En cuanto a memoria RAM, necesitas tener mucha, sobre todo si vas a tener un servidor de Minecraft *(ya no hablemos si quieres meterle mods)*. Java devora RAM.
 
 El servidor cuenta con **24GB** de memoria RAM **DDR3**. Por ahora es suficiente, pero tampoco sobra.
 ::: info
-Lo recomendable, a parte de ampliar la cantidad de RAM, sería cambiarla a **DDR4**, que es más moderna y rápida, pero para eso haría falta cambiar la placa base y, consecuentemente, el procesador.
+Lo recomendable, a parte de ampliar la cantidad de RAM, sería cambiarla a **DDR4** o **DDR5**, que son más modernas y rápidas, pero para eso haría falta cambiar la placa base y, consecuentemente, el procesador.
 :::
 
 ## Discos duros

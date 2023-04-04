@@ -12,7 +12,7 @@ Aquí nuestro objetivo será no tener que preocuparnos de nada que no sea el pro
 
 Aquí vamos a hablar de dos tipos de IPs:
 - **IP Pública:** Esta es la IP con la que se puede acceder al servidor *(o cualquier otro dispositivo de tu red, si lo permites)* desde cualquier parte de internet.
-- **IP Local:** Esta IP identifica al sevidor dentro de la red a la que está conectado, pero no sirve fuera.
+- **IP Local:** Esta IP identifica al servidor dentro de la red a la que está conectado, pero no sirve fuera.
 
 ![IPs Públicas vs Privadas](../images/ips-pub-priv.png)
 
@@ -26,7 +26,7 @@ Un dominio es un pseudónimo para la IP, que es más bonito y fácil de recordar
 
 ![URL](../images/url.png)
 
-En nuestro caso, el dominio es `wupp.dev`, aunque antes era `servermamadisimo.xyz` y, cuando te intentas conectar a esa dirección, el ordenador le pregunta qué IP es a la que apunta la dirección a unos servidoes especiales que se llaman nameservers. Estos servidores son una parte fundamental del DNS *(Domain Name System)*, que permite utilizar las direcciones en vez de las IPs. Normalmente los nameservers que se usan son los del propio proveedor de internet, pero se pueden cambiar para que sean a otros como [NextDNS](https://my.nextdns.io).
+En nuestro caso, el dominio es `wupp.dev`, aunque antes era `servermamadisimo.xyz` y, cuando te intentas conectar a esa dirección, el ordenador le pregunta qué IP es a la que apunta la dirección a unos servidores especiales que se llaman nameservers. Estos servidores son una parte fundamental del DNS *(Domain Name System)*, que permite utilizar las direcciones en vez de las IPs. Normalmente los nameservers que se usan son los del propio proveedor de internet, pero se pueden cambiar para que sean a otros como [NextDNS](https://my.nextdns.io).
 
 Los dominios **hay que pagarlos**, esta es la parte mala. Los más baratos suelen estar entre 10€ y 15€ anuales, aunque el primer año suele costar menos.
 
@@ -34,15 +34,15 @@ Una vez compras un dominio, puedes elegir a qué IP apunta e incluso puedes crea
 
 ### ¿Qué son los subdominios?
 
-Pues lo que va antes del dominio claro, por ejemplo, para `wupp.dev` podemos crear los subdominios `www.wupp.dev`, `mc.wupp.dev` o `cloud.wupp.dev`. Esto es útil para separar los servcios que tienes en el servidor. Además, te permite apuntar a distintas IPs o incluso hacer redirecciones para cada subdominio.
+Pues lo que va antes del dominio claro, por ejemplo, para `wupp.dev` podemos crear los subdominios `www.wupp.dev`, `mc.wupp.dev` o `cloud.wupp.dev`. Esto es útil para separar los servicios que tienes en el servidor. Además, te permite apuntar a distintas IPs o incluso hacer redirecciones para cada subdominio.
 
-Pero el hecho de tener un dominio no solo ayuda a la comodidad de recordarlo y escribirlo, a parte de que es necesario para poder usar subdominios, también nos permite no preocuparnos de qué pasa si la IP pública del servidor cambia *(que puede ocurrir)*, solo tienes que decirle al dominio que señale a la nueva IP. De no tener un dominio, tendrías que decirle a todas las personas que se conectan al servidor la nueva IP para que la cambien.
+Pero el hecho de tener un dominio no solo ayuda a la comodidad de recordarlo y escribirlo; a parte de que es necesario para poder usar subdominios, también nos permite no preocuparnos de qué pasa si la IP pública del servidor cambia *(que puede ocurrir)*, solo tienes que decirle al dominio que señale a la nueva IP. De no tener un dominio, tendrías que decirle a todas las personas que se conectan al servidor la nueva IP para que la cambien.
 
 ### Adquiriendo el dominio
 
 Para comprar un dominio, primero debes buscar un proveedor, hay muchas elecciones. La nuestra fue [OnlyDomains](https://www.onlydomains.com/account/login) para `servermamadisimo.xyz`, aunque después nos pasamos a [Namecheap](https://www.namecheap.com/) para `wupp.dev`. Después, tendrás que pensar en qué nombre quieres para tu dominio y comprobar que esté disponible.
 
-Una cosa muy importante a la hora de registrar un dominio es tener la protección **Whois**, porque así evitará que cualquiera que busque quién ha registrado el dominio pueda saber tus datos personales como el número de teléfono y el correo electrónico. Puede llegarte mucho spam por no tener esta protección. Por suerte, suele costar poco o incluso estar incluído con el pago del dominio, como es nuestro caso.
+Una cosa muy importante a la hora de registrar un dominio es tener la protección **Whois**, porque así evitará que cualquiera que busque quién ha registrado el dominio pueda saber tus datos personales como el número de teléfono y el correo electrónico. Puede llegarte mucho spam por no tener esta protección. Por suerte, suele costar poco o incluso estar incluido con el pago del dominio, como es nuestro caso.
 
 ### Utilizando otros nameservers
 
@@ -59,13 +59,13 @@ Así se ven los nameservers de nuestro dominio al cambiarlos a FreeDNS:
 
 ## Actualizando la IP pública en el domino automáticamente
 
-FreeDNS nos permite gestionar todos los subdominios y actualizar la IP a la que apuntan símplemente con un enlace, que debemos abrir desde el servidor. Esto hará que dejemos de preocuparnos por si estamos fuera de casa y de repente nuestra IP pública cambia, ya que si no se actualizara automáticamente, perderíamos acceso al servidor a través del dominio y para poder conectarnos tendríamos que averiguar la nueva IP pública, cosa que no es precisamente sencilla.
+FreeDNS nos permite gestionar todos los subdominios y actualizar la IP a la que apuntan simplemente con un enlace, que debemos abrir desde el servidor. Esto hará que dejemos de preocuparnos por si estamos fuera de casa y de repente nuestra IP pública cambia, ya que si no se actualizara automáticamente, perderíamos acceso al servidor a través del dominio y para poder conectarnos tendríamos que averiguar la nueva IP pública, cosa que no es precisamente sencilla.
 
 Teniendo una cuenta de FreDNS y el dominio con sus nameservers, podemos ir al apartado de **Dynamic DNS** y copiar la **Direct URL** para actualizar la IP de nuestro dominio.
 ![FreeDNS](../images/freedns.png)
-En este caso cualesquiera de las URLs nos serviría, ya que tanto el dominio como los subdominios apuntan a la misma IP y está activada la opción **Link updates of the same IP together**, haciendo que al actualizar un dominio o subdominio, se actualicen los demás que aputaban a la misma IP.
+En este caso cualesquiera de las URLs nos serviría, ya que tanto el dominio como los subdominios apuntan a la misma IP y está activada la opción **Link updates of the same IP together**, haciendo que al actualizar un dominio o subdominio, se actualicen los demás que apuntaban a la misma IP.
 
-Vayamos al servidor. Debemos tener installado `crontab`, un software para ejecutar tareas cada cierto tiempo. Escribimos `sudo crontab -e` *(importante el sudo para que se asocie al usuario root, ya que nos será cómodo para un futuro)* y el archivo debería quedar más o menos así:
+Vayamos al servidor. Debemos tener instalado `crontab`, un software para ejecutar tareas cada cierto tiempo. Escribimos `sudo crontab -e` *(importante el sudo para que se asocie al usuario root, ya que nos será cómodo para un futuro)* y el archivo debería quedar más o menos así:
 
 ```bash
 # 
@@ -86,7 +86,7 @@ Vayamos al servidor. Debemos tener installado `crontab`, un software para ejecut
 # For more information see the manual pages of crontab(5) and cron(8)
 # 
 # m h  dom mon dow   command
-1,6,11,16,21,26,31,36,41,46,51,56 * * * * sleep 46 ; wget --no-check-certificate -O - UpdateURL >> /tmp/freedns_@_dominio_com.log 2>&1 &
+1,6,11,16,21,26,31,36,41,46,51,56 * * * * sleep 46 ; wget --no-check-certificate -O - UpdateURL > /tmp/freedns_@_dominio_com.log 2>&1 &
 ```
 
 Donde `UpdateURL` es la URL copiada de FreeDNS, que se verá como `https://freedns.afraid.org/dynamic/update.php?cosas` y `dominio_com` es el dominio, que en nuestro caso sería `wupp_dev`.
@@ -99,13 +99,13 @@ Muy bien, ya tenemos el dominio apuntando a la IP pública de nuestro router y a
 
 Por defecto, el router no deja que alguien se conecte mediante la IP pública a algún dispositivo de la red porque es algo que solo debería ocurrir si estamos ofreciendo un servicio a través de internet.
 
-### Breve introdución sobre los puertos
+### Breve introducción sobre los puertos
 
 Para que varios programas puedan conectarse a internet y hacer cosas distintas simultáneamente se utilizan los puertos. Los puertos son puntos de transmisión y recepción de datos *(no son nada físico, solo un número que ayuda a gestionar mejor las conexiones)*, están numerados del 0 al 65535 y algunos de ellos están reservados o son los más habituales para un uso específico, por ejemplo:
 - Los puertos 20 y 21 se utilizan para transferencia de archivos.
-- El puerto 22 se utilia para las conexiones de Secure Shell *(SSH)* de las que hablaremos en la siguiente sección.
+- El puerto 22 se utiliza para las conexiones de Secure Shell *(SSH)* de las que hablaremos en la siguiente sección.
 - El puerto 80 se utiliza para las conexiones de Hypertext Transfer Protocol *(HTTP)*, que es el protocolo por el que funcionan las páginas web.
-- El puerto 123 se utiliza para el Network Time Protocol *(NTP)* para que los relojes de los ordenadoes estén sincronizados.
+- El puerto 123 se utiliza para el Network Time Protocol *(NTP)* para que los relojes de los ordenadores estén sincronizados.
 - El puerto 443 se utiliza para las conexiones HTTP Secure *(HTTPS)*, actuando como sustituto del puerto *HTTP*, ya que todas las conexiones deberían ir cifradas.
 - El puerto 25565 es el más común para los servidores de Minecraft.
 
@@ -116,10 +116,10 @@ Pues bien, por defecto estos puertos no están abiertos para que un dispositivo 
 En nuestro caso, como tenemos un servidor, sí que necesitamos que los puertos estén abiertos, así que debemos configurar el router para que permita conexiones externas a los puertos que digamos.
 
 ::: info
-Esto no quiere decir que de aquí en adelante cualquier persona se vaya a poder conectar a los puertos que quiera de cualquier dispositivo de tu red. Normalmente el router permite abrir los puertos solo para una IP local *(que en este caso será nuestro servidor)*, siguiendo cerrados para los demás dispositivos. Además, los ordenadores y teléfonos suelen venir con un firewall instalado, que también bloquea por defecto las conexiones externas en cualquier puerto. De hecho, tendremos que vérnolas también con el firewall del servidor aunque los puertos estén abiertos desde el router.
+Esto no quiere decir que de aquí en adelante cualquier persona se vaya a poder conectar a los puertos que quiera de cualquier dispositivo de tu red. Normalmente el router permite abrir los puertos solo para una IP local *(que en este caso será nuestro servidor)*, siguiendo cerrados para los demás dispositivos. Además, los ordenadores y teléfonos suelen venir con un firewall instalado, que también bloquea por defecto las conexiones externas en cualquier puerto. De hecho, tendremos que vérnoslas también con el firewall del servidor aunque los puertos estén abiertos desde el router.
 :::
 
-### Abriendo puertos en el router (tengo que poner imágenes)
+### Abriendo puertos en el router
 
 Lo primero es saber si tú desde tu casa puedes configurar tu router o debes contactar con el proveedor de internet para que lo haga, aunque lo más común es que sí puedas configurarlo.
 
@@ -135,7 +135,7 @@ Una vez conectado, te pedirá un nombre de usuario y una contraseña, que deber�
 Hay proveedores de internet como Digi, que te permiten configurar el router, pero los cambios que le hagas a los puertos no van a funcionar a no ser que contactes con ellos y les pidas que te permitan abrir puertos *(cosa por la que te cobrarán 1€ más al mes)*.
 :::
 
-Vamos a abrir los puertos necesarios, un ejemplo pueden ser los de HTTP, HTTPS, Minecraft y SSH, podemos habrirlos tanto para TCP como para UDP especificando la IP local del servidor o su direcicón MAC para que se abran solo para el servidor y quedaría así:
+Vamos a abrir los puertos necesarios, un ejemplo pueden ser los de HTTP, HTTPS, Minecraft y SSH, podemos abrirlos tanto para TCP como para UDP especificando la IP local del servidor o su dirección MAC para que se abran solo para el servidor y quedaría así:
 
 ![Router Port Fowarding](../images/router-puertos.png)
 

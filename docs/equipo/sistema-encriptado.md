@@ -53,7 +53,7 @@ Puede que te encuentres con dos posibles contraseñas, la de **usuario** y la de
 
 Ahora hay que ir al apartado de **Boot** y cambiar el orden de inicio de los dispositivos para poner como primera opción el USB donde tenemos el instalador del sistema operativo.
 
-Salimos guardando los cambios y el ordeandor debería reiniciarse y mostrar el instalador del sistema.
+Salimos guardando los cambios y el ordenador debería reiniciarse y mostrar el instalador del sistema.
 
 ## Instalación de Debian 11
 
@@ -81,13 +81,13 @@ El usuario escogido en la guía es `admin`. Este nombre es de ejemplo y Debian n
 5. La contraseña para el usuario `admin`. Una contraseña que sea buena, aunque no es necesario que sea tan extensa como la de `root`.
 6. Configuración del reloj, de chill.
 
-Después de esto toca poner una encriptación en el disco de instalación.
+Después de esto toca encriptar el disco de instalación.
 
 ### Encriptación del disco
 
 Para no complicarnos la vida, aquí dejaremos que Debian haga la magia de gestionar las particiones porque si no nos tocaría sufrir mucho.
 
-En el instalador, elegiremos el método de particionado **Guiado - utilizar todo el disco y configurar LVM cifrado**. Elegimos el disco donde queremos instalar el sistema operativo, que en nuestro caso es la SSD de 480GB y utilizamos como esquema de particionado **Todos los ficheros en una partición (recomendado para novatos)**.
+En el instalador, elegiremos el método de particionado **Guiado - utilizar todo el disco y configurar LVM cifrado**. Elegimos el disco donde queremos instalar el sistema operativo, que en nuestro caso es el SSD de 480GB y utilizamos como esquema de particionado **Todos los ficheros en una partición (recomendado para novatos)**.
 
 Ahora, si aprecias tu tiempo y no tenías archivos altamente sensibles en el disco donde vas a instalar Debian, puedes elegir no borrar el disco, ya que tardaría un buen rato.
 
@@ -123,14 +123,14 @@ Si no quieres que se te quede la cara de tonto que se me quedó a mí ya en dos 
 
 Encendemos el servidor, iniciamos sesión con el nombre de usuario que creamos, con su contraseña y ya estaría.
 
-Lo primero que vamos a hacer, por comodidad, es instalar el paquete `sudo`, que nos permite hacer casi todo lo que hace el usuario `root` sin necesidad de cambiarnos a ese usuario, para ello escribimos los siquientes comandos:
-```
+Lo primero que vamos a hacer, por comodidad, es instalar el paquete `sudo`, que nos permite hacer casi todo lo que hace el usuario `root` sin necesidad de cambiarnos a ese usuario, para ello escribimos los siguientes comandos:
+```sh
 $ su
 Contraseña:
 $ apt install sudo
 ```
 
-Ahora queda añadir al usuario que creamos durante la instalación como *sudoer*, para ello escribimos `nano /etc/sudoers` y ponemos lo siguiente:
+Ahora queda añadir al usuario que creamos durante la instalación como *sudoer*, para ello editamos el archivo `/etc/sudoers` y ponemos lo siguiente:
 ```bash
 #
 # This file MUST be edited with the 'visudo' command as root.
@@ -168,7 +168,7 @@ Donde `admin` será el usuario que creamos. Guardamos el archivo y ya podemos es
 
 **Si tenemos el sistema operativo en un disco SSD**, como es el caso, hay unos cambios que podemos hacer para mejorar el rendimiento y la durabilidad del disco, tenemos que editar `/etc/fstab`, concretamente la primera línea sin comentar, que debería ser la correspondiente al sistema de archivos `root`, añadiendo unas opciones extra para cuando se monte la partición:
 
-```
+```bash
 # /etc/fstab: static file system information.
 #
 # Use 'blkid' to print the universally unique identifier for a
@@ -178,19 +178,19 @@ Donde `admin` será el usuario que creamos. Guardamos el archivo y ya podemos es
 # systemd generates mount units based on this file, see systemd.mount(5).
 # Please run 'systemctl daemon-reload' after making changes here.
 #
-# <file system> <mount point>   <type>  <options>       <dump>  <pass>
+# <file system>             <mount point>   <type>  <options>                                                                              <dump>  <pass>
 /dev/mapper/server--vg-root /               btrfs   defaults,subvol=@rootfs,ssd,noatime,space_cache,commit=120,compress=zstd,discard=async 0       0
 ```
 
 El resto de líneas que haya debajo las dejamos intactas.
 
-### Montando el disco tocho en el encendido
+### Montando el disco tocho al inicio
 
-Como que tenemos un disco duro de 4TB que vamos a usar para almacenar archivos, necesitamos que se desencripte también y se monte al encenderse el servidor, así que vamos a ello.
+Como tenemos un disco duro de 4TB que vamos a usar para almacenar archivos, necesitamos que se desencripte también y se monte al encenderse el servidor, así que vamos a ello.
 
 Lo primero es que se desencripte, para ello tendremos que añadir el disco a  `/etc/crypttab`, pero como ese queremos que se desencripte solo sin tener que ponerle nosotros la contraseña, tendremos que crear un archivo que servirá como contraseña para desencriptar el disco. Localizamos el disco, que en este caso es `sdb1`:
 
-```
+```sh
 $ lsblk
 NAME                    MAJ:MIN RM   SIZE RO TYPE  MOUNTPOINT
 sda                       8:0    0 447,1G  0 disk  
@@ -207,7 +207,7 @@ sr0                      11:0    1  1024M  0 rom
 
 Ahora hay que buscar su UUID:
 
-```
+```sh
 $ ls -l /dev/disk/by-uuid
 total 0
 lrwxrwxrwx 1 root root 10 ago 10 17:47 0053a965-9146-4e52-b842-0ba1a756c4c5 -> ../../sda3
@@ -219,21 +219,21 @@ lrwxrwxrwx 1 root root 10 ago 10 17:47 eb777051-9d3a-4bf9-a186-fdfcc9d5c9c0 -> .
 ```
  Que en este caso es `60e8d58f-cb05-47f1-85bc-38e5b0a05505`, lo guardamos y vamos a crear el archivo que servirá de clave:
 
- ```
+ ```sh
 $ sudo dd if=/dev/urandom of=/root/hdd_key bs=1024 count=4
 $ sudo chmod 0400 /root/hdd_key
 $ sudo cryptsetup luksAddKey /dev/sdb1 /root/hdd_key
  ```
 
- Lo que acabamos de hacer es crear un archivo con carácteres aleatorios *(como una contraseña básicamente pero mucho más larga)* y añadirlo como clave para desencriptar el disco duro, ya que LUKS nos permite tener varias claves. Ahora sí, hay que editar `/etc/fstab` añadiendo esta línea al final:
- ```
+ Lo que acabamos de hacer es crear un archivo con caracteres aleatorios *(como una contraseña básicamente pero mucho más larga)* y añadirlo como clave para desencriptar el disco duro, ya que LUKS nos permite tener varias claves. Ahora sí, hay que editar `/etc/fstab` añadiendo esta línea al final:
+ ```sh
 vault UUID=60e8d58f-cb05-47f1-85bc-38e5b0a05505 /root/hdd_key luks
  ```
 
  Donde lo primero es el nombre que tendrá el volumen, lo segundo su UUID *(no olvidar comprobar que sea el correcto)*, lo tercero el archivo donde está la clave y lo cuarto especifica que utiliza LUKS.
 
  Muy bien, con esto el disco se desencriptará al encenderse el servidor, solo nos queda añadirlo a `/etc/fstab` para que también se monte. Añadimos esta línea al final del archivo:
- ```
+ ```sh
 /dev/mapper/vault /mnt/vault btrfs defaults,nofail 0 0
  ```
 

@@ -11,10 +11,10 @@ Esa guía se divide en dos partes y tiene una tercera de relatos:
 ---
 
 Puedes **consultar la guía** en [este enlace](https://comicivans.github.io/server/) o puedes compilarla tú mismo descargando el repositorio:
-1. Necesitarás `npm` instalado. Puedes descargarlo [aquí](https://github.com/nodesource/distributions/blob/master/README.md).
-2. Abre una terminal en la carpeta raiz del repositorio y escribe `npm install`
+1. Necesitarás `npm` o `pnpm` instalado. Puedes descargar NPM [aquí](https://github.com/nodesource/distributions/blob/master/README.md) y PNPM [aquí](https://pnpm.io/installation). Si decides instalar PNPM, cuando en un comando haya que poner `npm` tendrás que sustituirlo por `pnpm`.
+2. Abre una terminal en la carpeta raíz del repositorio y escribe `npm install`
 3. Ejecuta `npm run docs:build` y `npm run docs:serve` *(si esto no funciona, utiliza en su lugar `npm run docs:dev`)*
-4. Abre http://localhost:5000 *(si utilizaste `npm run docs:dev`, tienes que abrir http://localhost:3000)*
+4. Abre el enlace que aparezca en la consola y podrás ver la guía.
 
 ---
 

@@ -24,4 +24,4 @@
 # For more information see the manual pages of crontab(5) and cron(8)
 # 
 # m h  dom mon dow   command
-1,6,11,16,21,26,31,36,41,46,51,56 * * * * sleep 46 ; wget --no-check-certificate -O - https://69.42.215.252/dynamic/update.php?UpdateURL >> /tmp/freedns_@_servermamadisimo_xyz.log 2>&1 &
+1,6,11,16,21,26,31,36,41,46,51,56 * * * * sleep 46 ; wget --no-check-certificate -O - "https://$(nslookup freedns.afraid.org 1.1.1.1 | awk '/^Address: / { print $2 }')/dynamic/update.php?id" > /tmp/freedns_@_wupp_dev.log 2>&1 &

@@ -1,7 +1,8 @@
 node_modules/
 docs/.vitepress/dist/
+docs/.vitepress/cache/
 **/.env
-# !**/*.example
+pnpm-lock.yaml
 
 # Docker FS volume mappings (just for testing)
 db/
