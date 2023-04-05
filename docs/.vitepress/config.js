@@ -52,7 +52,6 @@ let guideSidebar = [
     text: "Relatos",
     collapsible: true,
     items: [
-      { text: "Initramfs vs Router", link: "/relatos/initramfs-vs-router" },
       { text: "Bloqueo de SSH", link: "/relatos/bloqueo-ssh" },
       {
         text: "Lucas vs. Debian & Docker & etc.",

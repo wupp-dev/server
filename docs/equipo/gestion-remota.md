@@ -87,6 +87,10 @@ $ sudo update-initramfs -u
 
 Esto generará de nuevo en la partición `boot` los archivos de `initramfs` incluyendo los cambios que hemos hecho.
 
+::: tip RELATO
+Tras esto descubrí que si el ordenador permanecía mucho tiempo encendido sin que nadie se conectase para desencriptar los discos, dejaba de ser accesible a través de la IP pública o el dominio (aunque sí era posible acceder a través de la IP local). Al principio pensé que era porque había que configurar la IP fija en `initramfs`, pero al intentar hacerlo, como el router ya tenía fijada la IP, se hacían un lío y no funcionaba. Al final se solucionó al poner también ahí el dominio a actualizarse, que es justo lo que viene ahora en la guía. 
+:::
+
 ### ¿Y qué pasa con el dominio?
 
 ¿No podría ocurrir que, mientras el ordenador está esperando a que alguien se conecte para desencriptar los discos, la IP pública cambie? Pues sería raro, pero podría ocurrir. Y no nos conviene, así que vamos a prevenir que eso pueda ocurrir.
