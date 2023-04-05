@@ -50,7 +50,7 @@ $ sudo systemctl start nginx
 $ sudo systemctl status nginx
 ```
 
-Sin embargo, queda un último paso, permitir los puertos `80` y `443` tanto en el rotuer como en el firewall, para el firewall escribimos:
+Sin embargo, queda un último paso, permitir los puertos `80` y `443` tanto en el router como en el firewall, para el firewall escribimos:
 
 ```
 $ sudo ufw allow 80
@@ -59,7 +59,7 @@ $ sudo ufw allow 443
 
 Estos son los puertos de HTTP y HTTPS respectivamente.
 
-Vamos a hacer retocar un poco la configuración para las partes venideras de la guía. La configuración de Nginx se estructura en bloques. Concretamente la parte que tocaremos son los bloques `server`, que serán la configuración de cada uno de nuestros subdominios. Estos archvios de configuración se guardan en `/etc/nginx/conf.d/` y, por defecto, solo habrá un archivo llamado `default.conf`, vamos a cambiarle el nombre a `wupp.dev`, ya que tendrá el bloque encargado de gestionar las conexiones con esa URL.
+Vamos a hacer retocar un poco la configuración para las partes venideras de la guía. La configuración de Nginx se estructura en bloques. Concretamente la parte que tocaremos son los bloques `server`, que serán la configuración de cada uno de nuestros subdominios. Estos archivos de configuración se guardan en `/etc/nginx/conf.d/` y, por defecto, solo habrá un archivo llamado `default.conf`, vamos a cambiarle el nombre a `wupp.dev`, ya que tendrá el bloque encargado de gestionar las conexiones con esa URL.
 ```
 $ mv /etc/nginx/conf.d/default.conf /etc/nginx/conf.d/wupp.dev.conf
 ```
@@ -69,7 +69,7 @@ Editamos el archivo y buscamos una línea que empiece por `server_name`:
 server_name wupp.dev www.wupp.dev;
 ```
 
-Ahora verificamos que el archivo modificado verifique la sintáxis y reiniciamos el servicio de Nginx:
+Ahora verificamos que el archivo modificado verifique la sintaxis y reiniciamos el servicio de Nginx:
 ```
 $ sudo nginx -t
 nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
