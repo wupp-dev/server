@@ -254,4 +254,10 @@ Por último (y este cambio es puñetero), como PHP se está ejecutando dentro de
 
 Una vez hecho esto, deberíamos de poder acceder a `cloud.wupp.dev` y nos aparecería la pantalla de configuración inicial de Nexcloud, donde debemos elegir un nombre de usuario y contraseña para la cuenta de administrador. Para la base de datos, elegimos "MySQL/MariaDB" y ponemos el nombre de usuario, contraseña y la base de datos para Nextcloud que pusimos en `docker-compose.yml`. Por último, para la dirección escribimos `db:3306`.
 
-Ya habiendo instalado Nextcloud, solo nos quedará navegar por los ajustes y configurarlo a nuestro gusto.
+Ya habiendo instalado Nextcloud, solo nos quedará navegar por los ajustes y configurarlo a nuestro gusto. Podemos también configurarlo también editando el archivo `/var/www/nextcloud/config/config.php`. Podemos añadir por ejemplo estas líneas al final:
+
+````php
+'default_language' => 'es',
+'default_locale' => 'es_ES',
+'default_phone_region' => 'ES',
+```
