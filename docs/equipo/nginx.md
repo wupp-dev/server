@@ -150,11 +150,11 @@ http {
 
     # Enable SSL/TLS
     ssl_protocols TLSv1.2 TLSv1.3;
-    ssl_prefer_server_ciphers on;
-    ssl_session_cache shared:SSL:10m;
-    ssl_session_timeout 1h;
-    ssl_ciphers ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256;
-
+    ssl_session_cache shared:le_nginx_SSL:10m;
+    ssl_session_timeout 1440m;
+    ssl_session_tickets off;
+    ssl_prefer_server_ciphers off;
+    
     # Enable HSTS with a 1 year duration
     add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload";
 
@@ -182,10 +182,10 @@ http {
 - `client_max_body_size 10m;`: Establece un límite de tamaño de solicitud máximo. Esto limita el tamaño de los datos que un usuario puede enviar en una sola solicitud para evitar ataques DDoS o intentos de cargar archivos muy grandes. Tendremos que cambiarlo dentro del bloque `server` para poder usar Nextcloud cómodamente.
 - `limit_rate 8m;`: Evita que se descarguen una cantidad masiva de datos. También tendremos que modificarlo para Nextcloud.
 - `ssl_protocols TLSv1.2 TLSv1.3;`: Especifica que se deben utilizar los protocolos TLSv1.2 y TLSv1.3, que son versiones seguras y recomendadas de los protocolos SSL/TLS.
-- `ssl_prefer_server_ciphers on;`: Para que el servidor priorice el uso de los cifrados que se han especificado en la configuración del servidor en lugar de los que propone el cliente. Esto es importante porque algunos clientes pueden sugerir cifrados menos seguros.
-- `ssl_session_cache shared:SSL:10m;`: Se pueden reutilizar las sesiones SSL que se han establecido previamente en una caché compartida llamada "SSL" con un tamaño de 10 megabytes. Esto puede reducir la carga en el servidor.
-- `ssl_session_timeout 1h;`: Indica que las sesiones SSL se mantienen en caché durante 1 hora. Después de ese tiempo, las sesiones SSL caducan y se eliminan de la caché.
-- `ssl_ciphers ...`: Especifica los cifrados permitidos para las conexiones SSL/TLS que, en este caso, se permiten sólo los cifrados más fuertes.
+- `ssl_session_cache shared:le_nginx_SSL:10m`: Se pueden reutilizar las sesiones SSL que se han establecido previamente en una caché compartida llamada "le_nginx_SSL" con un tamaño de 10 megabytes. Esto puede reducir la carga en el servidor.
+- `ssl_session_timeout 1440m;`: Indica que las sesiones SSL se mantienen en caché durante 1440 minutos. Después de ese tiempo, las sesiones SSL caducan y se eliminan de la caché.
+- `ssl_session_tickets off;`: Los tickets son una forma de guardar las sesiones SSL para más tarde, pero es algo inseguro por naturaleza, así que se recomienda desactivarlo.
+- `ssl_prefer_server_ciphers off;`: Esta opción es la recomendada si estamos limitando los protocolos a los más nuevos (TLSv1.2 y TLSv1.3), porque no tienen cifrados inseguros, así que se le permite escoger al cliente el que prefiera.
 - `add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload";`: Instruye a los navegadores a acceder al sitio web solo a través de conexiones seguras (HTTPS) durante un año completo. La opción "includeSubDomains" extiende esta directiva a todos los subdominios y "preload" indica que el sitio web desea ser incluido en la lista HSTS pre-cargada de los navegadores, lo que acelera el proceso de carga de HTTPS en visitas posteriores.
 - `sendfile on;`: Esta opción habilita el envío de archivos estáticos directamente desde el disco a través del sistema de archivos del kernel, lo que puede mejorar significativamente el rendimiento de la entrega de archivos estáticos.
 - `tcp_nopush on;`: Esta opción habilita el modo TCP_NOPUSH que evita que los paquetes de datos pequeños se envíen de manera fragmentada y que los paquetes más grandes se envíen en bloques más grandes, lo que reduce la sobrecarga de envío.
