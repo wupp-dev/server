@@ -30,6 +30,10 @@ let guideSidebar = [
     text: "Servicios",
     collapsible: true,
     items: [
+      {
+        text: "Nextcloud - Almacenamiento",
+        link: "/servicios/nextcloud",
+      },
       { text: "Minecraft con AMP", link: "/servicios/minecraft" },
       {
         text: "Dozzle - Visualizador de logs",
@@ -38,10 +42,6 @@ let guideSidebar = [
       { text: "Homarr - Dashboard", link: "/servicios/homarr" },
       { text: "Uptime Kuma - Status", link: "/servicios/uptime-kuma" },
       { text: "Authentik - Autenticación", link: "/servicios/authentik" },
-      {
-        text: "Nextcloud - Almacenamiento",
-        link: "/servicios/nextcloud",
-      },
       { text: "Gitea - Servicio git", link: "/servicios/gogs" },
       { text: "Navidrome - Streaming de música", link: "/servicios/navidrome" },
       { text: "Overleaf - Editor de LaTeX", link: "/servicios/sharelatex" },

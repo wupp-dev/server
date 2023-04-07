@@ -119,6 +119,7 @@ events {
 
 http {
     add_header Allow "GET, POST, OPTIONS";
+    add_header X-Permitted-Cross-Domain-Policies "none" always;
     add_header X-Content-Type-Options nosniff always;
     add_header X-Frame-Options "SAMEORIGIN" always;
     add_header X-XSS-Protection "1; mode=block" always;
@@ -170,7 +171,8 @@ http {
 }
 ```
 ¿Qué hace cada cambio?
-- `server_tokens off;`: Desactiva la información de versión del servidor que se envía en las cabeceras HTTP. De esta forma, se oculta información sensible y se evita que los atacantes puedan aprovechar vulnerabilidades específicas de una versión determinada del servidor.
+- `add_header Allow "GET, POST, OPTIONS";`: Indica los métodos HTTP que están permitidos, lo que restringe la capacidad de un atacante para realizar solicitudes no autorizadas o peligrosas en el servidor web.
+- `add_header X-Permitted-Cross-Domain-Policies "none" always;`: Impide que se compartan recursos con otros dominios. Esto es importante porque evita que un atacante pueda acceder a recursos del sitio web desde otro dominio.
 - `add_header X-Content-Type-Options nosniff;`: Añade una cabecera HTTP para evitar que los navegadores intenten interpretar archivos con un tipo MIME incorrecto. De esta forma, se evita que un atacante pueda enviar un archivo malicioso disfrazado como un archivo seguro.
 - `add_header X-Frame-Options SAMEORIGIN;`: Añade una cabecera HTTP para evitar ataques de "Clickjacking", que consisten en engañar al usuario para que haga clic en algo que no quiere haciendo uso de iframes. Al especificar "SAMEORIGIN", se permite que la página sólo sea enmarcada por otras páginas que se carguen desde el mismo origen.
 - `add_header X-XSS-Protection "1; mode=block";`: Añade una cabecera HTTP para habilitar la protección contra ataques XSS (Cross-Site Scripting) en los navegadores que soportan esta cabecera. Al habilitar esta protección, se evita que un atacante pueda inyectar código malicioso en una página web.
@@ -181,6 +183,7 @@ http {
 - El resto de `fastcgi_hide_header ...` ocultan qué software o tecnología se utiliza para ejecutar el servidor web, que puede ser utilizado por atacantes para encontrar vulnerabilidades en el servidor.
 - `client_max_body_size 10m;`: Establece un límite de tamaño de solicitud máximo. Esto limita el tamaño de los datos que un usuario puede enviar en una sola solicitud para evitar ataques DDoS o intentos de cargar archivos muy grandes. Tendremos que cambiarlo dentro del bloque `server` para poder usar Nextcloud cómodamente.
 - `limit_rate 8m;`: Evita que se descarguen una cantidad masiva de datos. También tendremos que modificarlo para Nextcloud.
+- `server_tokens off;`: Desactiva la información de versión del servidor que se envía en las cabeceras HTTP. De esta forma, se oculta información sensible y se evita que los atacantes puedan aprovechar vulnerabilidades específicas de una versión determinada del servidor.
 - `ssl_protocols TLSv1.2 TLSv1.3;`: Especifica que se deben utilizar los protocolos TLSv1.2 y TLSv1.3, que son versiones seguras y recomendadas de los protocolos SSL/TLS.
 - `ssl_session_cache shared:le_nginx_SSL:10m`: Se pueden reutilizar las sesiones SSL que se han establecido previamente en una caché compartida llamada "le_nginx_SSL" con un tamaño de 10 megabytes. Esto puede reducir la carga en el servidor.
 - `ssl_session_timeout 1440m;`: Indica que las sesiones SSL se mantienen en caché durante 1440 minutos. Después de ese tiempo, las sesiones SSL caducan y se eliminan de la caché.

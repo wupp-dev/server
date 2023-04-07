@@ -5,7 +5,7 @@ lang: es-ES
 
 # Docker
 
-Para gestionar y ejecutar todos los servicios web, utilizaremos el maravilloso Docker. Este hermoso software te permite (a través de un plugin llamado Docker Compose) ejecutar una serie de mini-vm desde la terminal en base a un archivo de configuración llamado `docker-compose.yml`.
+Para gestionar y ejecutar todos los servicios web, utilizaremos el maravilloso Docker. Este hermoso software te permite (a través de un plugin llamado Docker Compose) ejecutar una serie de mini máquinas virtuales desde la terminal en base a un archivo de configuración llamado `docker-compose.yml`.
 
 Aquí hay una guía de cómo instalar y configurar todo, pero si te quedas con dudas o quieres ver algo más a fondo, puedes visitar la [documentación oficial de Docker](https://docs.docker.com/).
 
@@ -26,7 +26,6 @@ $ sudo apt update
 $ sudo apt install docker-ce docker-ce-cli containerd.io docker-compose-plugin
 $ sudo adduser dockeruser
 $ sudo usermod -aG docker dockeruser
-$ sudo cp ./home/docker/ /home/docker/
 ```
 
 ## Instalación
@@ -60,7 +59,7 @@ Todo debería de estar bien, pero si eres muy tiquismiqui puedes probar a ejecut
 
 ## Docker Compose
 
-¡Sigamos instalando! La maravilla que Docker Compose es vamos a instalarla como un plugin del Docker que ya hemos instalado. Venga que esta es facilita, ejecuta esto y listo:
+¡Sigamos instalando! La maravilla de Docker Compose es qur vamos a instalarla como un plugin del Docker que ya hemos instalado. Venga que esta es facilita, ejecuta esto y listo:
 
 ```bash
 $ sudo apt install docker-compose-plugin
@@ -75,7 +74,7 @@ De nuevo, si no confías lo suficiente en `apt`, comprueba que todo está bien e
 Cuando estaba en esto, que parecía muy simple, Debian decidió que se iba a poner en mi contra y no funcionar, así que tenéis la historia de como colapsé en [un relato](../relatos/usuario-docker) (si veis que la guía y los comandos han cambiado, es por lo ocurrido en ese relato).
 :::
 
-Para ejecutar el inmejorable Docker vamos a crear un diferente usuario para ejecutar Docker, así mejoramos ligeramente la seguridad. Para que un usuario pueda ejecutar Docker sin tener que hacer `sudo` y ejecutarlo como _root_, hay que añadirlo al grupo _docker_. Desde tú usuario de administración con `sudo` aún instalado, vamos a ello entonces:
+Vamos a crear un usuario diferente para ejecutar Docker, así mejoramos ligeramente la seguridad. Para que un usuario pueda ejecutar Docker sin tener que hacer `sudo` y ejecutarlo como _root_, hay que añadirlo al grupo _docker_. Desde tu usuario de administración con `sudo` aún instalado, vamos a ello entonces:
 
 ```bash
 $ sudo adduser dockeruser # Creación del usuario y su home en /home/dockeruser
@@ -85,24 +84,51 @@ $ sudo usermod -aG docker dockeruser # Añadir el usuario al grupo
 
 ## Archivos para Docker
 
-Antes de cambiar al usuario `dockeruser`, aún con el usuario de administrador copiaremos todos los contenidos de este repositorio _\<repo_root\>/home/dockeruser_ a la carpeta de _/home/dockeruser_ en nuestro sistema (**importante hacerlo como el usuario administrador, con el usuario `dockeruser` no nos dejará**). Aquí están los archivos de configuración de todos los servicios y el famoso `docker-compose.yml`. Así que, **encontrándonos en la carpeta del clon del repositorio del server**, ejecutamos:
+Antes de cambiar al usuario `dockeruser`, aún con el usuario de administrador, vamos a crear el archivo `/home/dockeruser/docker-compose.yml` con el siguiente contenido:
 
-```bash
-$ sudo cp ./home/dockeruser/ /home/dockeruser/
+```yml
+version: '3'
+
+services:
+  db:
+    image: mariadb
+    container_name: db
+    restart: always
+    command: --transaction-isolation=READ-COMMITTED --log-bin=binlog --binlog-format=ROW
+    environment:
+      - MARIADB_USER=nextcloud
+      - MARIADB_PASSWORD=pwd
+      - MARIADB_DATABASE=nextcloud
+    volumes:
+      - ./db:/var/lib/mysql
+
+  nextcloud:
+    image: nextcloud:fpm
+    container_name: nextcloud
+    restart: always
+    ports:
+      - 9000:9000
+    depends_on:
+      - db
+    volumes:
+      - /var/www/nextcloud:/var/www/html
+    environment:
+      - MYSQL_HOST=db
+      - NEXTCLOUD_TRUSTED_DOMAINS=cloud.wupp.dev
+      - PHP_MEMORY_LIMIT=50G
+      - PHP_UPLOAD_LIMIT=50G
 ```
 
-Donde se asume que estamos la raíz del repositorio.
+Que es todo lo necesario para poner a funcionar el primero de los servicios, Nextcloud. ya lo veremos más adelante.
 
 ## El `docker-compose.yml`
 
-Por fin llegamos al famoso archivo. Este archivo incluye toda la configuración de los servicios a ejecutar con Docker y nos permite cómodamente iniciar todos. En la página de cada servicio se puede encontrar un extracto del contenido del `docker-compose.yml` para ese servicio concreto. Veamos la estructura de este archivo:
+Por fin llegamos al famoso archivo. Este archivo incluye toda la configuración de los servicios a ejecutar con Docker y nos permite cómodamente iniciar todos. En la página de cada servicio se puede encontrar un extracto del contenido del `docker-compose.yml` para ese servicio concreto. Veamos la estructura del archivo:
 
-- **`version`:** algo importará intuyo, pero no creo que mucho así que está la 2 por que lo debí de ver por ahí con el primer servicio que puse y ahí se ha quedado.
+- **`version`:** algo importará intuyo, pero no creo que mucho así que está la 2 por que lo debí de ver por ahí con el primer servicio que puse y ahí se ha quedado. **Actualización:** Ahora Iván lo ha cambiado a la 3 por el mismo motivo.
 
-- **`volumes`:** una forma integrada en docker para guardar archivos sin importar mucho donde se guardan estos, pero de forma que el programa pueda perdurar datos en forma de archivo, lo cual usaremos para caché o archivos que no sean de configuración o podramos requerir frecuentemente.
+- **`services`:** esto es lo importante, aquí declaramos todos los contenedores que se han de crear, en donde se especifica la imagen (el contenedor/mini-vm a utilizar), el nombre, la política de reinicio (será siempre _always_ o _unless-stopped_), un comando que ejecutar al iniciarse, los volúmenes para hacer los datos persistentes y los puertos que se exponen (mapeando `<EQUIPO>:<CONTENEDOR>`). Y esto son solo algunas de las cosas que se pueden especificar.
 
-- **`services`:** esto es lo importante, aquí declaramos todos los contenedores que se han de crear, en donde se especifica la imagen (el contenedor/mini-vm a utilizar), los puertos que se exponen (mapeando `<EQUIPO>:<CONTENEDOR>`), variables de entorno (environment vars para quien sepa), la política de reinicio (será siempre _always_ o _unless-stopped_) y los volúmenes y mapeo de archivos y carpetas correspondientes.
+Te recomiendo que leas la [documentación oficial de Docker Compose](https://docs.docker.com/compose/) para saber cómo funciona exactamente el archivo.
 
-Hay otro par de ajustes para este archivo (por ejemplo `networks`), pero no son relevantes para esta instalación y no se usan en ella, por tanto si quieres más información de estos lee la [documentación oficial de Docker Compose](https://docs.docker.com/compose/)
-
-Lo dicho, según vayamos viendo los diferentes servicios se irán mostrando los extractos del archivo para el correspondiente servicio para que así podáis cómodamente seleccionar que servicios queréis. El archivo también se encuentra ampliamente documentado, por tanto con leer este documento debería de ser suficiente para entenderlo.
+Lo dicho, según vayamos viendo los diferentes servicios se irán mostrando los extractos del archivo para el correspondiente servicio para que así podáis cómodamente seleccionar que servicios queréis.

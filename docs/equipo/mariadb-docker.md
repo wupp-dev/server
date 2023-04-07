@@ -5,6 +5,10 @@ lang: es-ES
 
 # Configurando MariaDB con Docker
 
+::: warning ATENCIÓN
+Esta página está desactualizada y pendiente de revisión.
+:::
+
 Para empezar a ver cómo funciona el `docker-compose.yaml` y probar docker, vamos a configurar un contenedor de MariaDB, que servirá como base de datos para los diferentes servicios que soporten MySQL.
 
 ## Contenido de `docker-compose.yaml`
