@@ -66,7 +66,7 @@ $ sudo apt install dropbear-initramfs
 
 Vamos a editar el archivo de configuración, que está en `/etc/dropbear-initramfs/config` y vamos a descomentar y editar la línea:
 
-```bash
+```conf
 DROPBEAR_OPTIONS="-I 300 -j -k -p 22 -s"
 ```
 
@@ -121,7 +121,7 @@ Y lo que hará es crear el directorio y copiar el mismo archivo que ya habíamos
 
 Antes de hacer nada, nos queda una última cosa por hacer, y es que en `initramfs` no hay configurado un servidor DNS, así que el ordenador no podrá resolver `freedns.afraid.org` a la IP que apunte y no se podrá ejecutar el comando. Un apaño para que funcione es cambiar el contenido de `crontab` escribiendo `sudo crontab -e` a este:
 
-```bash
+```conf
 # 
 # To define the time you can provide concrete values for
 # minute (m), hour (h), day of month (dom), month (mon),
@@ -147,10 +147,9 @@ Que lo que hace es resolver con otra herramienta de BusyBox, `nslookup`, el domi
 
 ## Resolviendo problemas
 
-Un problema con el que nos encontramos cuando intentamos conectarnos al servidor por SSH primero para desencriptar los discos y después para el uso normal, es que nos salta este error:
+Un problema con el que nos encontramos cuando intentamos conectarnos al servidor por SSH primero para desencriptar los discos y después para el uso normal, es que nos salta este error tras escribir `ssh admin@wupp.dev`:
 
 ```
-$ ssh admin@wupp.dev
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 @    WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED!     @
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -189,7 +188,7 @@ _Nuevamente el puerto es de ejemplo y es recomendable cambiarlo a otro._
 
 Por último, reiniciamos el servidor SSH para que los cambios tengan efecto:
 
-```
+```sh
 $ sudo systemctl restart ssh
 ```
 
@@ -199,7 +198,7 @@ Iván mientras escribía esto _(desde un sitio lejano a la ubicación del servid
 
 A partir de ahora ya no deberíamos tener el problema al conectarnos, lo único que hay que tener en cuenta es que, a la hora de establecer la conexión SSH, tendremos que indicar el puerto:
 
-```
+```sh
 $ ssh -p 2222 admin@wupp.dev
 ```
 
@@ -207,7 +206,7 @@ $ ssh -p 2222 admin@wupp.dev
 
 Todavía tenemos que desactivar el acceso con usuario y contraseña por SSH, que es muy poco seguro, para solo permitir el acceso con las claves públicas permitidas. Vamos a editar el archivo `/etc/ssh/sshd_config` y a cambiar las siguientes líneas:
 
-```
+```conf
 PasswordAuthentication no
 PermitRootLogin no
 AllowUsers admin
@@ -227,7 +226,7 @@ Antes de hacer efectivos los cambios, tenemos que asegurarnos de que existe el a
 
 Por último, hacemos efectivos los cambios:
 
-```
+```sh
 $ sudo systemctl restart ssh
 ```
 
