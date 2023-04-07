@@ -117,9 +117,36 @@ mkdir $DESTDIR/var/spool/cron/crontabs
 cp /var/spool/cron/crontabs/root $DESTDIR/var/spool/cron/crontabs/root
 ```
 
-Y lo que hará es crear el directorio y copiar el mismo archivo que ya habíamos configurado antes con el comando para actualizar la IP. Cada vez que escribamos `sudo update-initramfs -u` se volverá a crear el directorio y a copiar el archivo, con lo que también nos aseguraremos de que si cambiamos el archivo también se cambiará en `initramfs`, aunque no inmediatamente.
+Escribimos `sudo chmod +x /usr/share/initramfs-tools/hooks/crontab` para hacer el archivo ejecutable y esto lo que hará es crear el directorio y copiar el mismo archivo que ya habíamos configurado antes con el comando para actualizar la IP. Cada vez que escribamos `sudo update-initramfs -u` se volverá a crear el directorio y a copiar el archivo, con lo que también nos aseguraremos de que si cambiamos el archivo también se cambiará en `initramfs`, aunque no inmediatamente.
 
-Antes de hacer nada, nos queda una última cosa por hacer, y es que en `initramfs` no hay configurado un servidor DNS, así que el ordenador no podrá resolver `freedns.afraid.org` a la IP que apunte y no se podrá ejecutar el comando. Un apaño para que funcione es cambiar el contenido de `crontab` escribiendo `sudo crontab -e` a este:
+Sin embargo, aunque ya podemos usar `crontab` en `initramfs`, nos falta hacer que se empiece a ejecutar, así que tenemos que crear otro archivo que se encargue de iniciar `crond`, que ejecutará lo que haya en `crontab`. Ese archivo será `/usr/share/initramfs-tools/scripts/init-premount/crond` y tendrá este contenido:
+```bash
+#!/bin/sh
+# Start crond
+
+PREREQ="busybox"
+prereqs()
+{
+        echo "$PREREQ"
+}
+
+case $1 in
+prereqs)
+        prereqs
+        exit 0
+        ;;
+esac
+
+. /scripts/functions
+
+crond -l 2
+
+exit 0
+```
+
+Que no se nos olvide hacer el archivo ejecutable escribiendo `sudo chmod +x /usr/share/initramfs-tools/scripts/init-premount/crond` y ya podremos ir con el último paso para que todo esto funcione.
+
+Nos queda una última cosa por hacer, y es que en `initramfs` no hay configurado un servidor DNS, así que el ordenador no podrá resolver `freedns.afraid.org` a la IP que apunte y no se podrá ejecutar el comando. Un apaño para que funcione es cambiar el contenido de `crontab` escribiendo `sudo crontab -e` a este:
 
 ```conf
 # 
