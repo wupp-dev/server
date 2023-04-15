@@ -64,11 +64,11 @@ services:
     entrypoint: /cron.sh
 ```
 
-Lo primero que cabe destacar es que en este nuevo archivo, los usuarios y las contraseñas están directamente escritos. Esto no es una buena práctica de seguridad, pero para la guía lo vamos a dejar así, dejando claro que a la hora de implementarlo deberían usarse [secretos de docker](https://docs.docker.com/engine/swarm/secrets/).
+Lo primero que cabe destacar es que en este nuevo archivo, los usuarios y las contraseñas están directamente escritos. Esto no es una buena práctica de seguridad, pero para la guía lo vamos a dejar así, dejando claro que a la hora de implementarlo deberían usarse [secretos de docker](https://docs.docker.com/engine/swarm/secrets/). Una excepción que hemos hecho a esto es redis, que por unos cuantos problemas que nos ha dado lo hemos dejado sin contraseña.
 
 Vamos a analizar un poco el documento, concretamente los servicios que hay declarados:
 - `db`: Esta será la base de datos de Nextcloud, la línea que hay en `command` tiene opciones para un mejor rendimiento y escalabilidad. Luego en `environment` simplemente se establece la contraseña del usuario root y un usuario, contraseña y base de datos a crear, que serán Nextcloud. Por último, `volumes` permite que los datos guardados se conserven aunque el servicio se reinicie.
-- `redis`: Es otra base de datos pero que en este caso Nextcloud utilizará para almacenar archivos en caché y así tener un mejor rendimiento. En `command` se especifica la contraseña.
+- `redis`: Es otra base de datos pero que en este caso Nextcloud utilizará para almacenar archivos en caché y así tener un mejor rendimiento. También se usará para gestionar los inicios de sesión. En `command` se especifica la contraseña.
 - `nextcloud`: Tiene el mapeo de puertos `9000:9000` para que Nginx pueda redirigir las solicitudes PHP dentro del contenedor. Además, `depends_on` indica que tanto `db` como `redis` deben estar funcionando para que Nextcloud lo haga. Por último se hace igual que en `db` un mapeo de carpetas para conservar los datos y se establecen las variables de entorno para configurar Nextcloud.
 - `cron`: Este contenedor es peculiar. Es necesario solo si planeas que Nextcloud lo vaya a usar más de una persona, para reducir la carga de trabajo del servidor. Lo único que hace es ejecutar puntualmente una tarea de `cron` dentro de los archivos de Nextcloud para hacer labores de mantenimiento y limpieza de forma automática.
 
@@ -266,4 +266,17 @@ Ya habiendo instalado Nextcloud, podemos navegar por los ajustes y configurarlo,
 
 A parte de eso, como Nextcloud funciona con PHP, nos conviene modificar también la configuración de PHP. Y esto puede ser un poco lioso, porque en la imagen de docker que tenemos hay muchos archivos que modifican la configuración de PHP. Además, esos archivos no los podemos modificar directamente porque al reiniciar docker se borran. La solución es crear un nuevo archivo con las opciones que queremos cambiar y copiarlo dentro del contenedor de docker cada vez que se inicie.
 
-Para empezar creamos el archivo `/var/www/`...
+Para empezar creamos el archivo `/var/www/nextcloud/manual-php.ini` y ponemos el siguiente contenido:
+
+```ini
+; Manual configuration for PHP
+max_input_time = -1
+max_execution_time = 172800
+max_file_uploads = 10000
+max_input_nesting_level = 128
+max_input_vars = 10000
+```
+
+Estos valores se pueden ajustar al gusto de cada uno. Después, solo tendremos que añadir a `docker-compose.yml` la línea `/var/www/nextcloud/manual-php.ini:/usr/local/etc/php/conf.d/manual-php.ini` como volumen de Nextcloud y reiniciar los contenedores de docker.
+
+Finalmente, podemos añadir un poco más de seguridad siguiendo [estas recomendaciones](https://docs.nextcloud.com/server/latest/admin_manual/installation/harden_server.html#setup-fail2ban) del manual de Nextcloud.
