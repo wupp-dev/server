@@ -195,7 +195,11 @@ http {
 - `tcp_nodelay on;`: Esta opción habilita el modo TCP_NODELAY que deshabilita la espera antes de enviar paquetes pequeños, lo que puede reducir la latencia en conexiones de red.
 - `keepalive_timeout 65;`: Esta opción establece el tiempo máximo de espera para mantener una conexión TCP persistente con el cliente en segundos, lo que permite una reutilización más eficiente de las conexiones existentes y reduce la sobrecarga de establecimiento de conexiones en las solicitudes consecutivas.
 
-¿Cómo hemos decidido poner estas opciones? Pues siendo sinceros, preguntándole a [ChatGPT](https://chat.openai.com) (que también ha hecho la explicación de qué hace cada cosa).
+::: danger PELIGRO
+Debes tener mucho cuidado al añadir `preload` a la cabecera de Strict-Transport-Security. Esto es algo que puede provocar grandes dolores de cabeza si no se conocen bien sus consecuencias. Para más información puedes consultar [esta página](https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Headers_Cheat_Sheet.html#strict-transport-security-hsts).
+:::
+
+¿Cómo hemos decidido poner estas opciones? Pues siendo sinceros, entre preguntarle a [ChatGPT](https://chat.openai.com) (que también ha hecho la explicación de qué hace cada cosa) y revisar [esta página](https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Headers_Cheat_Sheet.html).
 
 Después de esto, dentro de cada bloque `server` podremos o tendremos que hacer otros cambios, pero eso es algo específico que iremos viendo.
 

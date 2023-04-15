@@ -18,7 +18,6 @@ services:
     image: mariadb
     container_name: db
     restart: always
-    command: --transaction-isolation=READ-COMMITTED --log-bin=binlog --binlog-format=ROW
     environment:
       - MARIADB_ROOT_PASSWORD=pwd
       - MARIADB_USER=nextcloud
@@ -26,6 +25,7 @@ services:
       - MARIADB_DATABASE=nextcloud
     volumes:
       - /var/lib/mysql:/var/lib/mysql
+    command: --transaction-isolation=READ-COMMITTED --log-bin=binlog --binlog-format=ROW
 
   redis:
     image: redis
@@ -36,13 +36,9 @@ services:
     image: nextcloud:fpm
     container_name: nextcloud
     restart: always
-    ports:
-      - 9000:9000
     depends_on:
       - db
       - redis
-    volumes:
-      - /var/www/nextcloud:/var/www/html
     environment:
       - MYSQL_HOST=db
       - NEXTCLOUD_TRUSTED_DOMAINS=cloud.wupp.dev
@@ -51,6 +47,11 @@ services:
       - REDIS_HOST_PASSWORD=pwd
       - PHP_MEMORY_LIMIT=50G
       - PHP_UPLOAD_LIMIT=50G
+    ports:
+      - 9000:9000
+    volumes:
+      - /var/www/nextcloud:/var/www/html
+
   cron:
     image: nextcloud:fpm
     container_name: cron
@@ -207,6 +208,7 @@ server {
         fastcgi_request_buffering off;
 
         fastcgi_max_temp_file_size 0;
+        fastcgi_read_timeout 600;
     }
 
     location ~ \.(?:css|js|svg|gif|png|jpg|ico|wasm|tflite|map)$ {
