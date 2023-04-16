@@ -262,7 +262,10 @@ Ya habiendo instalado Nextcloud, podemos navegar por los ajustes y configurarlo,
 'default_language' => 'es',
 'default_locale' => 'es_ES',
 'default_phone_region' => 'ES',
+'bulkupload.enabled' => false,
 ```
+
+Concretamente, la última línea ayuda a solucionar un [bug](https://github.com/nextcloud/desktop/issues/5094) que hay actualmente con el cliente de Nextcloud al tener la velocidad de subida ilimitada.
 
 A parte de eso, como Nextcloud funciona con PHP, nos conviene modificar también la configuración de PHP. Y esto puede ser un poco lioso, porque en la imagen de docker que tenemos hay muchos archivos que modifican la configuración de PHP. Además, esos archivos no los podemos modificar directamente porque al reiniciar docker se borran. La solución es crear un nuevo archivo con las opciones que queremos cambiar y copiarlo dentro del contenedor de docker cada vez que se inicie.
 
