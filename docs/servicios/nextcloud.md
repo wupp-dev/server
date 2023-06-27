@@ -8,41 +8,34 @@ Por fin llegó el momento de poner en marcha el primer servicio, y qué mejor el
 
 ## Configurando Docker
 
-Partimos del documento `docker-compose.yml` que nos quedó en la sección de [Docker](../equipo/docker.md) al que vamos a hacer unos cuantos cambios que ahora comentaré:
+Empezamos escribiendo en el `docker-compose.yml` todo lo necesario para tener una instalación funcional de Nextcloud:
 
 ```yml
-version: '3'
-
 services:
-  db:
-    image: mariadb
-    container_name: db
+  nextcloud-db:
+    image: postgres
     restart: always
     environment:
-      - MARIADB_ROOT_PASSWORD=pwd
-      - MARIADB_USER=nextcloud
-      - MARIADB_PASSWORD=pwd
-      - MARIADB_DATABASE=nextcloud
+      - POSTGRES_USER=nextcloud
+      - POSTGRES_PASSWORD=pwd
+      - POSTGRES_DB=nextcloud
     volumes:
-      - /var/lib/mysql:/var/lib/mysql
-    command: --transaction-isolation=READ-COMMITTED --log-bin=binlog --binlog-format=ROW
+      - /var/lib/nextcloud/postgresql/data:/var/lib/postgresql:Z
 
-  redis:
+  nextcloud-redis:
     image: redis
-    container_name: redis
     command: redis-server --requirepass pwd
 
   nextcloud:
     image: nextcloud:fpm
-    container_name: nextcloud
     restart: always
     depends_on:
-      - db
-      - redis
+      - nextcloud-db
+      - nextcloud-redis
     environment:
-      - MYSQL_HOST=db
+      - POSTGRES_HOST=nextcloud-db
       - NEXTCLOUD_TRUSTED_DOMAINS=cloud.wupp.dev
-      - REDIS_HOST=redis
+      - REDIS_HOST=nextcloud-redis
       - REDIS_HOST_PORT=6379
       - REDIS_HOST_PASSWORD=pwd
       - PHP_MEMORY_LIMIT=50G
@@ -52,25 +45,38 @@ services:
     volumes:
       - /var/www/nextcloud:/var/www/html
 
-  cron:
+  nextcloud-cron:
     image: nextcloud:fpm
-    container_name: cron
     restart: always
     depends_on:
-      - db
-      - redis
+      - nextcloud-db
+      - nextcloud-redis
     volumes:
       - /var/www/nextcloud:/var/www/html
     entrypoint: /cron.sh
+
+  nextcloud-imaginary:
+    image: nextcloud/aio-imaginary:latest
+    restart: always
+    ports:
+      - 9090:9000
+    command: -concurrency 20 -enable-url-source -return-size
+    cap_add:
+      - SYS_NICE
 ```
 
-Lo primero que cabe destacar es que en este nuevo archivo, los usuarios y las contraseñas están directamente escritos. Esto no es una buena práctica de seguridad, pero para la guía lo vamos a dejar así, dejando claro que a la hora de implementarlo deberían usarse [secretos de docker](https://docs.docker.com/engine/swarm/secrets/). Una excepción que hemos hecho a esto es redis, que por unos cuantos problemas que nos ha dado lo hemos dejado sin contraseña.
+:::info
+Hemos decidido usar PostgreSQL como base de datos para Nextcloud por preferencia personal, pero se puede configurar sin mucha distinción con MariaDB, que es de hecho como empezarmos a usarlo.
+:::
+
+Lo primero que cabe destacar es que en este nuevo archivo, los usuarios y las contraseñas están directamente escritos. Esto no es una buena práctica de seguridad, pero para la guía lo vamos a dejar así, dejando claro que a la hora de implementarlo deberían usarse [secretos de docker](https://docs.docker.com/engine/swarm/secrets/). Una excepción que hemos hecho a esto es redis, que por unos cuantos problemas que nos ha dado lo hemos dejado sin contraseña, aunque se puede usar con contraseña siempre que esté escrita en el `docker-compose.yml` en el comando de iniciación de redis (y se le pase a Nextcloud).
 
 Vamos a analizar un poco el documento, concretamente los servicios que hay declarados:
-- `db`: Esta será la base de datos de Nextcloud, la línea que hay en `command` tiene opciones para un mejor rendimiento y escalabilidad. Luego en `environment` simplemente se establece la contraseña del usuario root y un usuario, contraseña y base de datos a crear, que serán Nextcloud. Por último, `volumes` permite que los datos guardados se conserven aunque el servicio se reinicie.
-- `redis`: Es otra base de datos pero que en este caso Nextcloud utilizará para almacenar archivos en caché y así tener un mejor rendimiento. También se usará para gestionar los inicios de sesión. En `command` se especifica la contraseña.
-- `nextcloud`: Tiene el mapeo de puertos `9000:9000` para que Nginx pueda redirigir las solicitudes PHP dentro del contenedor. Además, `depends_on` indica que tanto `db` como `redis` deben estar funcionando para que Nextcloud lo haga. Por último se hace igual que en `db` un mapeo de carpetas para conservar los datos y se establecen las variables de entorno para configurar Nextcloud.
-- `cron`: Este contenedor es peculiar. Es necesario solo si planeas que Nextcloud lo vaya a usar más de una persona, para reducir la carga de trabajo del servidor. Lo único que hace es ejecutar puntualmente una tarea de `cron` dentro de los archivos de Nextcloud para hacer labores de mantenimiento y limpieza de forma automática.
+- `nextcloud-db`: Esta será la base de datos de Nextcloud. En `environment` simplemente se establece un usuario, contraseña y base de datos a crear, que serán para Nextcloud. Por último, `volumes` permite que los datos guardados se conserven aunque el servicio se reinicie y la `Z` la puso Lucas en por verla en la documentación, [aquí](https://docs.docker.com/storage/bind-mounts/#configure-the-selinux-label) se explica lo que hace.
+- `nextcloud-redis`: Es otra base de datos pero que en este caso Nextcloud utilizará para almacenar archivos en caché y así tener un mejor rendimiento. También se usará para gestionar los inicios de sesión. En `command` se puede especificar la contraseña.
+- `nextcloud`: Tiene el mapeo de puertos `9000:9000` para que Nginx pueda redirigir las solicitudes PHP dentro del contenedor. Además, `depends_on` indica que tanto `nextcloud-db` como `nextcloud-redis` deben estar funcionando para que Nextcloud lo haga. Por último se hace igual que en `nextcloud-db` un mapeo de carpetas para conservar los datos y se establecen las variables de entorno para configurar Nextcloud.
+- `nextcloud-cron`: Este contenedor es peculiar. Es necesario solo si planeas que Nextcloud lo vaya a usar más de una persona, para reducir la carga de trabajo del servidor. Lo único que hace es ejecutar puntualmente una tarea de `cron` dentro de los archivos de Nextcloud para hacer labores de mantenimiento y limpieza de forma automática.
+- `nextcloud-imaginary`: La imagen actualizada por Nextcloud de [Imaginary](https://github.com/h2non/imaginary), un microservicio encargado de generar las vistas previas de las imágenes subidas a Nextcloud. No es estrictamente necesario, pero es más rápido que la aplicación que tiene Nextcloud para ello.
 
 Para que Nextcloud empiece a ejecutarse (aunque aun no podamos acceder) simplemente escribimos `docker compose up -d`.
 
@@ -91,6 +97,7 @@ map $arg_v $asset_immutable {
 
 server {
     server_name cloud.wupp.dev;
+    http2 on;
 
     # set max upload size
     client_max_body_size 50G;
@@ -254,7 +261,7 @@ Por último (y este cambio es puñetero), como PHP se está ejecutando dentro de
 
 ## Configurando Nextcloud
 
-Una vez hecho esto, deberíamos de poder acceder a `cloud.wupp.dev` y nos aparecería la pantalla de configuración inicial de Nexcloud, donde debemos elegir un nombre de usuario y contraseña para la cuenta de administrador. Para la base de datos, elegimos "MySQL/MariaDB" y ponemos el nombre de usuario, contraseña y la base de datos para Nextcloud que pusimos en `docker-compose.yml`. Por último, para la dirección escribimos `db:3306`.
+Una vez hecho esto, deberíamos de poder acceder a `cloud.wupp.dev` y nos aparecería la pantalla de configuración inicial de Nexcloud, donde debemos elegir un nombre de usuario y contraseña para la cuenta de administrador. Para la base de datos, elegimos "MySQL/MariaDB" y ponemos el nombre de usuario, contraseña y la base de datos para Nextcloud que pusimos en `docker-compose.yml`. Por último, para la dirección escribimos `nextcloud-db:3306`.
 
 Ya habiendo instalado Nextcloud, podemos navegar por los ajustes y configurarlo, aunque también podemos hacerlo modificando los archivos de configuración como `/var/www/nextcloud/config/config.php`. Por ejemplo, podemos añadir estas líneas al final:
 
@@ -263,11 +270,33 @@ Ya habiendo instalado Nextcloud, podemos navegar por los ajustes y configurarlo,
 'default_locale' => 'es_ES',
 'default_phone_region' => 'ES',
 'bulkupload.enabled' => false,
+'enabledPreviewProviders' => [
+  'OC\\Preview\\TXT',
+  'OC\\Preview\\MarkDown',
+  'OC\\Preview\\PDF',
+  'OC\\Preview\\MSOfficeDoc',
+  'OC\\Preview\\JPEG',
+  'OC\\Preview\\PNG',
+  'OC\\Preview\\GIF',
+  'OC\\Preview\\BMP',
+  'OC\\Preview\\XBitmap',
+  'OC\\Preview\\MP3',
+  'OC\\Preview\\HEIC',
+  'OC\\Preview\\Movie',
+  'OC\\Preview\\MKV',
+  'OC\\Preview\\MP4',
+  'OC\\Preview\\AVI',
+  'OC\\Preview\\MP3',
+  'OC\\Preview\\OpenDocument',
+  'OC\\Preview\\Krita',
+  'OC\\Preview\\Imaginary',
+],
+'preview_imaginary_url' => 'http://127.0.0.1:9090',
 ```
 
-Concretamente, la última línea ayuda a solucionar un [bug](https://github.com/nextcloud/desktop/issues/5094) que hay actualmente con el cliente de Nextcloud al tener la velocidad de subida ilimitada.
+Concretamente, la línea `'bulkupload.enabled' => false,` ayuda a solucionar un [bug](https://github.com/nextcloud/desktop/issues/5094) que hay actualmente con el cliente de Nextcloud al tener la velocidad de subida ilimitada. Y las últimas líneas son la configuración de Imaginary.
 
-A parte de eso, como Nextcloud funciona con PHP, nos conviene modificar también la configuración de PHP. Y esto puede ser un poco lioso, porque en la imagen de docker que tenemos hay muchos archivos que modifican la configuración de PHP. Además, esos archivos no los podemos modificar directamente porque al reiniciar docker se borran. La solución es crear un nuevo archivo con las opciones que queremos cambiar y copiarlo dentro del contenedor de docker cada vez que se inicie.
+A parte de eso, como Nextcloud funciona con PHP, nos conviene modificar también la configuración de PHP. Y esto puede ser un poco lioso, porque en la imagen de docker que tenemos hay muchos archivos que modifican la configuración de PHP. Además, esos archivos no los podemos modificar directamente porque al reiniciar el contenedor se borran. La solución es crear un nuevo archivo con las opciones que queremos cambiar y copiarlo dentro del contenedor de docker cada vez que se inicie.
 
 Para empezar creamos el archivo `/var/www/nextcloud/manual-php.ini` y ponemos el siguiente contenido:
 

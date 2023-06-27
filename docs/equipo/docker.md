@@ -82,52 +82,52 @@ $ sudo passwd dockeruser # Tenemos que asignarle una contraseña (recomendación
 $ sudo usermod -aG docker dockeruser # Añadir el usuario al grupo
 ```
 
-## Archivos para Docker
+## El `docker-compose.yml`
 
-Antes de cambiar al usuario `dockeruser`, aún con el usuario de administrador, vamos a crear el archivo `/home/dockeruser/docker-compose.yml` con el siguiente contenido:
+Por fin llegamos al famoso archivo. Este archivo incluye toda la configuración de los servicios a ejecutar con Docker y nos permite cómodamente iniciar todos. En la página de cada servicio se puede encontrar un extracto del contenido del `docker-compose.yml` para ese servicio concreto. Veamos la estructura del archivo:
 
 ```yml
 version: '3'
 
 services:
-  db:
-    image: mariadb
-    container_name: db
-    restart: always
-    command: --transaction-isolation=READ-COMMITTED --log-bin=binlog --binlog-format=ROW
-    environment:
-      - MARIADB_USER=nextcloud
-      - MARIADB_PASSWORD=pwd
-      - MARIADB_DATABASE=nextcloud
-    volumes:
-      - ./db:/var/lib/mysql
-
-  nextcloud:
-    image: nextcloud:fpm
-    container_name: nextcloud
-    restart: always
-    ports:
-      - 9000:9000
+  service:
+    image: test
+    container_name: test-container
+    links:
+      - another_db
     depends_on:
       - db
-    volumes:
-      - /var/www/nextcloud:/var/www/html
+    restart: unless-stopped
+    privileged: false
+    user: uid:gid
+    secrets:
+      - super_secret_test
+    env_file:
+      - env/test.env
     environment:
-      - MYSQL_HOST=db
-      - NEXTCLOUD_TRUSTED_DOMAINS=cloud.wupp.dev
-      - PHP_MEMORY_LIMIT=50G
-      - PHP_UPLOAD_LIMIT=50G
+      - ...
+    ports:
+      - "127.0.0.1:34665:80"
+    expose:
+      - 7080
+    volumes:
+      - /var/app:/app
+    healthcheck:
+      test: "echo hi"
+      interval: 10s
+    logging:
+      driver: none
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+    entrypoint: ["sh"]
+    command: nice
 ```
 
-Que es todo lo necesario para poner a funcionar el primero de los servicios, Nextcloud. ya lo veremos más adelante.
-
-## El `docker-compose.yml`
-
-Por fin llegamos al famoso archivo. Este archivo incluye toda la configuración de los servicios a ejecutar con Docker y nos permite cómodamente iniciar todos. En la página de cada servicio se puede encontrar un extracto del contenido del `docker-compose.yml` para ese servicio concreto. Veamos la estructura del archivo:
+Obviamente no siempre tendremos que usar tantas opciones para un servicio, pero es útil saber las que hay y tener siempre un orden común. Vemos que el archivo se separa en dos partes:
 
 - **`version`:** algo importará intuyo, pero no creo que mucho así que está la 2 por que lo debí de ver por ahí con el primer servicio que puse y ahí se ha quedado. **Actualización:** Ahora Iván lo ha cambiado a la 3 por el mismo motivo.
 
-- **`services`:** esto es lo importante, aquí declaramos todos los contenedores que se han de crear, en donde se especifica la imagen (el contenedor/mini-vm a utilizar), el nombre, la política de reinicio (será siempre _always_ o _unless-stopped_), un comando que ejecutar al iniciarse, los volúmenes para hacer los datos persistentes y los puertos que se exponen (mapeando `<EQUIPO>:<CONTENEDOR>`). Y esto son solo algunas de las cosas que se pueden especificar.
+- **`services`:** esto es lo importante, aquí declaramos todos los contenedores que se han de crear, en donde se especifican todas las opciones.
 
 Te recomiendo que leas la [documentación oficial de Docker Compose](https://docs.docker.com/compose/) para saber cómo funciona exactamente el archivo.
 

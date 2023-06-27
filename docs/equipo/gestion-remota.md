@@ -66,7 +66,7 @@ $ sudo apt install dropbear-initramfs
 
 Vamos a editar el archivo de configuración, que está en `/etc/dropbear-initramfs/config` y vamos a descomentar y editar la línea:
 
-```conf
+```ssh-config
 DROPBEAR_OPTIONS="-I 300 -j -k -p 22 -s"
 ```
 
@@ -233,7 +233,7 @@ $ ssh -p 2222 admin@wupp.dev
 
 Todavía tenemos que desactivar el acceso con usuario y contraseña por SSH, que es muy poco seguro, para solo permitir el acceso con las claves públicas permitidas. Vamos a editar el archivo `/etc/ssh/sshd_config` y a cambiar las siguientes líneas:
 
-```conf
+```ssh-config
 PasswordAuthentication no
 PermitRootLogin no
 AllowUsers admin
@@ -286,3 +286,75 @@ $ sudo systemctl restart vncserver@1
 Es raro necesitar el servidor VNC, pero justo estoy escribiendo esta parte antes que la de configuración de servidor SSH porque necesito abrir unos puertos en el router y para eso necesito acceder con un navegador desde el servidor.
 Como era de esperar, Debian no venía con navegador instalado, así que para poder usar uno con el VNC instalamos Firefox con `sudo apt install firefox-esr`.
 :::
+
+## Embelleciendo
+
+Cuando iniciamos sesión por SSH nos aparece un mensaje como este:
+
+```
+Linux server 5.10.0-21-amd64 #1 SMP Debian 5.10.162-1 (2023-01-21) x86_64
+
+The programs included with the Debian GNU/Linux system are free software;
+the exact distribution terms for each program are described in the
+individual files in /usr/share/doc/*/copyright.
+
+Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
+permitted by applicable law.
+Last login: Mon May 24 01:23:45 2032 from 192.168.1.1
+```
+
+Que no es muy bonito la verdad, así que podemos hacer unos cambios para que quede un mensaje mucho más lindo.
+1. Editamos `/etc/ssh/sshd_config` para poner los siguientes ajustes:
+```ssh-config
+PrintMotd no
+PrintLastLog no
+Banner none
+```
+2. Quitamos el resto del mensaje de bienvenida con `sudo truncate -s 0 /etc/motd`.
+3. Editamos `/etc/pam.d/sshd` para asegurarnos de que las siguientes líneas están comentadas:
+```conf
+# Print the message of the day upon successful login.
+# This includes a dynamically generated part from /run/motd.dynamic
+# and a static (admin-editable) part from /etc/motd.
+#session    optional     pam_motd.so  motd=/run/motd.dynamic
+#session    optional     pam_motd.so noupdate
+
+# Print the status of the user's mailbox upon successful login.
+#session    optional     pam_mail.so standard noenv # [1]
+```
+4. Instalamos `figlet` y `lolcat` para tener colores y cabeceras personalizadas `sudo apt update && sudo apt install figlet lolcat`.
+5. Creamos el archivo `~/welcome_message.sh`:
+```bash
+#!/bin/bash
+
+# Cabecera personalizada
+echo "WUPP . DEV" | figlet | lolcat
+
+# Última conexión
+last_login=$(last -i -F $USER | head -n 2 | tail -n 1)
+login_time=$(echo $last_login | awk '{print $5 " " $6 " " $7 " " $8}')
+echo -e "\e[1;33mÚltima conexión:\e[0m" $login_time
+
+# Información del uso del sistema
+echo -e "\e[1;33mUso del CPU:\e[0m" $(grep 'cpu ' /proc/stat | awk '{usage=($2+$4)*100/($2+$4+$5)} END {print usage "%"}')
+echo -e "\e[1;33mUso de memoria:\e[0m" $(free -m | awk 'NR==2{printf "%.2f%%\t\t", $3*100/$2 }')
+
+# Espacio en disco
+echo -e "\e[1;33mEspacio en disco:\e[0m"
+df -h | grep -vE '^tmpfs|udev' | awk '{print $1 "\t" $5 "\t" $6}' | column -t | lolcat
+
+echo ""
+
+```
+6. Hacemos el archivo ejecutable `chmod +x ~/welcome_message.sh` y lo añadimos a `~/.bashrc`:
+```bash
+# ~/.bashrc: executed by bash(1) for non-login shells.
+# see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
+# for examples
+
+# ...
+
+# Add the welcome message
+~/welcome_message.sh
+```
+7. Reiniciamos el servicio de SSH `sudo systemctl restart ssh`, nos desconectamos y nos volvemos a conectar para comprobar que funciona.

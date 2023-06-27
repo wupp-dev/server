@@ -25,6 +25,6 @@
   },
   "homepage": "https://github.com/ComicIvans/server#readme",
   "dependencies": {
-    "vitepress": "^1.0.0-alpha.64"
+    "vitepress": "latest"
   }
 }

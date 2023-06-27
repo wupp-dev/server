@@ -13,6 +13,10 @@ Para ello, necesitamos un servidor web, que se encargará de gestionar las conex
 
 Nosotros usaremos Nginx por ser más moderno y más eficiente.
 
+::: warning ATENCIÓN
+En esta guía se utilizan varios ajustes que mejoran la seguridad del servidor, pero esto reduce la compatibilidad con dispositivos antiguos y navegadores desactualizados, que no podrán acceder a la página. Nosotros hemos decidido que es más importante garantizar la seguridad a la retrocompatibilidad, pero esto dependerá de cada caso.
+:::
+
 ## Instalación y puesta en marcha
 
 Para asegurarnos de tener la última versión siempre instalada, utilizaremos los repositorios de Nginx en vez de los del sistema operativo. Para añadirlos, podemos seguir los pasos de [su web](https://nginx.org/en/linux_packages.html#Debian), que para Debian son:
@@ -94,8 +98,10 @@ $ sudo apt install certbot python3-certbot-nginx
 
 Generamos el certificado para nuestro dominio:
 ```sh
-$ sudo certbot --nginx -d wupp.dev -d www.wupp.dev
+$ sudo certbot --key-type ecdsa --elliptic-curve secp384r1 --nginx -d wupp.dev -d www.wupp.dev
 ```
+
+Hemos especificado `--key-type ecdsa` porque 
 
 Y ya está, certbot se encarga de modificar la configuración del archivo `/etc/nginx/conf.d/www.wupp.dev.conf` para forzar el uso de HTTPS y para renovar automáticamente los certificados cuando vayan a expirar.
 
@@ -127,6 +133,7 @@ http {
     add_header Content-Security-Policy "default-src 'self';";
     add_header Content-Security-Policy-Report-Only "default-src 'self';";
     add_header Permissions-Policy "accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()";
+    add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload";
     fastcgi_hide_header X-Powered-By;
     fastcgi_hide_header Server;
     fastcgi_hide_header X-AspNet-Version;
@@ -150,14 +157,18 @@ http {
     server_tokens off;
 
     # Enable SSL/TLS
-    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_protocols TLSv1.3;
     ssl_session_cache shared:le_nginx_SSL:10m;
-    ssl_session_timeout 1440m;
+    ssl_session_timeout 1d;
     ssl_session_tickets off;
-    ssl_prefer_server_ciphers off;
+    ssl_ecdh_curve secp384r1;
     
-    # Enable HSTS with a 1 year duration
-    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload";
+    # OSCP
+    ssl_stapling on;
+    ssl_stapling_verify on;
+    resolver 208.67.222.222 208.67.220.220 valid=300s;
+    resolver_timeout 5s;
+    ssl_trusted_certificate /etc/letsencrypt/live/wupp.dev/chain.pem;
 
     sendfile on;
     tcp_nopush on;
@@ -169,37 +180,22 @@ http {
 
     include /etc/nginx/conf.d/*.conf;
 }
-```
-¿Qué hace cada cambio?
-- `add_header Allow "GET, POST, OPTIONS";`: Indica los métodos HTTP que están permitidos, lo que restringe la capacidad de un atacante para realizar solicitudes no autorizadas o peligrosas en el servidor web.
-- `add_header X-Permitted-Cross-Domain-Policies "none" always;`: Impide que se compartan recursos con otros dominios. Esto es importante porque evita que un atacante pueda acceder a recursos del sitio web desde otro dominio.
-- `add_header X-Content-Type-Options nosniff;`: Añade una cabecera HTTP para evitar que los navegadores intenten interpretar archivos con un tipo MIME incorrecto. De esta forma, se evita que un atacante pueda enviar un archivo malicioso disfrazado como un archivo seguro.
-- `add_header X-Frame-Options SAMEORIGIN;`: Añade una cabecera HTTP para evitar ataques de "Clickjacking", que consisten en engañar al usuario para que haga clic en algo que no quiere haciendo uso de iframes. Al especificar "SAMEORIGIN", se permite que la página sólo sea enmarcada por otras páginas que se carguen desde el mismo origen.
-- `add_header X-XSS-Protection "1; mode=block";`: Añade una cabecera HTTP para habilitar la protección contra ataques XSS (Cross-Site Scripting) en los navegadores que soportan esta cabecera. Al habilitar esta protección, se evita que un atacante pueda inyectar código malicioso en una página web.
-- `add_header Referrer-Policy "strict-origin-when-cross-origin";`: Indica que se debe enviar información del referente solo para solicitudes desde el mismo origen y solicitudes de sitios de terceros que compartan el mismo origen. Esto ayuda a proteger la privacidad del usuario limitando la información que se comparte con sitios externos.
-- `add_header Content-Security-Policy "default-src 'self';";`: Especifica que solo se permiten recursos desde el mismo origen que el sitio web Esto reduce el riesgo de ataques XSS (cross-site scripting). Esto tendremos que cambiarlo en el momento en el que usemos recursos de otras páginas como pueden ser fuentes de Google Fonts.
-- `add_header Content-Security-Policy-Report-Only "default-src 'self';";`: La diferencia de esta con la anterior es que no bloquea los recursos, sino que reporta las violaciones de la política. En este caso no tiene utilidad, porque es más restrictiva la política anterior, pero igualmente la vamos a poner.
-- `add_header Permissions-Policy "accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()";`: Especifica las políticas de permisos para los dispositivos y sensores utilizados por el sitio web.
-- El resto de `fastcgi_hide_header ...` ocultan qué software o tecnología se utiliza para ejecutar el servidor web, que puede ser utilizado por atacantes para encontrar vulnerabilidades en el servidor.
-- `client_max_body_size 10m;`: Establece un límite de tamaño de solicitud máximo. Esto limita el tamaño de los datos que un usuario puede enviar en una sola solicitud para evitar ataques DDoS o intentos de cargar archivos muy grandes. Tendremos que cambiarlo dentro del bloque `server` para poder usar Nextcloud cómodamente.
-- `limit_rate 8m;`: Evita que se descarguen una cantidad masiva de datos. También tendremos que modificarlo para Nextcloud.
-- `server_tokens off;`: Desactiva la información de versión del servidor que se envía en las cabeceras HTTP. De esta forma, se oculta información sensible y se evita que los atacantes puedan aprovechar vulnerabilidades específicas de una versión determinada del servidor.
-- `ssl_protocols TLSv1.2 TLSv1.3;`: Especifica que se deben utilizar los protocolos TLSv1.2 y TLSv1.3, que son versiones seguras y recomendadas de los protocolos SSL/TLS.
-- `ssl_session_cache shared:le_nginx_SSL:10m`: Se pueden reutilizar las sesiones SSL que se han establecido previamente en una caché compartida llamada "le_nginx_SSL" con un tamaño de 10 megabytes. Esto puede reducir la carga en el servidor.
-- `ssl_session_timeout 1440m;`: Indica que las sesiones SSL se mantienen en caché durante 1440 minutos. Después de ese tiempo, las sesiones SSL caducan y se eliminan de la caché.
-- `ssl_session_tickets off;`: Los tickets son una forma de guardar las sesiones SSL para más tarde, pero es algo inseguro por naturaleza, así que se recomienda desactivarlo.
-- `ssl_prefer_server_ciphers off;`: Esta opción es la recomendada si estamos limitando los protocolos a los más nuevos (TLSv1.2 y TLSv1.3), porque no tienen cifrados inseguros, así que se le permite escoger al cliente el que prefiera.
-- `add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload";`: Instruye a los navegadores a acceder al sitio web solo a través de conexiones seguras (HTTPS) durante un año completo. La opción "includeSubDomains" extiende esta directiva a todos los subdominios y "preload" indica que el sitio web desea ser incluido en la lista HSTS pre-cargada de los navegadores, lo que acelera el proceso de carga de HTTPS en visitas posteriores.
-- `sendfile on;`: Esta opción habilita el envío de archivos estáticos directamente desde el disco a través del sistema de archivos del kernel, lo que puede mejorar significativamente el rendimiento de la entrega de archivos estáticos.
-- `tcp_nopush on;`: Esta opción habilita el modo TCP_NOPUSH que evita que los paquetes de datos pequeños se envíen de manera fragmentada y que los paquetes más grandes se envíen en bloques más grandes, lo que reduce la sobrecarga de envío.
-- `tcp_nodelay on;`: Esta opción habilita el modo TCP_NODELAY que deshabilita la espera antes de enviar paquetes pequeños, lo que puede reducir la latencia en conexiones de red.
-- `keepalive_timeout 65;`: Esta opción establece el tiempo máximo de espera para mantener una conexión TCP persistente con el cliente en segundos, lo que permite una reutilización más eficiente de las conexiones existentes y reduce la sobrecarga de establecimiento de conexiones en las solicitudes consecutivas.
+
+Para saber qué hace cada cambio, puedes buscarlo en la documentación de Nginx, porque por ahora me da pereza ponerlo aquí.
 
 ::: danger PELIGRO
-Debes tener mucho cuidado al añadir `preload` a la cabecera de Strict-Transport-Security. Esto es algo que puede provocar grandes dolores de cabeza si no se conocen bien sus consecuencias. Para más información puedes consultar [esta página](https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Headers_Cheat_Sheet.html#strict-transport-security-hsts).
+Debes tener mucho cuidado al añadir `preload` a la cabecera de Strict-Transport-Security. Esto es algo que puede traerte problemitas si no conoces bien sus consecuencias. Para más información puedes consultar [esta página](https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Headers_Cheat_Sheet.html#strict-transport-security-hsts).
 :::
 
-¿Cómo hemos decidido poner estas opciones? Pues siendo sinceros, entre preguntarle a [ChatGPT](https://chat.openai.com) (que también ha hecho la explicación de qué hace cada cosa) y revisar [esta página](https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Headers_Cheat_Sheet.html).
+¿Cómo hemos decidido poner estas opciones? Pues buscando entre varias páginas recomendaciones. Aquí hay una lista de páginas que hemos consultado:
+- [Generador de configuración SSL de Mozilla](https://ssl-config.mozilla.org/)
+- [Recomendaciones de TLS de Mozilla](https://wiki.mozilla.org/Security/Server_Side_TLS)
+- [Guía de HTTP de Mozilla](https://developer.mozilla.org/en-US/docs/Web/HTTP)
+- [Descripción de cada cabecera HTTP](https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Headers_Cheat_Sheet.html)
+- [Reportage de SSL Labs](https://www.ssllabs.com/ssltest/analyze.html?d=cloud.wupp.dev)
+- [Reportage de TLS Profiler](https://tlsprofiler.danielfett.de/)
+
+Aun así, no hemos seguido las recomendaciones de cada página al pie de la letra, hemos escogido lo que más nos convenía.
 
 Después de esto, dentro de cada bloque `server` podremos o tendremos que hacer otros cambios, pero eso es algo específico que iremos viendo.
 
@@ -240,6 +236,60 @@ server {
     ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
 }
 ```
+
+Un detalle importante al usar Certbot es que añade automáticamente esta línea a cada bloque `server` para el que genera certificado:
+
+```conf
+include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+```
+
+Si vemos el contenido de este archivo, nos daremos cuenta de un ligero problema:
+
+```conf
+# This file contains important security parameters. If you modify this file
+# manually, Certbot will be unable to automatically provide future security
+# updates. Instead, Certbot will print and log an error message with a path to
+# the up-to-date file that you will need to refer to when manually updating
+# this file. Contents are based on https://ssl-config.mozilla.org
+
+ssl_session_cache shared:le_nginx_SSL:10m;
+ssl_session_timeout 1440m;
+ssl_session_tickets off;
+
+ssl_protocols TLSv1.2 TLSv1.3;
+ssl_prefer_server_ciphers off;
+
+ssl_ciphers "ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384";
+```
+
+Este archivo nos está sobreescribiendo algunos ajustes que hemos hecho, pero advierte que si lo modificamos dejará de actualizarse junto con Certbot, así que tenemos dos opciones:
+- Dejar simplemente que Certbot elija y actualice la configuración.
+- Cambiarla nosotros y asegurarnos de mantenerla en un futuro si surge alguna nueva recomendación de seguridad.
+
+Como nosotros no estamos satisfechos con la configuración actual de Certbot, hemos decidido cambiarla, quedando así:
+
+```conf
+# This file contains important security parameters. If you modify this file
+# manually, Certbot will be unable to automatically provide future security
+# updates. Instead, Certbot will print and log an error message with a path to
+# the up-to-date file that you will need to refer to when manually updating
+# this file. Contents are based on https://ssl-config.mozilla.org
+
+ssl_protocols TLSv1.3;
+ssl_session_cache shared:le_nginx_SSL:10m;
+ssl_session_timeout 1d;
+ssl_session_tickets off;
+ssl_ecdh_curve secp384r1;
+ssl_stapling on;
+ssl_stapling_verify on;
+resolver 208.67.222.222 208.67.220.220 valid=300s;
+resolver_timeout 5s;
+ssl_trusted_certificate /etc/letsencrypt/live/wupp.dev/chain.pem;
+```
+
+:::info
+Entre todas las cosas que hemos añadido está el OCSP Stapling, pero no está implementado en su totalidad, pues se puede añadir la etiqueta "OCSP Must-Staple" al certificado del servidor, pero no es algo esencial y habría que volver a generar todos los certificados de nuevo. Puedes ver más información [aquí](https://scotthelme.co.uk/ocsp-must-staple/).
+:::
 
 Aunque ya hemos acabado de configurar Nginx, hay que tener en cuenta de que por ahora lo único que hace es servir archivos estáticos localizados en `/usr/share/nginx/html/`.
 
