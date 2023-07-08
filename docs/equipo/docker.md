@@ -15,44 +15,44 @@ Aquí hay una guía de cómo instalar y configurar todo, pero si te quedas con d
 
 Si vas con prisa o te da pereza leer, aunque no lo recomiendo para nada, copia y pega lo siguiente en tu terminal, dale a intro y que se haga la magia:
 
-```bash
-$ sudo apt remove docker docker-engine docker.io containerd runc
-$ sudo mkdir -p /etc/apt/keyrings
-$ curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-$ echo \
+```sh
+sudo apt remove docker docker-engine docker.io containerd runc
+sudo mkdir -p /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+echo \
   "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian \
   $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-$ sudo apt update
-$ sudo apt install docker-ce docker-ce-cli containerd.io docker-compose-plugin
-$ sudo adduser dockeruser
-$ sudo usermod -aG docker dockeruser
+sudo apt update
+sudo apt install docker-ce docker-ce-cli containerd.io docker-compose-plugin
+sudo adduser dockeruser
+sudo usermod -aG docker dockeruser
 ```
 
 ## Instalación
 
 Gracias a estar en el inmejorable Debian, usaremos el magnífico comando `apt`. Nuestros queridos amigos de docker hace un tiempo cambiaron de los repositorios oficiales de apt a unos propios, y por tanto, **si ya tienes alguna versión de docker instalada** (llamadas `docker`, `docker.io` o `docker-engine`) toca eliminar los antiguos paquetes ejecutando lo siguiente:
 
-```bash
-$ sudo apt remove docker docker-engine docker.io containerd runc
+```sh
+sudo apt remove docker docker-engine docker.io containerd runc
 ```
 
 Antes de empezar con la instalación de Docker, hay unos pequeños requerimientos que instalar de apt: `ca-certificates`, `curl`, `gnupg`, `lsb-release`. Así que **asegúrate de tener esto instalado para seguir**.
 
 Ahora que tenemos esto instalado, vamos a descargar la clave GPG oficial de Docker y configurar el repositorio de APT. Ejecuta los siguientes comandos:
 
-```bash
-$ sudo mkdir -p /etc/apt/keyrings
-$ curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-$ echo \
+```sh
+sudo mkdir -p /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+echo \
   "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian \
   $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 ```
 
 Y ahora sin más dilación instalemos docker:
 
-```bash
-$ sudo apt update
-$ sudo apt install docker-ce docker-ce-cli containerd.io
+```sh
+sudo apt update
+sudo apt install docker-ce docker-ce-cli containerd.io
 ```
 
 Todo debería de estar bien, pero si eres muy tiquismiqui puedes probar a ejecutar `sudo docker run hello-world` o mirar la documentación si algo va mal. No debería de haber ningún problema con la compatibilidad de versiones, por lo menos por ahora, pero si llegase a haberlo pues ª.
@@ -61,8 +61,8 @@ Todo debería de estar bien, pero si eres muy tiquismiqui puedes probar a ejecut
 
 ¡Sigamos instalando! La maravilla de Docker Compose es qur vamos a instalarla como un plugin del Docker que ya hemos instalado. Venga que esta es facilita, ejecuta esto y listo:
 
-```bash
-$ sudo apt install docker-compose-plugin
+```sh
+sudo apt install docker-compose-plugin
 ```
 
 De nuevo, si no confías lo suficiente en `apt`, comprueba que todo está bien ejecutando `docker compose version`.
@@ -76,18 +76,18 @@ Cuando estaba en esto, que parecía muy simple, Debian decidió que se iba a pon
 
 Vamos a crear un usuario diferente para ejecutar Docker, así mejoramos ligeramente la seguridad. Para que un usuario pueda ejecutar Docker sin tener que hacer `sudo` y ejecutarlo como _root_, hay que añadirlo al grupo _docker_. Desde tu usuario de administración con `sudo` aún instalado, vamos a ello entonces:
 
-```bash
-$ sudo adduser dockeruser # Creación del usuario y su home en /home/dockeruser
-$ sudo passwd dockeruser # Tenemos que asignarle una contraseña (recomendación: que sea larga)
-$ sudo usermod -aG docker dockeruser # Añadir el usuario al grupo
+```sh
+sudo adduser dockeruser # Creación del usuario y su home en /home/dockeruser
+sudo passwd dockeruser # Tenemos que asignarle una contraseña (recomendación: que sea larga)
+sudo usermod -aG docker dockeruser # Añadir el usuario al grupo
 ```
 
 ## El `docker-compose.yml`
 
 Por fin llegamos al famoso archivo. Este archivo incluye toda la configuración de los servicios a ejecutar con Docker y nos permite cómodamente iniciar todos. En la página de cada servicio se puede encontrar un extracto del contenido del `docker-compose.yml` para ese servicio concreto. Veamos la estructura del archivo:
 
-```yml
-version: '3'
+```yaml
+version: "3"
 
 services:
   service:

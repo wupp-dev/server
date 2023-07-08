@@ -35,9 +35,9 @@ Sin embargo, si intentamos conectarnos desde otro ordenador, no nos dejará, por
 Así que lo que hay que hacer es primero abrir el puerto SSH en el router y, si tenemos un firewall, permitirlo también. **Si no tenemos un firewall, vamos a instalarlo porque es necesario.** Para ello ejecutamos los siguientes comandos:
 
 ```sh
-$ sudo apt install ufw
-$ sudo ufw allow 22/tcp
-$ sudo ufw enable
+sudo apt install ufw
+sudo ufw allow 22/tcp
+sudo ufw enable
 ```
 
 Donde `22` es el puerto de SSH y `tcp` el protocolo, que puedes leer [aquí](https://nordvpn.com/es/blog/protocolo-tcp-udp/) las diferencias entre el protocolo TCP y el UDP. Con esto ya tenemos el firewall configurado para aceptar conexiones SSH.
@@ -59,7 +59,7 @@ Teniendo en cuenta lo anterior, `dropbear-initramfs` es un software que permite 
 Instalarlo es muy sencillo, solo hay que irse a la terminal del servidor e instalarlo como un paquete normal y corriente escribiendo
 
 ```sh
-$ sudo apt install dropbear-initramfs
+sudo apt install dropbear-initramfs
 ```
 
 **¿Eso es todo?** Obviamente no, hay que configurarlo.
@@ -81,14 +81,14 @@ DROPBEAR_OPTIONS="-I 300 -j -k -p 22 -s"
 Como indica el último parámetro, la autenticación por contraseña está deshabilitada, así que utilizaremos también las claves públicas que hayamos autorizado para OpenSSH Server, podemos copiarlas y hacer que los cambios tengan efecto con los comandos:
 
 ```sh
-$ sudo cp /home/admin/.ssh/authorized_keys /etc/dropbear-initramfs/
-$ sudo update-initramfs -u
+sudo cp /home/admin/.ssh/authorized_keys /etc/dropbear-initramfs/
+sudo update-initramfs -u
 ```
 
 Esto generará de nuevo en la partición `boot` los archivos de `initramfs` incluyendo los cambios que hemos hecho.
 
 ::: tip RELATO
-Tras esto descubrí que si el ordenador permanecía mucho tiempo encendido sin que nadie se conectase para desencriptar los discos, dejaba de ser accesible a través de la IP pública o el dominio (aunque sí era posible acceder a través de la IP local). Al principio pensé que era porque había que configurar la IP fija en `initramfs`, pero al intentar hacerlo, como el router ya tenía fijada la IP, se hacían un lío y no funcionaba. Al final se solucionó al poner también ahí el dominio a actualizarse, que es justo lo que viene ahora en la guía. 
+Tras esto descubrí que si el ordenador permanecía mucho tiempo encendido sin que nadie se conectase para desencriptar los discos, dejaba de ser accesible a través de la IP pública o el dominio (aunque sí era posible acceder a través de la IP local). Al principio pensé que era porque había que configurar la IP fija en `initramfs`, pero al intentar hacerlo, como el router ya tenía fijada la IP, se hacían un lío y no funcionaba. Al final se solucionó al poner también ahí el dominio a actualizarse, que es justo lo que viene ahora en la guía.
 :::
 
 ### ¿Y qué pasa con el dominio?
@@ -104,7 +104,8 @@ Aunque seguramente no sea el caso, puede ser que al hacer esto se cree una incom
 :::
 
 Después de esto `crontab` ya estará disponible, pero no funcionará porque en `initramfs` el directorio donde se guarda por defecto el archivo con los comandos no existe. La forma de resolverlo es creando el archivo `/usr/share/initramfs-tools/hooks/crontab` con este contenido:
-```bash
+
+```sh
 #!/bin/sh -e
 
 if [ "$1" = "prereqs" ]; then exit 0; fi
@@ -120,7 +121,8 @@ cp /var/spool/cron/crontabs/root $DESTDIR/var/spool/cron/crontabs/root
 Escribimos `sudo chmod +x /usr/share/initramfs-tools/hooks/crontab` para hacer el archivo ejecutable y esto lo que hará es crear el directorio y copiar el mismo archivo que ya habíamos configurado antes con el comando para actualizar la IP. Cada vez que escribamos `sudo update-initramfs -u` se volverá a crear el directorio y a copiar el archivo, con lo que también nos aseguraremos de que si cambiamos el archivo también se cambiará en `initramfs`, aunque no inmediatamente.
 
 Sin embargo, aunque ya podemos usar `crontab` en `initramfs`, nos falta hacer que se empiece a ejecutar, así que tenemos que crear otro archivo que se encargue de iniciar `crond`, que ejecutará lo que haya en `crontab`. Ese archivo será `/usr/share/initramfs-tools/scripts/init-premount/crond` y tendrá este contenido:
-```bash
+
+```sh
 #!/bin/sh
 # Start crond
 
@@ -149,23 +151,23 @@ Que no se nos olvide hacer el archivo ejecutable escribiendo `sudo chmod +x /usr
 Nos queda una última cosa por hacer, y es que en `initramfs` no hay configurado un servidor DNS, así que el ordenador no podrá resolver `freedns.afraid.org` a la IP que apunte y no se podrá ejecutar el comando. Un apaño para que funcione es cambiar el contenido de `crontab` escribiendo `sudo crontab -e` a este:
 
 ```conf
-# 
+#
 # To define the time you can provide concrete values for
 # minute (m), hour (h), day of month (dom), month (mon),
 # and day of week (dow) or use '*' in these fields (for 'any').
-# 
+#
 # Notice that tasks will be started based on the cron's system
 # daemon's notion of time and timezones.
-# 
+#
 # Output of the crontab jobs (including errors) is sent through
 # email to the user the crontab file belongs to (unless redirected).
-# 
+#
 # For example, you can run a backup of all your user accounts
 # at 5 a.m every week with:
 # 0 5 * * 1 tar -zcf /var/backups/home.tgz /home/
-# 
+#
 # For more information see the manual pages of crontab(5) and cron(8)
-# 
+#
 # m h  dom mon dow   command
 1,6,11,16,21,26,31,36,41,46,51,56 * * * * sleep 46 ; wget --no-check-certificate -O - "https://$(nslookup freedns.afraid.org 1.1.1.1 | awk '/^Address: / { print $2 }')/dynamic/update.php?cosas" > /tmp/freedns_@_dominio_com.log 2>&1 &
 ```
@@ -216,7 +218,7 @@ _Nuevamente el puerto es de ejemplo y es recomendable cambiarlo a otro._
 Por último, reiniciamos el servidor SSH para que los cambios tengan efecto:
 
 ```sh
-$ sudo systemctl restart ssh
+sudo systemctl restart ssh
 ```
 
 ::: tip RELATO
@@ -226,7 +228,7 @@ Iván mientras escribía esto _(desde un sitio lejano a la ubicación del servid
 A partir de ahora ya no deberíamos tener el problema al conectarnos, lo único que hay que tener en cuenta es que, a la hora de establecer la conexión SSH, tendremos que indicar el puerto:
 
 ```sh
-$ ssh -p 2222 admin@wupp.dev
+ssh -p 2222 admin@wupp.dev
 ```
 
 ## Reforzando la seguridad
@@ -254,7 +256,7 @@ Antes de hacer efectivos los cambios, tenemos que asegurarnos de que existe el a
 Por último, hacemos efectivos los cambios:
 
 ```sh
-$ sudo systemctl restart ssh
+sudo systemctl restart ssh
 ```
 
 Y ya deberíamos de poder conectarnos sin que nos pida la contraseña del usuario `admin`.
@@ -278,8 +280,8 @@ En nuestro caso, al intentar conectarnos nos encontramos con el siguiente error:
 Por suerte, se solucionó instalando un paquete y reiniciando el servidor VNC:
 
 ```sh
-$ sudo apt install dbus-x11
-$ sudo systemctl restart vncserver@1
+sudo apt install dbus-x11
+sudo systemctl restart vncserver@1
 ```
 
 ::: info
@@ -304,14 +306,18 @@ Last login: Mon May 24 01:23:45 2032 from 192.168.1.1
 ```
 
 Que no es muy bonito la verdad, así que podemos hacer unos cambios para que quede un mensaje mucho más lindo.
+
 1. Editamos `/etc/ssh/sshd_config` para poner los siguientes ajustes:
+
 ```ssh-config
 PrintMotd no
 PrintLastLog no
 Banner none
 ```
+
 2. Quitamos el resto del mensaje de bienvenida con `sudo truncate -s 0 /etc/motd`.
 3. Editamos `/etc/pam.d/sshd` para asegurarnos de que las siguientes líneas están comentadas:
+
 ```conf
 # Print the message of the day upon successful login.
 # This includes a dynamically generated part from /run/motd.dynamic
@@ -322,9 +328,11 @@ Banner none
 # Print the status of the user's mailbox upon successful login.
 #session    optional     pam_mail.so standard noenv # [1]
 ```
+
 4. Instalamos `figlet` y `lolcat` para tener colores y cabeceras personalizadas `sudo apt update && sudo apt install figlet lolcat`.
 5. Creamos el archivo `~/welcome_message.sh`:
-```bash
+
+```sh
 #!/bin/bash
 
 # Cabecera personalizada
@@ -346,8 +354,10 @@ df -h | grep -vE '^tmpfs|udev' | awk '{print $1 "\t" $5 "\t" $6}' | column -t | 
 echo ""
 
 ```
+
 6. Hacemos el archivo ejecutable `chmod +x ~/welcome_message.sh` y lo añadimos a `~/.bashrc`:
-```bash
+
+```sh
 # ~/.bashrc: executed by bash(1) for non-login shells.
 # see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
 # for examples
@@ -357,4 +367,5 @@ echo ""
 # Add the welcome message
 ~/welcome_message.sh
 ```
+
 7. Reiniciamos el servicio de SSH `sudo systemctl restart ssh`, nos desconectamos y nos volvemos a conectar para comprobar que funciona.

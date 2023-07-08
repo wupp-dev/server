@@ -2,6 +2,7 @@
 title: Nextcloud
 lang: es-ES
 ---
+
 # Nextcloud - Almacenamiento
 
 Por fin llegó el momento de poner en marcha el primer servicio, y qué mejor elección que [Nextcloud](https://nextcloud.com/es/). Antes de empezar asegúrate de que tienes un subdominio creado para Nextcloud como `cloud.wupp.dev`.
@@ -10,7 +11,7 @@ Por fin llegó el momento de poner en marcha el primer servicio, y qué mejor el
 
 Empezamos escribiendo en el `docker-compose.yml` todo lo necesario para tener una instalación funcional de Nextcloud:
 
-```yml
+```yaml
 services:
   nextcloud-db:
     image: postgres
@@ -72,6 +73,7 @@ Hemos decidido usar PostgreSQL como base de datos para Nextcloud por preferencia
 Lo primero que cabe destacar es que en este nuevo archivo, los usuarios y las contraseñas están directamente escritos. Esto no es una buena práctica de seguridad, pero para la guía lo vamos a dejar así, dejando claro que a la hora de implementarlo deberían usarse [secretos de docker](https://docs.docker.com/engine/swarm/secrets/). Una excepción que hemos hecho a esto es redis, que por unos cuantos problemas que nos ha dado lo hemos dejado sin contraseña, aunque se puede usar con contraseña siempre que esté escrita en el `docker-compose.yml` en el comando de iniciación de redis (y se le pase a Nextcloud).
 
 Vamos a analizar un poco el documento, concretamente los servicios que hay declarados:
+
 - `nextcloud-db`: Esta será la base de datos de Nextcloud. En `environment` simplemente se establece un usuario, contraseña y base de datos a crear, que serán para Nextcloud. Por último, `volumes` permite que los datos guardados se conserven aunque el servicio se reinicie y la `Z` la puso Lucas en por verla en la documentación, [aquí](https://docs.docker.com/storage/bind-mounts/#configure-the-selinux-label) se explica lo que hace.
 - `nextcloud-redis`: Es otra base de datos pero que en este caso Nextcloud utilizará para almacenar archivos en caché y así tener un mejor rendimiento. También se usará para gestionar los inicios de sesión. En `command` se puede especificar la contraseña.
 - `nextcloud`: Tiene el mapeo de puertos `9000:9000` para que Nginx pueda redirigir las solicitudes PHP dentro del contenedor. Además, `depends_on` indica que tanto `nextcloud-db` como `nextcloud-redis` deben estar funcionando para que Nextcloud lo haga. Por último se hace igual que en `nextcloud-db` un mapeo de carpetas para conservar los datos y se establecen las variables de entorno para configurar Nextcloud.
@@ -84,7 +86,7 @@ Para que Nextcloud empiece a ejecutarse (aunque aun no podamos acceder) simpleme
 
 Con el `docker-compose.yml` configurado, podemos pasar a configurar el subdominio para Nextcloud en Nginx. La mayor parte de la configuración la hemos tomado de [este ejemplo](https://github.com/nextcloud/docker/blob/master/.examples/docker-compose/insecure/postgres/fpm/web/nginx.conf), pero añadiendo HTTPS y cambiando unas cuantas cosas. Creamos el archivo `/etc/nginx/conf.d/cloud.wupp.dev.conf` con el contenido:
 
-```conf
+```nginx
 upstream nextcloud {
     server 127.0.0.1:9000;
 }
@@ -255,7 +257,7 @@ Como puntos a destacar, se ha puesto un límite de cuerpo de 50GB para permitir 
 
 También se vuelven a especificar todas las cabeceras HTTP a pesar de que las pusimos en el bloque `http` de Nginx, donde está contenido nuestro bloque actual. ¿Por qué? Porque las cabeceras HTTP definidas en un bloque superior solo se heredan al siguiente si en ese no hay ninguna cabecera definida y, en este caso, había que definir sí o sí cabeceras nuevas, así que hay que añadir las que se quieran conservar.
 
-Por último (y este cambio es puñetero), como PHP se está ejecutando dentro de Docker, para PHP los archivos no están en `/var/www/nextcloud`, están en `/var/www/html`, así que hay que cambiarlo en `fastcgi_param SCRIPT_FILENAME` o, de lo contrario, el servidor solo devolverá un mensaje de "File not found". 
+Por último (y este cambio es puñetero), como PHP se está ejecutando dentro de Docker, para PHP los archivos no están en `/var/www/nextcloud`, están en `/var/www/html`, así que hay que cambiarlo en `fastcgi_param SCRIPT_FILENAME` o, de lo contrario, el servidor solo devolverá un mensaje de "File not found".
 
 ¡Ojo! Que no se nos olvide generar el certificado HTTPS para el subdominio `cloud.wupp.dev`. Después, comprobamos que el archivo está bien con `sudo nginx -t` y si lo está, lo recargamos con `sudo nginx -s reload`.
 

@@ -2,6 +2,7 @@
 title: Bloqueo de SSH
 lang: es-ES
 ---
+
 # Bloqueo de SSH
 
 De cuando Iván escogió no tener inteligencia estando lejos del servidor.
@@ -14,7 +15,7 @@ Iván, estando en Valencia y sabiendo que quedaba un mes al menos hasta que pasa
 
 ## La cagada
 
-Primero se acordó de que tenía que abrir los puertos en el router, pero claro, para eso necesitaba configurar el servidor VNC *(de ahí surgió esa parte de la guía)* para poder meterse con Firefox a la IP del router y abrir el nuevo puerto.
+Primero se acordó de que tenía que abrir los puertos en el router, pero claro, para eso necesitaba configurar el servidor VNC _(de ahí surgió esa parte de la guía)_ para poder meterse con Firefox a la IP del router y abrir el nuevo puerto.
 
 Esto le mantuvo ocupado todo el día, así que nos trasladamos al 29 de julio, donde se disponía, con los puertos abiertos en el router, a cambiar el puerto de SSH.
 
@@ -47,6 +48,7 @@ Esto no dio buenos resultados porque el disco siempre se marcaba como ocupado y 
 Como esto no funcionaba, tocaba entender mejor cómo funcionaba Initramfs y las fases en las que se dive, que viene bien explicado en la [wiki de Ubuntu](https://wiki.ubuntu.com/Initramfs).
 
 Además, vi que por defecto el disco duro se montaba en solo lectura desde initramfs y, cuando seguía el proceso de arranque, ya se montaba escribible. Así que tenía que:
+
 - Conseguir que initramfs montase el disco escribible.
 - Conseguir que el, una vez montado, borrase el archivo de configuración de OpenSSH para que se regenerase el por defecto.
 
@@ -57,7 +59,8 @@ Este último enfoque resultó no ser válido, porque OpenSSH no regenera el arch
 Intenté modificar los scripts de inicio que se ejecutan después de desencriptar el disco para que montasen el disco en escritura y borrasen el archivo de configuración, pero por mucho que cambiaba los parámetros, parecía no afectar y seguía en solo escritura.
 
 Finalmente, ya con pocas esperanzas, el 6 de agosto decidí cambiar ligeramente el enfoque y editar únicamente el archivo `/init`, que es el que se encarga de llamar a todos los scrips de inicio. Concretamente añadí estas líneas justo antes del comentario `# Move virtual filesystems over to the real filesystem`:
-```bash
+
+```sh
 mount -w -t btrfs -o remount ${ROOT} ${rootmnt}
 rm -f ${rootmnt}/etc/ufw/ufw.conf
 unset ROOT
