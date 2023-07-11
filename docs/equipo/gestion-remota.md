@@ -174,6 +174,8 @@ Nos queda una última cosa por hacer, y es que en `initramfs` no hay configurado
 
 Que lo que hace es resolver con otra herramienta de BusyBox, `nslookup`, el dominio `freedns.afraid.org` con los servidores de Cloudflare y ya después ejecutar el resto del comando.
 
+Ejecutamos una última vez `sudo update-initramfs -u` y ya estaría.
+
 ## Resolviendo problemas
 
 Un problema con el que nos encontramos cuando intentamos conectarnos al servidor por SSH primero para desencriptar los discos y después para el uso normal, es que nos salta este error tras escribir `ssh admin@wupp.dev`:
