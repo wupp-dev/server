@@ -5,6 +5,7 @@ let guideSidebar = [
     text: "Equipo",
     collapsible: true,
     items: [
+      { text: "Historia", link: "/equipo/historia" },
       { text: "Hardware", link: "/equipo/hardware" },
       {
         text: "Instalación del SO encriptado",
@@ -76,7 +77,7 @@ export default defineConfig({
       { text: "Inicio", link: "/", activeMatch: "" },
       {
         text: "Guía del servidor",
-        link: "/equipo/hardware",
+        link: "/equipo/historia",
         activeMatch: "/(equipo|servicios)/",
       },
       {

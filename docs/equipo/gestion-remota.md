@@ -64,7 +64,7 @@ sudo apt install dropbear-initramfs
 
 **¿Eso es todo?** Obviamente no, hay que configurarlo.
 
-Vamos a editar el archivo de configuración, que está en `/etc/dropbear-initramfs/config` y vamos a descomentar y editar la línea:
+Vamos a editar el archivo de configuración, que está en `/etc/dropbear/initramfs/dropbear.conf` y vamos a descomentar y editar la línea:
 
 ```ssh-config
 DROPBEAR_OPTIONS="-I 300 -j -k -p 22 -s"
@@ -81,8 +81,8 @@ DROPBEAR_OPTIONS="-I 300 -j -k -p 22 -s"
 Como indica el último parámetro, la autenticación por contraseña está deshabilitada, así que utilizaremos también las claves públicas que hayamos autorizado para OpenSSH Server, podemos copiarlas y hacer que los cambios tengan efecto con los comandos:
 
 ```sh
-sudo cp /home/admin/.ssh/authorized_keys /etc/dropbear-initramfs/
-sudo update-initramfs -u
+$ sudo cp /home/admin/.ssh/authorized_keys /etc/dropbear-initramfs/etc/dropbear/initramfs/
+$ sudo update-initramfs -u
 ```
 
 Esto generará de nuevo en la partición `boot` los archivos de `initramfs` incluyendo los cambios que hemos hecho.
@@ -150,7 +150,7 @@ Que no se nos olvide hacer el archivo ejecutable escribiendo `sudo chmod +x /usr
 
 Nos queda una última cosa por hacer, y es que en `initramfs` no hay configurado un servidor DNS, así que el ordenador no podrá resolver `freedns.afraid.org` a la IP que apunte y no se podrá ejecutar el comando. Un apaño para que funcione es cambiar el contenido de `crontab` escribiendo `sudo crontab -e` a este:
 
-```conf
+```nginx
 #
 # To define the time you can provide concrete values for
 # minute (m), hour (h), day of month (dom), month (mon),
@@ -318,7 +318,7 @@ Banner none
 2. Quitamos el resto del mensaje de bienvenida con `sudo truncate -s 0 /etc/motd`.
 3. Editamos `/etc/pam.d/sshd` para asegurarnos de que las siguientes líneas están comentadas:
 
-```conf
+```nginx
 # Print the message of the day upon successful login.
 # This includes a dynamically generated part from /run/motd.dynamic
 # and a static (admin-editable) part from /etc/motd.

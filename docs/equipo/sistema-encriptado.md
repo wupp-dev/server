@@ -174,8 +174,15 @@ Donde `admin` será el usuario que creamos. Guardamos el archivo y ya podemos es
 
 ### Optimizando el disco SSD
 
-**Si tenemos el sistema operativo en un disco SSD**, como es el caso, hay unos cambios que podemos hacer para mejorar el rendimiento y la durabilidad del disco, tenemos que editar `/etc/fstab`, concretamente la primera línea sin comentar, que debería ser la correspondiente al sistema de archivos `root`, añadiendo unas opciones extra para cuando se monte la partición:
+::: danger PELIGRO
+Ten cuidado con esta parte, ya que una configuración incorrecta puede causar que el ordenador deje de encenderse correctamente, con lo que tendrás que reiniciarlo en modo de recuperación, montar el sistema temporalmente y volver a cambiar la configuración.
+:::
 
+<<<<<<< Updated upstream
+=======
+**Si tenemos el sistema operativo en un disco SSD SATA**, como es el caso, hay unos cambios que podemos hacer para mejorar el rendimiento y la durabilidad del disco, tenemos que editar `/etc/fstab`, concretamente la primera línea sin comentar, que debería ser la correspondiente al sistema de archivos `root`, añadiendo unas opciones extra para cuando se monte la partición:
+
+>>>>>>> Stashed changes
 ```sh
 # /etc/fstab: static file system information.
 #
@@ -190,13 +197,35 @@ Donde `admin` será el usuario que creamos. Guardamos el archivo y ya podemos es
 /dev/mapper/server--vg-root /               btrfs   defaults,subvol=@rootfs,ssd,noatime,space_cache,commit=120,compress=zstd,discard=async 0       0
 ```
 
+**Si tenemos el sistema operativo en un disco SSD NVME M.2**, como es el caso para el servidor de Minecraft, podemos mejorar el rendimiento editando `/etc/fstab`, concretamente la primera línea sin comentar, que debería ser la correspondiente al sistema de archivos `root`, añadiendo unas opciones extra para cuando se monte la partición:
+
+```sh
+# /etc/fstab: static file system information.
+#
+# Use 'blkid' to print the universally unique identifier for a
+# device; this may be used with UUID= as a more robust way to name devices
+# that works even if disks are added and removed. See fstab(5).
+#
+# systemd generates mount units based on this file, see systemd.mount(5).
+# Please run 'systemctl daemon-reload' after making changes here.
+#
+# <file system>             <mount point>   <type>  <options>                                                                              <dump>  <pass>
+/dev/mapper/mcserver--vg-root /               btrfs   defaults,subvol=@rootfs,compress=zstd:1,discard=async 0       0
+```
+
 El resto de líneas que haya debajo las dejamos intactas.
 
 ### Montando el disco tocho al inicio
 
 Como tenemos un disco duro de 4TB que vamos a usar para almacenar archivos, necesitamos que se desencripte también y se monte al encenderse el servidor, así que vamos a ello.
 
+<<<<<<< Updated upstream
 Lo primero es que se desencripte, para ello tendremos que añadir el disco a `/etc/crypttab`, pero como ese queremos que se desencripte solo sin tener que ponerle nosotros la contraseña, tendremos que crear un archivo que servirá como contraseña para desencriptar el disco. Localizamos el disco, que en este caso es `sdb1`:
+=======
+Si el disco es recién comprado, es probable que no tenga ninguna partición, así que habrá que crearla antes de poder hacer nada. Para ello, instalaremos GParted `apt install gparted` y lo primero que haremos es, si no tiene tabla de particiones, crear una tabla de particiones `gpt`.
+
+Ahora podremos localizar el disco, que en este caso es `sdb1`.
+>>>>>>> Stashed changes
 
 ```sh
 lsblk
@@ -213,7 +242,23 @@ lsblk
 # sr0                      11:0    1  1024M  0 rom
 ```
 
-Ahora hay que buscar su UUID:
+Una vez hecho esto, si queremos encriptar el disco, tendremos que hacerlo desde la terminal, escribiendo `sudo cryptsetup luksFormat /dev/sdb1` y escribiendo la contraseña.
+
+Ahora toca desencriptar el disco con `sudo cryptsetup luksOpen /dev/sdb1 vault` y escribiendo la contraseña. Volvemos a GParted y creamos una nueva partición que ocupe todo el volumen del disco y elegimos como sistema de archivos `btrfs`. Hecho esto, podemos desencriptar el disco.
+
+Ya podemos hacer que el disco se desencripte y se monte al encenderse el ordenador :D
+
+Lo primero es que se desencripte, para ello tendremos que añadir el disco a  `/etc/crypttab`, pero como ese queremos que se desencripte solo sin tener que ponerle nosotros la contraseña, tendremos que crear un archivo que servirá como contraseña para desencriptar el disco.
+
+ ```sh
+$ sudo dd if=/dev/urandom of=/root/hdd_key bs=1024 count=4
+$ sudo chmod 0400 /root/hdd_key
+$ sudo cryptsetup luksAddKey /dev/sdb1 /root/hdd_key
+ ```
+
+Lo que acabamos de hacer es crear un archivo con caracteres aleatorios *(como una contraseña básicamente pero mucho más larga)* y añadirlo como clave para desencriptar el disco duro, ya que LUKS nos permite tener varias claves.
+ 
+Ahora hay que buscar la UUID del disco:
 
 ```sh
 ls -l /dev/disk/by-uuid
@@ -233,10 +278,16 @@ sudo dd if=/dev/urandom of=/root/hdd_key bs=1024 count=4
 sudo chmod 0400 /root/hdd_key
 sudo cryptsetup luksAddKey /dev/sdb1 /root/hdd_key
 ```
+<<<<<<< Updated upstream
 
 Lo que acabamos de hacer es crear un archivo con caracteres aleatorios _(como una contraseña básicamente pero mucho más larga)_ y añadirlo como clave para desencriptar el disco duro, ya que LUKS nos permite tener varias claves. Ahora sí, hay que editar `/etc/fstab` añadiendo esta línea al final:
 
 ```sh
+=======
+ Que en este caso es `60e8d58f-cb05-47f1-85bc-38e5b0a05505`, así que vamos a editar `/etc/crypttab` añadiendo esta línea al final:
+
+ ```sh
+>>>>>>> Stashed changes
 vault UUID=60e8d58f-cb05-47f1-85bc-38e5b0a05505 /root/hdd_key luks
 ```
 

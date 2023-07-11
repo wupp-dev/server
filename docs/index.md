@@ -3,13 +3,13 @@ layout: home
 title: Inicio
 
 hero:
-  name: Servidor mamadísimo
-  text: Un servidor hecho para los amigos
+  name: WUPP.DEV
+  text: Un servidor mamádisimo
   tagline: Patrocinado por la polla con peluca y el pelirrojo de comedores
   actions:
     - theme: brand
       text: Guía del servidor
-      link: equipo/hardware
+      link: equipo/historia
     - theme: alt
       text: Repositorio de GitHub
       link: https://github.com/ComicIvans/server
