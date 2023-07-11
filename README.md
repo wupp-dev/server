@@ -4,8 +4,8 @@ Este repositorio contiene los **archivos de configuración** que se han usado en
 Además, incluye una **guía detallada de todo el proceso** que se ha seguido para poner el servidor en funcionamiento.
 
 Esa guía se divide en dos partes y tiene una tercera de relatos:
-1. [Preparación del equipo](https://comicivans.github.io/server/equipo/hardware)
-2. [Instalación de servicios específicos](https://comicivans.github.io/server/servicios/minecraft)
+1. [Preparación del equipo](https://comicivans.github.io/server/equipo/historia)
+2. [Instalación de servicios específicos](https://comicivans.github.io/server/servicios/nextcloud)
 3. [Relatos de dramas ocurridos](https://comicivans.github.io/server/relatos/initramfs-vs-router)
 
 ---
