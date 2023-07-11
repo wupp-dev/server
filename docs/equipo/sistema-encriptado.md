@@ -178,11 +178,8 @@ Donde `admin` será el usuario que creamos. Guardamos el archivo y ya podemos es
 Ten cuidado con esta parte, ya que una configuración incorrecta puede causar que el ordenador deje de encenderse correctamente, con lo que tendrás que reiniciarlo en modo de recuperación, montar el sistema temporalmente y volver a cambiar la configuración.
 :::
 
-<<<<<<< Updated upstream
-=======
 **Si tenemos el sistema operativo en un disco SSD SATA**, como es el caso, hay unos cambios que podemos hacer para mejorar el rendimiento y la durabilidad del disco, tenemos que editar `/etc/fstab`, concretamente la primera línea sin comentar, que debería ser la correspondiente al sistema de archivos `root`, añadiendo unas opciones extra para cuando se monte la partición:
 
->>>>>>> Stashed changes
 ```sh
 # /etc/fstab: static file system information.
 #
@@ -219,16 +216,12 @@ El resto de líneas que haya debajo las dejamos intactas.
 
 Como tenemos un disco duro de 4TB que vamos a usar para almacenar archivos, necesitamos que se desencripte también y se monte al encenderse el servidor, así que vamos a ello.
 
-<<<<<<< Updated upstream
-Lo primero es que se desencripte, para ello tendremos que añadir el disco a `/etc/crypttab`, pero como ese queremos que se desencripte solo sin tener que ponerle nosotros la contraseña, tendremos que crear un archivo que servirá como contraseña para desencriptar el disco. Localizamos el disco, que en este caso es `sdb1`:
-=======
 Si el disco es recién comprado, es probable que no tenga ninguna partición, así que habrá que crearla antes de poder hacer nada. Para ello, instalaremos GParted `apt install gparted` y lo primero que haremos es, si no tiene tabla de particiones, crear una tabla de particiones `gpt`.
 
 Ahora podremos localizar el disco, que en este caso es `sdb1`.
->>>>>>> Stashed changes
 
 ```sh
-lsblk
+$ lsblk
 # NAME                    MAJ:MIN RM   SIZE RO TYPE  MOUNTPOINT
 # sda                       8:0    0 447,1G  0 disk
 # ├─sda1                    8:1    0   512M  0 part  /boot/efi
@@ -250,18 +243,18 @@ Ya podemos hacer que el disco se desencripte y se monte al encenderse el ordenad
 
 Lo primero es que se desencripte, para ello tendremos que añadir el disco a  `/etc/crypttab`, pero como ese queremos que se desencripte solo sin tener que ponerle nosotros la contraseña, tendremos que crear un archivo que servirá como contraseña para desencriptar el disco.
 
- ```sh
-$ sudo dd if=/dev/urandom of=/root/hdd_key bs=1024 count=4
-$ sudo chmod 0400 /root/hdd_key
-$ sudo cryptsetup luksAddKey /dev/sdb1 /root/hdd_key
- ```
+```sh
+sudo dd if=/dev/urandom of=/root/hdd_key bs=1024 count=4
+sudo chmod 0400 /root/hdd_key
+sudo cryptsetup luksAddKey /dev/sdb1 /root/hdd_key
+```
 
 Lo que acabamos de hacer es crear un archivo con caracteres aleatorios *(como una contraseña básicamente pero mucho más larga)* y añadirlo como clave para desencriptar el disco duro, ya que LUKS nos permite tener varias claves.
  
 Ahora hay que buscar la UUID del disco:
 
 ```sh
-ls -l /dev/disk/by-uuid
+$ ls -l /dev/disk/by-uuid
 # total 0
 # lrwxrwxrwx 1 root root 10 ago 10 17:47 0053a965-9146-4e52-b842-0ba1a756c4c5 -> ../../sda3
 # lrwxrwxrwx 1 root root 10 ago 10 17:47 1e28c433-5bf5-41e5-9708-5730bb18d0ef -> ../../dm-2
@@ -271,27 +264,13 @@ ls -l /dev/disk/by-uuid
 # lrwxrwxrwx 1 root root 10 ago 10 17:47 eb777051-9d3a-4bf9-a186-fdfcc9d5c9c0 -> ../../sda2
 ```
 
-Que en este caso es `60e8d58f-cb05-47f1-85bc-38e5b0a05505`, lo guardamos y vamos a crear el archivo que servirá de clave:
+Que en este caso es `60e8d58f-cb05-47f1-85bc-38e5b0a05505`, así que vamos a editar `/etc/crypttab` añadiendo esta línea al final:
 
 ```sh
-sudo dd if=/dev/urandom of=/root/hdd_key bs=1024 count=4
-sudo chmod 0400 /root/hdd_key
-sudo cryptsetup luksAddKey /dev/sdb1 /root/hdd_key
-```
-<<<<<<< Updated upstream
-
-Lo que acabamos de hacer es crear un archivo con caracteres aleatorios _(como una contraseña básicamente pero mucho más larga)_ y añadirlo como clave para desencriptar el disco duro, ya que LUKS nos permite tener varias claves. Ahora sí, hay que editar `/etc/fstab` añadiendo esta línea al final:
-
-```sh
-=======
- Que en este caso es `60e8d58f-cb05-47f1-85bc-38e5b0a05505`, así que vamos a editar `/etc/crypttab` añadiendo esta línea al final:
-
- ```sh
->>>>>>> Stashed changes
 vault UUID=60e8d58f-cb05-47f1-85bc-38e5b0a05505 /root/hdd_key luks
 ```
 
-Donde lo primero es el nombre que tendrá el volumen, lo segundo su UUID _(no olvidar comprobar que sea el correcto)_, lo tercero el archivo donde está la clave y lo cuarto especifica que utiliza LUKS.
+Donde lo primero es el nombre que tendrá el volumen, lo segundo su UUID *(no olvidar comprobar que sea el correcto)*, lo tercero el archivo donde está la clave y lo cuarto especifica que utiliza LUKS.
 
 Muy bien, con esto el disco se desencriptará al encenderse el servidor, solo nos queda añadirlo a `/etc/fstab` para que también se monte. Añadimos esta línea al final del archivo:
 
