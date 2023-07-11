@@ -57,6 +57,8 @@ Puede que te encuentres con dos posibles contraseñas, la de **usuario** y la de
 
 Ahora hay que ir al apartado de **Boot** y cambiar el orden de inicio de los dispositivos para poner como primera opción el USB donde tenemos el instalador del sistema operativo.
 
+Una opción que nos puede interesar es la llamada `Restore on AC/Power loss`, que podremos encontrar por el apartado Boot o en avanzado. Podemos dejarla en `Last State` o `Memory` dependiendo de como salga, pero lo que viene a significar es que si se fuera la luz estando el ordenador encendido y luego volviese, el ordenador se encendería de nuevo. Esto es interesante por si hay un apagón y quieres que el servidor vuelva a estar encendido en cuanto vuelva la luz.
+
 Salimos guardando los cambios y el ordenador debería reiniciarse y mostrar el instalador del sistema.
 
 ## Instalación de Debian 11
