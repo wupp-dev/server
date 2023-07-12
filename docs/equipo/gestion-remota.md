@@ -17,6 +17,10 @@ Es aquí donde se nos plantea un gran problema: Cuando nos podemos conectar al s
 
 Este problema lo resolveremos tras preparar el servidor para el uso habitual.
 
+::: warning ADVERTENCIA
+Aunque estoy seguro de que es por culpa del router que usamos. En nuestro caso, si el servidor no tiene ningún tipo de interacción a través de internet durante unos minutos, el router deja de permitir conexiones a él. Para ahorrarnos el disgusto de intentar conectarnos y descubrir que el router no nos lo va a permitir porque el servidor haya estado "inactivo", tendremos que forzar una actividad periódica mínima (como hacer un ping) tanto cuando el ordenador esté encendido como cuando esté esperando a que se introduzca la contraseña para desencriptar los discos.
+:::
+
 ## Uso habitual
 
 Vamos a empezar dejando lista nuestra vía para poder gestionar remotamente el servidor cuando esté encendido.

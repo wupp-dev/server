@@ -35,6 +35,10 @@ let guideSidebar = [
         text: "Nextcloud - Almacenamiento",
         link: "/servicios/nextcloud",
       },
+      {
+        text: "Docker Mailserver - Correo electrónico",
+        link: "/servicios/mailserver",
+      },
       { text: "Minecraft con AMP", link: "/servicios/minecraft" },
       {
         text: "Dozzle - Visualizador de logs",
