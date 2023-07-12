@@ -91,6 +91,8 @@ Como vamos a habilitar `TLS` mediante letsencrypt, tendremos que general el cert
 sudo certbot --key-type ecdsa --elliptic-curve secp384r1 --nginx -d mail.wupp.dev
 ```
 
+Si aquí intentásemos ejecutar el contenedor, puede ser que salga un error diciendo que el puerto 25 ya está en uso. En nuestro caso, estaba en uso por `exim4`, que es un servicio para el correo que viene instalado en Debian. Nosotros lo que hicimos fue parar el servicio y desactivarlo con `sudo systemctl stop exim4.service` y `sudo systemctl disable exim4-base.timer`.
+
 Hecho todo esto, podemos ejecutar `docker compose up -d` y, rápidamente habrá que crear una primera cuenta como puede ser `admin@wupp.dev`, así que ejecutamos el siguiente comando:
 
 ```sh
