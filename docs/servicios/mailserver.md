@@ -109,6 +109,8 @@ Como primera recomendación, crearemos un alias para postmaster:
 docker exec -ti mailserver setup alias add postmaster@wupp.dev admin@wupp.dev
 ```
 
+Queda configurar DMARC, DKIM y SPF.
+
 ## ¿Cliente web?
 
 *Posible sección.*

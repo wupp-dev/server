@@ -188,6 +188,7 @@ http {
 
     include /etc/nginx/conf.d/*.conf;
 }
+````
 
 Para saber qué hace cada cambio, puedes buscarlo en la documentación de Nginx, porque por ahora me da pereza ponerlo aquí.
 

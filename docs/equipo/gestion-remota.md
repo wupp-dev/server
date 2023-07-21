@@ -295,6 +295,21 @@ Es raro necesitar el servidor VNC, pero justo estoy escribiendo esta parte antes
 Como era de esperar, Debian no venía con navegador instalado, así que para poder usar uno con el VNC instalamos Firefox con `sudo apt install firefox-esr`.
 :::
 
+## SSH File Transfer Protocol (SFTP)
+
+A veces necesitaremos transferir archivos entre nuestro ordenador y el servidor. La forma más cómoda de hacer eso es a través de SFTP, para lo cual solo necesitaremos tener instalado un cliente como [Filezilla](https://filezilla-project.org/) en nuestro ordenador.
+
+Para activar SFTP en el servidor desde el usuario `admin`, simplemente tendremos que comentar una línea y añadir otra en `/etc/ssh/sshd_config`:
+
+```ssh-config
+#Subsystem      sftp    /usr/lib/openssh/sftp-server
+Subsystem       sftp    internal-sftp
+```
+
+Y reiniciar el servicio con `sudo systemctl restart ssh`.
+
+Si todo va bien, ya podremos conectarnos desde Filezilla (usando nuestra clave privada, aunque antes habrá que importarla en el programa y que nos la convierta a un formato compatible) al puerto SSH del servidor y transferir archivos.
+
 ## Embelleciendo
 
 Cuando iniciamos sesión por SSH nos aparece un mensaje como este:
