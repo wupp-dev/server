@@ -262,7 +262,7 @@ world-settings:
       furnace:
         use-lava-from-underneath: false
       end_portal:
-        safe-teleporting: true
+        safe-teleporting: false
       packed_ice:
         allow-mob-spawns: true
       blue_ice:
@@ -288,7 +288,7 @@ world-settings:
         explosion-fire: true
         explosion-effect: BLOCK
       sand:
-        fix-duping: true
+        fix-duping: false
       sculk_shrieker:
         can-summon-default: false
       shulker_box:
@@ -317,7 +317,7 @@ world-settings:
       water:
         infinite-required-sources: 2
       enchantment-table:
-        lapis-persists: false
+        lapis-persists: true
       conduit:
         effect-distance: 16
         mob-damage:
@@ -1426,11 +1426,11 @@ world-settings:
           fire: []
           lightning: []
         shears:
-          damage-if-sprinting: false
+          damage-if-sprinting: true
           ignore-in-water: false
           ignore-in-lava: false
           sprinting-damage: 1.0
-          defuse-tnt-chance: 0.0
+          defuse-tnt-chance: 0.9
         ender-pearl:
           damage: 5.0
           cooldown: 20
@@ -1444,9 +1444,9 @@ world-settings:
           holding-shows-bossbar: false
         snowball:
           extinguish:
-            fire: false
-            candles: false
-            campfires: false
+            fire: true
+            candles: true
+            campfires: true
       mob-effects:
         health-regen-amount: 1.0
         minimal-health-poison-amount: 1.0
@@ -1534,8 +1534,8 @@ world-settings:
         can-move-in-water-over-fence: true
         place-with-arms-visible: false
       arrow:
-        movement-resets-despawn-counter: true
-      use-better-mending: false
+        movement-resets-despawn-counter: false
+      use-better-mending: true
       mending-multiplier: 1.0
       always-tame-in-creative: false
       boat:
@@ -1554,7 +1554,7 @@ world-settings:
       projectiles-bypass-mob-griefing: false
       tick-fluids: true
       entity-blindness-multiplier: 1.0
-      trident-loyalty-void-return-height: 0.0
+      trident-loyalty-void-return-height: -64.0
       void-damage-height: -64.0
       void-damage-dealt: 4.0
       raid-cooldown-seconds: 0
@@ -1585,7 +1585,7 @@ world-settings:
       entity-lifespan: 0
       entity-left-handed-chance: 0.05000000074505806
       minecart:
-        max-speed: 0.4
+        max-speed: 1
         place-anywhere: false
         powered-rail:
           boost-modifier: 0.06
@@ -1598,3 +1598,6 @@ world-settings:
           block-speed:
             grass_block: 0.3
             stone: 0.5
+#          block-speed:
+#            grass_block: 0.3
+#            stone: 0.5

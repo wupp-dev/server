@@ -145,12 +145,12 @@ Iniciamos la instancia para generar el archivo de configuración `velocity.toml`
 Además, esta es la lista de plugins:
 
 - [Carbon](https://hangar.papermc.io/Vicarious/Carbon)
+- [LuckPerms](https://luckperms.net/download)
 - [MiniMOTD](https://hangar.papermc.io/jmp/MiniMOTD)
+- [MiniPlaceholders](https://hangar.papermc.io/MiniPlaceholders/MiniPlaceholders)
+- [SkinsRestorer](https://hangar.papermc.io/SRTeam/SkinsRestorer)
 - [SlashHub](https://www.spigotmc.org/resources/%E2%9B%8F%EF%B8%8F-slashhub-%E2%9B%8F%EF%B8%8F-%E2%9C%A8-velocity%E2%9C%A8.101114/)
 - [TAB](https://github.com/NEZNAMY/TAB)
-- [MiniPlaceholders](https://hangar.papermc.io/MiniPlaceholders/MiniPlaceholders)
-- [LuckPerms](https://luckperms.net/download)
-- [SkinsRestorer](https://hangar.papermc.io/SRTeam/SkinsRestorer)
 
 Algunos de los plugins utilizan una base de datos, que es la que configuramos en docker anteriormente. Vamos a crear una base de datos para cada plugin que lo necesite.
 
@@ -194,15 +194,15 @@ Nuevamente, estos argumentos de java aumentan el rendmiento, de servidor y está
 
 Esta es la lista de plugins:
 
-- [LuckPerms](https://luckperms.net/download)
-- [SkinsRestorer](https://hangar.papermc.io/SRTeam/SkinsRestorer)
-- [ViaVersion](https://hangar.papermc.io/ViaVersion/ViaVersion)
-- [ViaBackwards](https://hangar.papermc.io/ViaVersion/ViaBackwards)
 - [DeluxeHub](https://www.spigotmc.org/resources/deluxehub-3-professional-hub-management.49425/)
+- [LuckPerms](https://luckperms.net/download)
 - [Parkour](https://www.spigotmc.org/resources/parkour.23685/)
 - [PlaceholderAPI](https://www.spigotmc.org/resources/placeholderapi.6245/)
-- [WorldGuard](https://dev.bukkit.org/projects/worldguard)
+- [SkinsRestorer](https://hangar.papermc.io/SRTeam/SkinsRestorer)
+- [ViaBackwards](https://hangar.papermc.io/ViaVersion/ViaBackwards)
+- [ViaVersion](https://hangar.papermc.io/ViaVersion/ViaVersion)
 - [WorldEdit](https://dev.bukkit.org/projects/worldedit)
+- [WorldGuard](https://dev.bukkit.org/projects/worldguard)
 
 ## Resto de servidores
 
@@ -210,7 +210,28 @@ Esta sección de la documentación es aun más vaga si cabe porque estoy prioriz
 
 ### Survival Comunitario
 
-TODO.
+Esta es la lista de plugins:
+
+- [Aurelium Skills](https://hangar.papermc.io/Archy/AureliumSkills)
+- [Chunky](https://hangar.papermc.io/pop4959/Chunky)
+- [CoreProtect](https://hangar.papermc.io/CORE/CoreProtect)
+- [Dynmap](https://www.spigotmc.org/resources/dynmap%C2%AE.274/)
+- [EssentialsX](https://hangar.papermc.io/EssentialsX/Essentials)
+- [Graves](https://www.spigotmc.org/resources/graves.74208/)
+- [InteractiveChat](https://hangar.papermc.io/LOOHP/InteractiveChat)
+- [Inventory Rollback Plus](https://www.spigotmc.org/resources/inventory-rollback-plus-1-8-1-20-x.85811/)
+- [LuckPerms](https://luckperms.net/download)
+- [OpenInv](https://dev.bukkit.org/projects/openinv)
+- [PlaceholderAPI](https://www.spigotmc.org/resources/placeholderapi.6245/)
+- [ProtocolLib](https://hangar.papermc.io/dmulloy2/ProtocolLib)
+- [SinglePlayerSleep](https://www.spigotmc.org/resources/singleplayersleep.68139/)
+- [SkinsRestorer](https://hangar.papermc.io/SRTeam/SkinsRestorer)
+- [Themis](https://www.spigotmc.org/resources/themis-anti-cheat-1-17-1-20-bedrock-support-paper-compatibility-free-optimized.90766/)
+- [Vault](https://www.spigotmc.org/resources/vault.34315/)
+- [ViaBackwards](https://hangar.papermc.io/ViaVersion/ViaBackwards)
+- [ViaVersion](https://hangar.papermc.io/ViaVersion/ViaVersion)
+- [WorldEdit](https://dev.bukkit.org/projects/worldedit)
+- [WorldGuard](https://dev.bukkit.org/projects/worldguard)
 
 ## Más allá
 
