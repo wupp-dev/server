@@ -1,0 +1,23 @@
+{
+   "Ready": true,
+   "Checkpoint": {"0": {
+      "CheckpointX": -331,
+      "CheckpointY": 151,
+      "CheckpointZ": 132,
+      "Location": {
+         "world": "lobby",
+         "x": -330.5,
+         "y": 152.5,
+         "z": 132.5,
+         "pitch": -1.650098,
+         "yaw": 0.3002658
+      }
+   }},
+   "Views": 4,
+   "Checkpoints": 0,
+   "Completed": 2,
+   "MaxDeaths": 2,
+   "Creator": "Lord_javibu",
+   "MaxFallTicks": 20,
+   "Name": "conejo"
+}

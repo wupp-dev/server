@@ -376,7 +376,7 @@ echo ""
 
 ```
 
-6. Hacemos el archivo ejecutable `chmod +x ~/welcome_message.sh` y lo añadimos a `~/.bashrc`:
+6. Hacemos el archivo ejecutable `sudo chmod +x ~/welcome_message.sh` y lo añadimos a `~/.bashrc`:
 
 ```sh
 # ~/.bashrc: executed by bash(1) for non-login shells.

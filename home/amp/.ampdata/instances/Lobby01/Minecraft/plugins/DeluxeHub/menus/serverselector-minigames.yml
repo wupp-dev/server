@@ -1,0 +1,43 @@
+slots: 27
+
+title: "CODERE"
+
+refresh:
+  enabled: false
+  rate: 30
+
+items:
+  filler:
+    material: GRAY_STAINED_GLASS_PANE
+    slot: -1
+  Nexo:
+    material: END_STONE
+    slot: 11
+    amount: 1
+    glow: true
+    display_name: '&4&lDestruir el Nexo'
+    lore:
+      - '&6&l4 equipos con un nexo que proteger.'
+      - '&5&l ♦ 5 FASES ♦'
+      - '&l◇ 1 &a Nexo invulterable, prepárate.'
+      - '&l◇ 2 &d El nexo puede ser atacado.'
+      - '&l◇ 3 &b ¡Diamantes en el centro!' 
+      - '&l◇ 4 &e Accesible la dimensión del Boss.'
+      - '&l◇ 5 &c El nexo recibe el doble de daño.'
+      - '&c&lAun no disponible'
+    actions:
+      - '[CLOSE]'
+      - '[MESSAGE] &cMundo aun no disponible.'
+  UHC:
+    material: GOLDEN_APPLE
+    slot: 15
+    amount: 1
+    glow: true
+    display_name: '&5UHC'
+    lore:
+      - '&bClick para iniciar servidor y generear nuevo mundo'
+      - '&3&lTiempo aproximado: &213.5 minutos'
+      - '&c&lAun no disponible'
+    actions:
+      - '[CLOSE]'
+      - '[MESSAGE] &cMundo aun no disponible.'

@@ -305,3 +305,7 @@ Entre todas las cosas que hemos añadido está el OCSP Stapling, pero no está i
 Aunque ya hemos acabado de configurar Nginx, hay que tener en cuenta de que por ahora lo único que hace es servir archivos estáticos localizados en `/usr/share/nginx/html/`.
 
 En un principio, nos dedicaremos a añadir servicios en subdominios, dejando `www` intacto, así que puede dejarse como una página web estática, retocando un poco su apariencia o puede configurarse como uno de los servicios, eso ya queda a elección de cada uno.
+
+### Para el dominio
+
+Entre la gran variedad de registros que podemos añadir a un dominio, está el Certificate Authority Authorization (CAA) con el que podemos indicar qué autoridades pueden crear certificados para el dominio y sus subdominios. Para configurarlo, simplemente añadimos el registro CAA bajo el dominio base `wupp.dev` y como destino indicamos `0 issue "letsencrypt.org"` para que solo se puedan crear certificados por letsencrypt.

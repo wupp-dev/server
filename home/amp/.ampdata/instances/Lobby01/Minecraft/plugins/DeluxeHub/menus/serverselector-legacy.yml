@@ -1,0 +1,54 @@
+slots: 27
+
+title: "QUEREMOS IR A MISA"
+
+refresh:
+  enabled: false
+  rate: 30
+
+items:
+  filler:
+    material: GRAY_STAINED_GLASS_PANE
+    slot: -1
+  Survival:
+    material: GRASS_BLOCK
+    slot: 10
+    amount: 1
+    glow: true
+    display_name: '&eSurvival.OLD'
+    lore:
+      - '&9&l¡ &b&oAntes con más fuego azul &9&l!'
+      - '&c&lAun no disponible'
+    actions:
+      - '[CLOSE]'
+      - '[MESSAGE] &cMundo aun no disponible.'
+#      - '[MESSAGE] &7Yendo a: &eSurvival'
+#      - '[BUNGEE] Survival'
+  Creativo:
+    material: BEDROCK
+    slot: 13
+    amount: 1
+    glow: true
+    display_name: '&0&l&k-&4&l&k-&0&l&k-'
+    lore:
+      - '&5Ministerio de Hacienda'
+      - '&c&lAun no disponible'
+    actions:
+      - '[CLOSE]'
+      - '[MESSAGE] &cMundo aun no disponible.'
+#      - '[MESSAGE] &7Yendo a: &0&l&k-&4&l&k-&0&l&k-'
+#      - '[BUNGEE] Creativo'
+  SurvivalMMD:
+    material: WARPED_NYLIUM
+    slot: 16
+    amount: 1
+    glow: true
+    display_name: '&5&lSurvival mamadísimo'
+    lore:
+      - '&b&oMás profundo que tu &9&lorto'
+      - '&c&lAun no disponible'
+    actions:
+      - '[CLOSE]'
+      - '[MESSAGE] &cMundo aun no disponible.'
+#      - '[MESSAGE] &7Yendo a: &5&l Survival mamadísimo'
+#      - '[BUNGEE] SurvivalMMD'

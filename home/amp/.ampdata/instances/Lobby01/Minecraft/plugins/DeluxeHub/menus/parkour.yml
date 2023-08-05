@@ -1,0 +1,47 @@
+# Slots of the GUI
+slots: 9
+
+# Title of the GUI
+title: "PARKOUR"
+
+# Automatically update open inventories.
+# This can be used to update placeholders in the GUI.
+refresh:
+  enabled: true
+  rate: 30
+
+# The items inside the GUI can be listed here
+items:
+  filler:
+    material: GRAY_STAINED_GLASS_PANE
+    slot: -1 # Setting the slot to -1 will fill every empty slot, you can also do "slots: [0, 1, 2]"
+  Matias:
+    material: WITHER_SKELETON_SKULL
+    slot: 0
+    amount: 1
+    glow: false
+    display_name: '&5&lMatías'
+    lore:
+#      - '&9&lPremio: &6&l500 &4☭&0.'
+#      - '&9&lDisponible en: &b&o%parkour_course_prize_delay_matias%'
+      - '&c&lMáximas muertes: &625'
+      - '&aRecord de tiempo: &d&l%parkour_course_record_matias_time%'
+      - '&aRecord de muertes: &d&l%parkour_course_record_matias_deaths%'
+    actions:
+      - '[CLOSE]'
+      - '[COMMAND] pa join matias'
+  Conejo:
+    material: RABBIT
+    slot: 1
+    amount: 1
+    glow: false
+    display_name: '&4&lConejo'
+    lore:
+#      - '&9&lPremio: &6&l100 &4☭&0.'
+#      - '&9&lDisponible en: &b&o%parkour_course_prize_delay_conejo%'
+      - '&c&lMáximas muertes: &62'
+      - '&aRecord de tiempo: &d&l%parkour_course_record_conejo_time%'
+      - '&aRecord de muertes: &d&l%parkour_course_record_conejo_deaths%'
+    actions:
+      - '[CLOSE]'
+      - '[COMMAND] pa join conejo'

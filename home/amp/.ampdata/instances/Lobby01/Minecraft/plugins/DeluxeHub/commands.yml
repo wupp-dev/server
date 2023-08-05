@@ -1,0 +1,50 @@
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+# | CUSTOM COMMANDS                          |
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+# You do not need to restart your server if you edit anything below here
+
+custom_commands:
+
+  # Command name, this will be used as the main command
+  website:
+    # List any aliases for the command here
+    aliases:
+      - web
+    # Actions to be executed
+    actions:
+      - '[MESSAGE] &bWebsite: &fmc.wupp.dev'
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+# | DELUXEHUB COMMANDS                       |
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+# It's highly recommended to restart your server if you edit anything below
+
+commands:
+  gamemode:
+    enabled: false
+    aliases:
+      - gm
+  gms:
+    enabled: false
+  gmc:
+    enabled: false
+  gma:
+    enabled: false
+  gmsp:
+    enabled: false
+  clearchat:
+    enabled: false
+  fly:
+    enabled: true
+  lockchat:
+    enabled: false
+    aliases:
+      - lc
+  setlobby:
+    enabled: true
+  lobby:
+    enabled: true
+  vanish:
+    enabled: false
+    aliases:
+      - v

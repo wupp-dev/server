@@ -25,6 +25,9 @@ let guideSidebar = [
         text: "Configurando MariaDB con Docker",
         link: "/equipo/mariadb-docker",
       },
+      { text: "Conectando varios servidores",
+        link: "/equipo/conectando-servidores",
+      }
     ],
   },
   {
@@ -38,6 +41,10 @@ let guideSidebar = [
       {
         text: "Docker Mailserver - Correo electrónico",
         link: "/servicios/mailserver",
+      },
+      {
+        text: "Minio - Almacenamiento S3",
+        link: "/servicios/minio",
       },
       { text: "Minecraft con AMP", link: "/servicios/minecraft" },
       {

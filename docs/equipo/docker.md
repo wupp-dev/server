@@ -132,3 +132,7 @@ Obviamente no siempre tendremos que usar tantas opciones para un servicio, pero 
 Te recomiendo que leas la [documentación oficial de Docker Compose](https://docs.docker.com/compose/) para saber cómo funciona exactamente el archivo.
 
 Lo dicho, según vayamos viendo los diferentes servicios se irán mostrando los extractos del archivo para el correspondiente servicio para que así podáis cómodamente seleccionar que servicios queréis.
+
+## Particularidades
+
+Como nosotros tenemos `/var` en el disco duro mecánico, tuvimos que mover la carpeta con las imágenes de docker al disco SSD porque la diferencia de rendimiento es abismal. Lo único que tuvimos que hacer para ello fue mover la carpeta de docker con `sudo mv /var/lib/docker /` y crear un enlace simbólico con `sudo ln -s /docker/ /var/lib/docker`.

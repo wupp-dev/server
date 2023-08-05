@@ -214,7 +214,7 @@ Ten cuidado con esta parte, ya que una configuración incorrecta puede causar qu
 
 El resto de líneas que haya debajo las dejamos intactas.
 
-### Montando el disco tocho al inicio
+### Montando el disco grande al inicio
 
 Como tenemos un disco duro de 4TB que vamos a usar para almacenar archivos, necesitamos que se desencripte también y se monte al encenderse el servidor, así que vamos a ello.
 
@@ -281,3 +281,21 @@ Muy bien, con esto el disco se desencriptará al encenderse el servidor, solo no
 ```
 
 Que hará que el disco se monte en `/mnt/vault` cuando se encienda el servidor. La opción `nofail` hace que, aunque no se pueda montar el disco, el ordenador se siga encendiendo en vez de fallar.
+
+### Alternativa de montaje del disco grande
+
+Hemos optado por mover toda la carpeta `/var` al disco duro grande por ser una carpeta donde se suelen almacenar logs y archivos más pesados. Para ello, vamos a montar directamente el disco grande en `/var`.
+
+Empezamos copiando todo el contenido al disco duro con `sudo cp -rf /var/* /mnt/vault/`. Después modificamos `/etc/fstab` para cambiar el punto de montaje del disco duro de `/mnt/vault` a `/var` y tenemos que reiniciar *daemon* de *systemclt* con `sudo systemctl daemon-reload`. Ahora podemos mover la actual carpeta a una copia y mantenerla durante un tiempo prudencial `sudo mv /var /var.old`, creamos la nueva carpeta `sudo mkdir /var` y remontamos el disco duro con `sudo umount /mnt/vault` y `sudo mount /dev/mapper/vault`.
+
+Si después de esto obtuviésemos un error al usar `apt` similar a:
+
+```
+/usr/bin/mandb: can't chmod /var/cache/man/CACHEDIR.TAG: Operation not permitted
+/usr/bin/mandb: can't remove /var/cache/man/CACHEDIR.TAG: Permission denied
+/usr/bin/mandb: fopen /var/cache/man/28371: Permission denied
+```
+
+Podemos solucionarlo con `chown -R man: /var/cache/man/` y `chmod -R 755 /var/cache/man/`.
+
+También es posible que, después de eso, nos encontremos con que el servicio `lighdm` falla (posiblemente después de un reinicio y de escribir `sudo systemctl status lightdm`). Lo podemos solucionar con `sudo chown -R lightdm:lightdm /var/lib/lightdm/` y `sudo chmod -R 755 /var/lib/lightdm/`.
