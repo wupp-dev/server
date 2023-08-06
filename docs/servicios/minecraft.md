@@ -28,7 +28,7 @@ version: "3"
 services:
   mariadb:
     image: mariadb
-    container_name: mariadb
+    container_name: mariadb:10.6.14
     restart: always
     env_file: mariadb.env
     ports:
@@ -212,7 +212,6 @@ Esta sección de la documentación es aun más vaga si cabe porque estoy prioriz
 
 Esta es la lista de plugins:
 
-- [Aurelium Skills](https://hangar.papermc.io/Archy/AureliumSkills)
 - [Chunky](https://hangar.papermc.io/pop4959/Chunky)
 - [CoreProtect](https://hangar.papermc.io/CORE/CoreProtect)
 - [Dynmap](https://www.spigotmc.org/resources/dynmap%C2%AE.274/)
@@ -221,6 +220,7 @@ Esta es la lista de plugins:
 - [InteractiveChat](https://hangar.papermc.io/LOOHP/InteractiveChat)
 - [Inventory Rollback Plus](https://www.spigotmc.org/resources/inventory-rollback-plus-1-8-1-20-x.85811/)
 - [LuckPerms](https://luckperms.net/download)
+- [OnlineTime](https://modrinth.com/plugin/onlinetime)
 - [OpenInv](https://dev.bukkit.org/projects/openinv)
 - [PlaceholderAPI](https://www.spigotmc.org/resources/placeholderapi.6245/)
 - [ProtocolLib](https://hangar.papermc.io/dmulloy2/ProtocolLib)
