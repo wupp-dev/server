@@ -22,8 +22,8 @@ CommandAliases = [ "lobby" ]
 
 # Message customization
 # MiniMessage is supported, for tips on using MiniMessage see https://docs.advntr.dev/minimessage/format.html
-ConnectingMessage = "<green>Sending you to Lobby.."
-AlreadyOnHubMessage = "<red>You are already connected to this server!"
+ConnectingMessage = "<green>Yendo al lobby.."
+AlreadyOnHubMessage = "<red>¡Ya estás en el lobby!"
 CannotExecuteOnConsoleMessage = "<green>This command can only be executed by a player!"
 ServerNotFound = "<red>It appears that the server you are trying to connect to does not exist. Please contact an Administrator."
 NoPermission = "<red>You do not have permission to run this command!"

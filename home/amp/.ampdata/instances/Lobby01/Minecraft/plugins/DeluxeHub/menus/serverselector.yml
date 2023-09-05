@@ -73,7 +73,8 @@ items:
       - '&a&lDisponible'
     actions:
       - '[CLOSE]'
-      - '[MESSAGE] &cMundo aun no disponible.'
+      - '[MESSAGE] &7Yendo a: &b&lSurvival &c&lComunitario'
+      - '[BUNGEE] survival-vanilla-pve'
   Mods:
     material: PAPER
     slot: 16

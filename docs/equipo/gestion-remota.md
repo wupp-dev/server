@@ -85,8 +85,8 @@ DROPBEAR_OPTIONS="-I 300 -j -k -p 22 -s"
 Como indica el último parámetro, la autenticación por contraseña está deshabilitada, así que utilizaremos también las claves públicas que hayamos autorizado para OpenSSH Server, podemos copiarlas y hacer que los cambios tengan efecto con los comandos:
 
 ```sh
-$ sudo cp /home/admin/.ssh/authorized_keys /etc/dropbear-initramfs/etc/dropbear/initramfs/
-$ sudo update-initramfs -u
+sudo cp /home/admin/.ssh/authorized_keys /etc/dropbear-initramfs/etc/dropbear/initramfs/
+sudo update-initramfs -u
 ```
 
 Esto generará de nuevo en la partición `boot` los archivos de `initramfs` incluyendo los cambios que hemos hecho.
@@ -97,9 +97,9 @@ Tras esto descubrí que si el ordenador permanecía mucho tiempo encendido sin q
 
 ### ¿Y qué pasa con el dominio?
 
-¿No podría ocurrir que, mientras el ordenador está esperando a que alguien se conecte para desencriptar los discos, la IP pública cambie? Pues sería raro, pero podría ocurrir. Y no nos conviene, así que vamos a prevenir que eso pueda ocurrir.
+¿No podría ocurrir que, mientras el ordenador está esperando a que alguien se conecte para desencriptar los discos, la IP pública cambie? Pues sería raro, pero podría ocurrir. Y no nos conviene, así que vamos a prevenir que eso pueda pasar.
 
-El objetivo es poner la tarea de `crontab` para ir actualizando la IP para que también se ejecute durante el encendido. El primer problema que nos encontramos para esto es que los comandos disponibles cuando estamos en `ìnitramfs` son muy pocos y no incluyen `crontab`. Concretamente, los comandos que hay disponibles son una versión reducida de [BusyBox](https://busybox.net/) y para poder usar `crontab` necesitamos la versión completa.
+El objetivo es crear una tarea de `crontab` para ir actualizando la IP cada cierto tiempo durante el encendido. El primer problema que nos encontramos para esto es que los comandos disponibles cuando estamos en `ìnitramfs` son muy pocos y no incluyen `crontab`. Concretamente, los comandos que hay disponibles son una versión reducida de [BusyBox](https://busybox.net/) y para poder usar `crontab` necesitamos la versión completa.
 
 `initramfs` utiliza la versión de BusyBox que haya instalada en Debian, así que tenemos que cambiarla escribiendo `sudo apt install busybox-static`, que reemplazará a la anterior y se incluirá automáticamente en `initramfs`.
 
@@ -119,10 +119,16 @@ mkdir $DESTDIR/var
 mkdir $DESTDIR/var/spool
 mkdir $DESTDIR/var/spool/cron
 mkdir $DESTDIR/var/spool/cron/crontabs
-cp /var/spool/cron/crontabs/root $DESTDIR/var/spool/cron/crontabs/root
+cp /usr/share/initramfs-tools/crontab $DESTDIR/var/spool/cron/crontabs/root
 ```
 
-Escribimos `sudo chmod +x /usr/share/initramfs-tools/hooks/crontab` para hacer el archivo ejecutable y esto lo que hará es crear el directorio y copiar el mismo archivo que ya habíamos configurado antes con el comando para actualizar la IP. Cada vez que escribamos `sudo update-initramfs -u` se volverá a crear el directorio y a copiar el archivo, con lo que también nos aseguraremos de que si cambiamos el archivo también se cambiará en `initramfs`, aunque no inmediatamente.
+Escribimos `sudo chmod +x /usr/share/initramfs-tools/hooks/crontab` para hacer el archivo ejecutable y esto lo que hará es crear el directorio y copiar un archivo con la configuración de `crontab` que vamos a crear ahora mismo. Escribimos en `/usr/share/initramfs-tools/crontab` la línea necesaria para actualizar únicamente `wupp.dev`, ya que el resto de subdominios nos da igual que se actualicen ahora si no van a poder usarse porque el ordenador no está completamente encendido:
+
+```
+1,6,11,16,21,26,31,36,41,46,51,56 * * * * sleep 46 ; wget --no-check-certificate -qO- ipinfo.io/ip -O - | xargs -I {} wget --no-check-certificate -qO- "https://dynamicdns.park-your-domain.com/update?host=@&domain=wupp.dev&password=passwd&ip={}" > /tmp/dnsupdate.log 2>&1 &
+```
+
+Cada vez que ejecutemos `sudo update-initramfs -u` se volverá a crear el directorio y a copiar el archivo, con lo que también nos aseguraremos de que si cambiamos el archivo también se cambiará en `initramfs`, aunque no inmediatamente.
 
 Sin embargo, aunque ya podemos usar `crontab` en `initramfs`, nos falta hacer que se empiece a ejecutar, así que tenemos que crear otro archivo que se encargue de iniciar `crond`, que ejecutará lo que haya en `crontab`. Ese archivo será `/usr/share/initramfs-tools/scripts/init-premount/crond` y tendrá este contenido:
 
@@ -150,35 +156,29 @@ crond -l 2
 exit 0
 ```
 
-Que no se nos olvide hacer el archivo ejecutable escribiendo `sudo chmod +x /usr/share/initramfs-tools/scripts/init-premount/crond` y ya podremos ir con el último paso para que todo esto funcione.
+Que no se nos olvide hacer el archivo ejecutable escribiendo `sudo chmod +x /usr/share/initramfs-tools/scripts/init-premount/crond`.
 
-Nos queda una última cosa por hacer, y es que en `initramfs` no hay configurado un servidor DNS, así que el ordenador no podrá resolver `freedns.afraid.org` a la IP que apunte y no se podrá ejecutar el comando. Un apaño para que funcione es cambiar el contenido de `crontab` escribiendo `sudo crontab -e` a este:
+Genial, ahora si probamos a reiniciar el ordenador nos encontraremos con otro problema, y es que la resolución de dominios no funciona. Podemos comprobarlo con un comando tan sencillo como `wget google.com`, que nos dará un error.
 
-```nginx
-#
-# To define the time you can provide concrete values for
-# minute (m), hour (h), day of month (dom), month (mon),
-# and day of week (dow) or use '*' in these fields (for 'any').
-#
-# Notice that tasks will be started based on the cron's system
-# daemon's notion of time and timezones.
-#
-# Output of the crontab jobs (including errors) is sent through
-# email to the user the crontab file belongs to (unless redirected).
-#
-# For example, you can run a backup of all your user accounts
-# at 5 a.m every week with:
-# 0 5 * * 1 tar -zcf /var/backups/home.tgz /home/
-#
-# For more information see the manual pages of crontab(5) and cron(8)
-#
-# m h  dom mon dow   command
-1,6,11,16,21,26,31,36,41,46,51,56 * * * * sleep 46 ; wget --no-check-certificate -O - "https://$(nslookup freedns.afraid.org 1.1.1.1 | awk '/^Address: / { print $2 }')/dynamic/update.php?cosas" > /tmp/freedns_@_dominio_com.log 2>&1 &
+::: tip RELATO
+La información que hay en internet sobre cómo hacer funcionar la resolución de dominios en `initramfs` es casi nula, así que la forma en la que lo conseguimos fue con varias pruebas que puedes consultar [aquí](../relatos/dns-initramfs).
+:::
+
+Para arreglarlo, crearemos un último archivo `/usr/share/initramfs-tools/hooks/dns` con el contenido:
+
+```sh
+#!/bin/sh -e
+
+if [ "$1" = "prereqs" ]; then exit 0; fi
+. /usr/share/initramfs-tools/hook-functions
+
+cp /usr/lib/x86_64-linux-gnu/libnss_dns.so.2 $DESTDIR/usr/lib/x86_64-linux-gnu/libnss_dns.so.2
+cp /etc/resolv.conf $DESTDIR/etc/resolv.conf
+cp /etc/host.conf $DESTDIR/etc/host.conf
+cp /etc/hosts $DESTDIR/etc/hosts
 ```
 
-Que lo que hace es resolver con otra herramienta de BusyBox, `nslookup`, el dominio `freedns.afraid.org` con los servidores de Cloudflare y ya después ejecutar el resto del comando.
-
-Ejecutamos una última vez `sudo update-initramfs -u` y ya estaría.
+Y lo hacemos ejecutable con `sudo chmod +x /usr/share/initramfs-tools/hooks/dns`. Hecho esto ejecutamos una última vez `sudo update-initramfs -u` y ya estaría.
 
 ## Resolviendo problemas
 
@@ -339,7 +339,7 @@ Banner none
 2. Quitamos el resto del mensaje de bienvenida con `sudo truncate -s 0 /etc/motd`.
 3. Editamos `/etc/pam.d/sshd` para asegurarnos de que las siguientes líneas están comentadas:
 
-```nginx
+```ssh-config
 # Print the message of the day upon successful login.
 # This includes a dynamically generated part from /run/motd.dynamic
 # and a static (admin-editable) part from /etc/motd.

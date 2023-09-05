@@ -295,7 +295,7 @@ Other:
       TeleportToLobby: false
 Plugin: 
    BountifulAPI: 
-      Enabled: true
+      Enabled: false
    Vault: 
       Enabled: true
       RegisterParkoins: false

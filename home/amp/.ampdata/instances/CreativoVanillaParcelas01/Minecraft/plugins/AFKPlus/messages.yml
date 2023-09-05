@@ -1,0 +1,46 @@
+ConfigVersion: 2
+
+PrimaryColor: "&6"
+SecondaryColor: "&3"
+
+#The language used for time values like "60 minutes from now"
+#Accepted values can be found at http://www.ocpsoft.org/prettytime/#i18n
+#Please use the abbreviation next to the language e.g. DE for German or FR for french
+PrettyTimeLocale: "es"
+
+#These are sent to all players when AFK starts and stops
+Broadcast:
+  Start: "&p{PLAYER}&r está ausente"
+  #You may also add a {TIME} variable that will be replaced by how long the player was AFK
+  Stop: "&p{PLAYER}&r dejó de estar ausente tras {TIME}"
+
+Updater:
+  NoUpdate: "&pThere is no update available"
+  UpdateFound: "&pThere is an update available for AFKPlus"
+  UpdateDownloading: "&pAn update was found and is being downloaded, it will be installed on the next server restart"
+
+Player:
+  AFK: "&s{PLAYER}&p has been AFK since &s{TIME}"
+  NotAFK: "&s{PLAYER}&p is not AFK"
+
+#Sent when the player is AFK long enough for a warning to be sent
+Warning: "&8[&6AFK&4+&8]&p You will be kicked for AFK soon!"
+
+Help:
+  Help: "The following is a list of commands and their uses:\n"
+  AFKPlus: "\"/afkplus\"\n
+  Shows plugin information"
+  AFKPlusHelp: "\"/afkplus [help]\"\n
+  Displays all of the commands and their uses"
+  AFKPlusUpdate: "\"/afkplus [update]\"\n
+  Checks for and installs any available update"
+  AFKPlusPlayer: "\"/afkplus player [PlayerName]\"\n
+  Tells you the AFK status of the player, if they are AFK it will also tell you how long they have been AFK"
+  AFK: "\"/afk [PlayerName]\"\n
+  Without a players name this will toggle your AFK status\n
+  With a name it will attempt to toggle that players AFK status"
+
+Error:
+  MustBePlayer: "&sYou must be player to do this!"
+  PlayerNotFound: "&sPlayer not found"
+  NotPermitted: "&sYou aren't permitted to do this"

@@ -1,0 +1,259 @@
+Lang:
+  
+  # Defines the Plugin-Language
+  lang: es_es
+  
+  
+  
+Options:
+  
+  # Checks if a new Update got released
+  check-for-update: true
+  
+  # Defines Shortcuts for Commands
+  CommandShortcuts:
+    
+    setwarp: "gwarp set"
+    delwarp: "gwarp delete"
+    warps: "gwarp warps"
+    sethome: "ghome set"
+    delhome: "ghome delete"
+    homes: "ghome homes"
+    teleport: "gtp"
+    tp: "gtp"
+    tpa: "gtpa"
+    tpahere: "gtpahere"
+    
+  Warp:
+    
+    # Defines whether the Warp-Command opens the GUI
+    warp-command-open-gui: false
+    
+    # Defines the Default Warp GUI
+    default-warp-gui: "menu"
+    
+    # Defines the Default Material for a Warp-Icon
+    default-warp-icon: "GRASS_BLOCK"
+    
+    # Defines whether Warps where shown on the Dynmap
+    show-warps-on-dynmap: true
+    
+    # Defines the Warp-Icon on the Dynmap
+    dynmap-icon: "pin"
+    
+    # Defines how many Warps should be shown in the "/warp top"
+    top-list-size: 10
+    
+    # Defines the minimum Number of Visitors so that a Warp can be listed in the "/warp top"
+    min-visitors-for-top: 1
+    
+    # Defines how many Warps should be shown on one Page of "/warp list"
+    list-page-size: 10
+    
+    # Defines how many Warps should be shown on one Page of "/warp warps"
+    warps-page-size: 10
+    
+    # Defines how many Warps a Player can create without any extra Permissions
+    default-warp-amount: 0
+    
+    # Defines the maximum length of a Warpname
+    max-warp-length: 20
+    
+    # Defines whether a Player can create a Warp only on his Island (Only works with BentoBox)
+    set-warp-only-on-island: true
+    
+    # Defines whether the Owner counts as Visitor, when he teleported to his Warp
+    owner-count-as-visitor: false
+    
+    # Defines whether a Player can only teleported to a Warp if he is in the same World as the Warp-Location
+    use-warp-only-in-same-world: false
+    
+    # Defines whether a Player can only teleported to a Warp if the Warp is safe (Can be ignored with Permission)
+    use-safe-warp: false
+    
+    # Defines the Warp-Effect
+    WarpEffectOptions:
+      
+      particle-amount: 50
+      particle-offset-x: 1.0
+      particle-offset-y: 1.0
+      particle-offset-z: 1.0
+      particle-speed: 0.1
+      
+    # Defines the Warp-Sound
+    WarpSoundOptions:
+      
+      sound-volume: 1.0
+      sound-pitch: 1.0
+      
+      allow-gmusic-songs: true
+      
+    # Defines the Time-Placeholder-Format for the Welcome-Message
+    welcome-time-format: "HH:mm:ss"
+    
+    # Defines the Date-Placeholder-Format for the Welcome-Message
+    welcome-date-format: "dd.MM.yyyy"
+    
+    # Defines the Warp-Cooldown in Seconds until a Player can use the "/warp <Warp>" again (Can be ignored with Permission)
+    warp-cooldown: 0.0
+    
+    # Defines the Seconds a Player must wait, to get teleported to the Warp (Can be ignored with Permission)
+    warp-warmup: 0.0
+    
+    # Defines whether a Warp WarmUp should be canceled if the Player moves
+    cancel-warp-warmup-by-move: true
+    
+    # Defines the Warp-Rating-Settings
+    WarpRating:
+      
+      min-rating: 1.00
+      max-rating: 5.00
+      allow-decimal-rating: false
+      
+    # Defines the List of Warpnames that can't be used (Write the Names in lower case)
+    NameBlacklist:
+    - "spawn"
+    - "help"
+    - "warp"
+    
+    # Defines the Worlds in which no Warp can be created
+    WorldBlacklist:
+    - "disabled_world"
+    
+    # Defines the WarpSign-Header on which the Sign gets detected
+    warp-sign-header: "[Warp]"
+    
+    # Defines whether the WarpSign is destroyed if an Error occurs during the creation
+    destroy-warp-sign-on-error: true
+
+    # Defines if Warps should be shown in the Tab-Completion
+    tab-completion-show-warps: true
+
+    # Defines the Settings which should not be shown in the Tab Completion List
+    TabBlacklist: []
+    
+    
+    
+  Home:
+    
+    # Defines how many Homes should be shown on one Page of "/home homes"
+    homes-page-size: 10
+    
+    # Defines how many Homes a Player can create without any extra Permissions
+    default-home-amount: 1
+    
+    # Defines the maximum length of a Homename
+    max-home-length: 20
+    
+    # Defines whether a Player can create a Home only on his Island (Only works with BentoBox)
+    set-home-only-on-island: false
+    
+    # Defines whether a Player can only teleported to a Home if he is in the same World as the Home-Location
+    use-home-only-in-same-world: false
+    
+    # Defines whether a Player can only teleported to a Home if the Home is safe (Can be ignored with Permission)
+    use-safe-home: false
+    
+    # Defines the Home-Cooldown in Seconds until a Player can use the "/home <Home>" again (Can be ignored with Permission)
+    home-cooldown: 0.0
+    
+    # Defines the Seconds a Player must wait, to get teleported to the Home (Can be ignored with Permission)
+    home-warmup: 0.0
+    
+    # Defines whether a Home WarmUp should be canceled if the Player moves
+    cancel-home-warmup-by-move: true
+    
+    # Defines the Worlds in which no Home can be created
+    WorldBlacklist:
+    - "world_nether"
+    - "world_end"
+    
+    # Defines if Homes should be shown in the Tab-Completion
+    tab-completion-show-homes: true
+    
+    # Defines the Settings which should not be shown in the Tab Completion List
+    TabBlacklist: []
+    
+    
+    
+  Spawn:
+    
+    # Defines whether a Player should teleported back to the Spawn if he joins the Server
+    return-to-spawn-on-join: false
+    
+    # Defines whether a Player should teleported to the Spawn if he joins the Server for the first time
+    spawn-on-first-join: true
+    
+    # Defines whether a Player should force-teleported to the Spawn if he dies (ignores bed)
+    return-to-spawn-on-death: false
+    
+    # Defines whether a Player can only teleported to the Spawn if he is in the same World as the Spawn-Location
+    use-spawn-only-in-same-world: false
+    
+    # Defines whether a Player can only teleported to the Spawn if the Spawn is safe (Can be ignored with Permission)
+    use-safe-spawn: false
+    
+    # Defines the Spawn-Cooldown in Seconds until a Player can use the "/spawn" again (Can be ignored with Permission)
+    spawn-cooldown: 0.0
+    
+    # Defines the Seconds a Player must wait, to get teleported to the Spawn (Can be ignored with Permission)
+    spawn-warmup: 0.0
+    
+    # Defines whether the Spawn WarmUp should be canceled if the Player moves
+    cancel-spawn-warmup-by-move: true
+    
+    
+    
+  Teleport:
+    
+    # Defines after how many Seconds a Teleport-Request should expire
+    tpa-respond-time: 60.0
+    
+    # Defines after how many Seconds a Teleport-Here-Request should expire
+    tpahere-respond-time: 60.0
+    
+    # Defines the Random-Teleport-Settings (CURRENTLY NOT SUPPORTED! WILL BE ADDED SOON!)
+    RandomTeleport:
+      
+      # Defines the Radius of the Random-Teleport Command
+      rtp-default-radius: 500
+      
+      # Defines the Radius of the Random-Teleport Command
+      rtp-max-command-radius: 1000
+      
+      # Defines whether the Area should be a Rectangle or Circle
+      rtp-area-is-rect: true
+      
+      # Defines whether the Player is the Center of the Random-Teleport Area
+      rtp-player-is-center: false
+      
+      # Defines the Center of the Random-Teleport Area (Only works if rtp-player-is-center is false)
+      Center:
+        
+        x: 0.0
+        z: 0.0
+        
+      # Defines whether a Player can only random teleported if the End-Location is safe (Can be ignored with Permission)
+      use-safe-rtp: false
+      
+      # Defines the Random-Teleport Cooldown in Seconds until a Player can use the "/rtp" again (Can be ignored with Permission)
+      rtp-cooldown: 120.0
+      
+      # Defines the Seconds a Player must wait, to get random teleported (Can be ignored with Permission)
+      rtp-warmup: 0.0
+      
+      # Defines whether the Random-Teleport WarmUp should be canceled if the Player moves
+      cancel-rtp-warmup-by-move: true
+      
+      # Defines the Worlds in which no Random-Teleport can be used
+      WorldBlacklist:
+      - "disabled_world"
+      
+    # Defines whether a Player-Death should create a Back-Location on this Position
+    death-create-back-location: true
+    
+    # Defines whether a normal Player-Teleport should create a Back-Location on this Position
+    normal-tp-create-back-location: true
+    
+    # Defines whether the Back-Location of a Player should get cleared on Quit
+    clear-back-location-on-quit: true

@@ -1,5 +1,3 @@
-import { defineConfig } from "vitepress";
-
 let guideSidebar = [
   {
     text: "Equipo",
@@ -69,11 +67,15 @@ let guideSidebar = [
         text: "Lucas vs. Debian & Docker & etc.",
         link: "/relatos/usuario-docker",
       },
+      {
+        text: "Resolución de dominios en initramfs",
+        link: "/relatos/dns-initramfs",
+      },
     ],
   },
 ];
 
-export default defineConfig({
+export default {
   title: "Servidor mamadísimo",
   description: "Guía del servidor.",
   lang: "es-ES",
@@ -96,7 +98,7 @@ export default defineConfig({
         link: "https://github.com/ComicIvans/server",
       },
     ],
-    socialLinks: [{ icon: "discord", link: "https://discord.gg/YdnmG5v8" }],
+    socialLinks: [{ icon: "discord", link: "https://discord.gg/2pdbaf6Ugz" }],
     sidebar: {
       "/equipo/": guideSidebar,
       "/servicios/": guideSidebar,
@@ -108,4 +110,4 @@ export default defineConfig({
         "Copyright © 2022-presente Lucas de Uña Ocampo e Iván Salido Cobo",
     },
   },
-});
+}

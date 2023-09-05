@@ -183,7 +183,7 @@ settings:
     minecraft:brown_bed:
       distance: 0.5
   disable-give-dropping: false
-  use-alternate-keepalive: false
+  use-alternate-keepalive: true
 config-version: 32
 world-settings:
   default:
@@ -1472,8 +1472,8 @@ world-settings:
           kick-if-idle: false
           tick-nearby-entities: true
           count-as-sleeping: false
-          update-tab-list: false
-          mobs-target: true
+          update-tab-list: true
+          mobs-target: false
         spawn-invulnerable-ticks: 60
         invulnerable-while-accepting-resource-pack: false
         exp-dropped-on-death:

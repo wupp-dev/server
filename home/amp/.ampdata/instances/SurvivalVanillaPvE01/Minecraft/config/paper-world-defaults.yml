@@ -56,15 +56,27 @@ chunks:
   auto-save-interval: default
   delay-chunk-unloads-by: 10s
   entity-per-chunk-save-limit:
-    arrow: -1
-    ender_pearl: -1
-    experience_orb: -1
-    fireball: -1
-    small_fireball: -1
-    snowball: -1
+    area_effect_cloud: 8
+    arrow: 16
+    dragon_fireball: 3
+    egg: 8
+    ender_pearl: 8
+    experience_bottle: 3
+    experience_orb: 16
+    eye_of_ender: 8
+    fireball: 8
+    firework_rocket: 8
+    llama_spit: 3
+    potion: 8
+    shulker_bullet: 8
+    small_fireball: 8
+    snowball: 8
+    spectral_arrow: 16
+    trident: 16
+    wither_skull: 4
   fixed-chunk-inhabited-time: -1
   flush-regions-on-save: false
-  max-auto-save-chunks-per-tick: 24
+  max-auto-save-chunks-per-tick: 8
   prevent-moving-into-unloaded-chunks: false
 collisions:
   allow-player-cramming-damage: false
@@ -101,8 +113,8 @@ entities:
       zombies: false
     nerf-pigmen-from-nether-portals: false
     parrots-are-unaffected-by-player-movement: true
-    phantoms-do-not-spawn-on-creative-players: true
-    phantoms-only-attack-insomniacs: true
+    phantoms-do-not-spawn-on-creative-players: false
+    phantoms-only-attack-insomniacs: false
     phantoms-spawn-attempt-max-seconds: 119
     phantoms-spawn-attempt-min-seconds: 60
     piglins-guard-chests: true
@@ -240,7 +252,7 @@ fixes:
   tnt-entity-height-nerf: disabled
 hopper:
   cooldown-when-full: true
-  disable-move-event: true
+  disable-move-event: false
   ignore-occluding-blocks: false
 lootables:
   auto-replenish: false
@@ -280,7 +292,7 @@ tick-rates:
     villager:
       validatenearbypoi: -1
   container-update: 1
-  grass-spread: 1
+  grass-spread: 4
   mob-spawner: 1
   sensor:
     villager:

@@ -1,0 +1,9 @@
+#!/bin/sh -e
+
+if [ "$1" = "prereqs" ]; then exit 0; fi
+. /usr/share/initramfs-tools/hook-functions
+
+cp /usr/lib/x86_64-linux-gnu/libnss_dns.so.2 $DESTDIR/usr/lib/x86_64-linux-gnu/libnss_dns.so.2
+cp /etc/resolv.conf $DESTDIR/etc/resolv.conf
+cp /etc/host.conf $DESTDIR/etc/host.conf
+cp /etc/hosts $DESTDIR/etc/hosts

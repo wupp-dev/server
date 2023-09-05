@@ -35,7 +35,7 @@ services:
       - "3306:3306"
     volumes:
       - /var/lib/mysql:/var/lib/mysql
-    command: --transaction-isolation=READ-COMMITTED --log-bin=binlog --binlog-format=ROW
+
   adminer:
     image: adminer
     container_name: adminer
@@ -144,13 +144,17 @@ Iniciamos la instancia para generar el archivo de configuración `velocity.toml`
 
 Además, esta es la lista de plugins:
 
-- [Carbon](https://hangar.papermc.io/Vicarious/Carbon)
+- [AuthMeVelocity](https://modrinth.com/plugin/authmevelocity)
+- [CarbonChat](https://hangar.papermc.io/Vicarious/Carbon)
+- [FastLoginVelocity](https://ci.codemc.io/job/Games647/job/FastLogin/)
 - [LuckPerms](https://luckperms.net/download)
 - [MiniMOTD](https://hangar.papermc.io/jmp/MiniMOTD)
 - [MiniPlaceholders](https://hangar.papermc.io/MiniPlaceholders/MiniPlaceholders)
 - [SkinsRestorer](https://hangar.papermc.io/SRTeam/SkinsRestorer)
 - [SlashHub](https://www.spigotmc.org/resources/%E2%9B%8F%EF%B8%8F-slashhub-%E2%9B%8F%EF%B8%8F-%E2%9C%A8-velocity%E2%9C%A8.101114/)
 - [TAB](https://github.com/NEZNAMY/TAB)
+- [UnSignedVelocity](https://modrinth.com/plugin/unsignedvelocity)
+- [VPacketEvents](https://modrinth.com/plugin/vpacketevents)
 
 Algunos de los plugins utilizan una base de datos, que es la que configuramos en docker anteriormente. Vamos a crear una base de datos para cada plugin que lo necesite.
 
@@ -194,11 +198,17 @@ Nuevamente, estos argumentos de java aumentan el rendmiento, de servidor y está
 
 Esta es la lista de plugins:
 
+- [AFKPlus](https://www.spigotmc.org/resources/afk.35065/)
+- [AFKPlusPAPI](https://github.com/Dart2112/AFKPlusPAPI)
+- [AuthMeReloaded](https://www.spigotmc.org/resources/authmereloaded.6269/)
+- [AuthMeVelocity](https://modrinth.com/plugin/authmevelocity)
 - [DeluxeHub](https://www.spigotmc.org/resources/deluxehub-3-professional-hub-management.49425/)
+- [FastLoginBukkit](https://ci.codemc.io/job/Games647/job/FastLogin/)
 - [LuckPerms](https://luckperms.net/download)
 - [Parkour](https://www.spigotmc.org/resources/parkour.23685/)
 - [PlaceholderAPI](https://www.spigotmc.org/resources/placeholderapi.6245/)
 - [SkinsRestorer](https://hangar.papermc.io/SRTeam/SkinsRestorer)
+- [TAB-Bridge](https://www.spigotmc.org/resources/tab-bridge-1-8-1-20-1.83966/)
 - [ViaBackwards](https://hangar.papermc.io/ViaVersion/ViaBackwards)
 - [ViaVersion](https://hangar.papermc.io/ViaVersion/ViaVersion)
 - [WorldEdit](https://dev.bukkit.org/projects/worldedit)
@@ -212,12 +222,15 @@ Esta sección de la documentación es aun más vaga si cabe porque estoy prioriz
 
 Esta es la lista de plugins:
 
+- [AFKPlus](https://www.spigotmc.org/resources/afk.35065/)
+- [AFKPlusPAPI](https://github.com/Dart2112/AFKPlusPAPI)
+- [ajLeaderboards](https://www.spigotmc.org/resources/ajleaderboards.85548/)
 - [Chunky](https://hangar.papermc.io/pop4959/Chunky)
 - [CoreProtect](https://hangar.papermc.io/CORE/CoreProtect)
+- [DecentHolograms](https://www.spigotmc.org/resources/decentholograms-1-8-1-20-1-papi-support-no-dependencies.96927/)
 - [Dynmap](https://www.spigotmc.org/resources/dynmap%C2%AE.274/)
-- [EssentialsX](https://hangar.papermc.io/EssentialsX/Essentials)
 - [Graves](https://www.spigotmc.org/resources/graves.74208/)
-- [InteractiveChat](https://hangar.papermc.io/LOOHP/InteractiveChat)
+- [GWarpPro](https://www.spigotmc.org/resources/gwarppro-%E2%AD%90-advanced-warp-home-spawn-teleport-plugin-%E2%9C%85-1-9-1-20-%E2%9C%A8-10-off-%E2%9C%A8.81461/)
 - [Inventory Rollback Plus](https://www.spigotmc.org/resources/inventory-rollback-plus-1-8-1-20-x.85811/)
 - [LuckPerms](https://luckperms.net/download)
 - [OnlineTime](https://modrinth.com/plugin/onlinetime)
@@ -226,13 +239,35 @@ Esta es la lista de plugins:
 - [ProtocolLib](https://hangar.papermc.io/dmulloy2/ProtocolLib)
 - [SinglePlayerSleep](https://www.spigotmc.org/resources/singleplayersleep.68139/)
 - [SkinsRestorer](https://hangar.papermc.io/SRTeam/SkinsRestorer)
+- [TAB-Bridge](https://www.spigotmc.org/resources/tab-bridge-1-8-1-20-1.83966/)
 - [Themis](https://www.spigotmc.org/resources/themis-anti-cheat-1-17-1-20-bedrock-support-paper-compatibility-free-optimized.90766/)
 - [Vault](https://www.spigotmc.org/resources/vault.34315/)
 - [ViaBackwards](https://hangar.papermc.io/ViaVersion/ViaBackwards)
 - [ViaVersion](https://hangar.papermc.io/ViaVersion/ViaVersion)
+- [WhitelistBypass](https://www.spigotmc.org/resources/whitelistbypass.101306/)
 - [WorldEdit](https://dev.bukkit.org/projects/worldedit)
+- [WorldGuard](https://dev.bukkit.org/projects/worldguard)
+
+## Creativo con parcelas
+
+Esta es la lista de plugins:
+
+- [AFKPlus](https://www.spigotmc.org/resources/afk.35065/)
+- [AFKPlusPAPI](https://github.com/Dart2112/AFKPlusPAPI)
+- [Chunky](https://hangar.papermc.io/pop4959/Chunky)
+- [FastAsyncWorldEdit](https://www.spigotmc.org/resources/fastasyncworldedit.13932/)
+- [GWarpPro](https://www.spigotmc.org/resources/gwarppro-%E2%AD%90-advanced-warp-home-spawn-teleport-plugin-%E2%9C%85-1-9-1-20-%E2%9C%A8-10-off-%E2%9C%A8.81461/)
+- [LuckPerms](https://luckperms.net/download)
+- [PlaceholderAPI](https://www.spigotmc.org/resources/placeholderapi.6245/)
+- [SkinsRestorer](https://hangar.papermc.io/SRTeam/SkinsRestorer)
+- [TAB-Bridge](https://www.spigotmc.org/resources/tab-bridge-1-8-1-20-1.83966/)
+- [Vault](https://www.spigotmc.org/resources/vault.34315/)
+- [ViaBackwards](https://hangar.papermc.io/ViaVersion/ViaBackwards)
+- [ViaVersion](https://hangar.papermc.io/ViaVersion/ViaVersion)
+- [VirtualRealty](https://www.spigotmc.org/resources/virtual-realty-easy-plots-and-advanced-world-protection.95599/)
+- [WhitelistBypass](https://www.spigotmc.org/resources/whitelistbypass.101306/)
 - [WorldGuard](https://dev.bukkit.org/projects/worldguard)
 
 ## Más allá
 
-Nuestra intención es gestionar la autenticación de los jugadores de Minecraft con [NamelessMC](https://namelessmc.com/) bajo el subdominio `mc.wupp.dev`.
+Nuestra intención es gestionar la autenticación de los jugadores de Minecraft con [NamelessMC](https://namelessmc.com/) bajo el subdominio `mc.wupp.dev`, pero como para eso hace falta tener el servidor de correo configurado completamente, vamos a tirar por ahora con AuthMe.

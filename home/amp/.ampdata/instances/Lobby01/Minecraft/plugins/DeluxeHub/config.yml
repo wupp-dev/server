@@ -277,8 +277,8 @@ join_leave_messages:
   enabled: true
 
   # Set to '' if you want silent join/quit messages
-  join_message: "&2&l+ &6%player% &7Connected"
-  quit_message: "&4&l- &6%player% &7Disconnected"
+  join_message: "&2&l+ &6%player% &7 se ha conectado"
+  quit_message: "&4&l- &6%player% &7 se ha desconectado"
 
 # Actions executed upon join
 join_events:
@@ -343,7 +343,7 @@ custom_join_items:
        material: compass
        amount: 1
        slot: 3
-       display_name: "&6&lVolver al centro"
+       display_name: "&6Volver al centro"
        actions:
          - "[COMMAND] deluxehub:lobby"
 
@@ -355,7 +355,7 @@ custom_join_items:
        material: smooth_stone_slab
        amount: 1
        slot: 5
-       display_name: "&6&lParkour"
+       display_name: "&6Parkour"
        actions:
          - "[MENU] parkour"
 

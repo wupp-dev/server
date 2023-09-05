@@ -48,7 +48,11 @@ Una cosa muy importante a la hora de registrar un dominio es tener la protecció
 
 Cada dominio está asociado a unos nameservers, que serán los que digan a qué IP apunta el dominio y cada subdominio que haya.
 
-Por defecto, los proveedores de dominios suelen usar sus propios nameservers, pero puedes configurar tu dominio para que use otros. Eso es básicamente como darle el control del dominio a otra página en vez de la página en la que has comprado el dominio. **¿Por qué querrías hacer esto?** Pues porque hay páginas como [FreeDNS](https://freedns.afraid.org/) que te dan muchas facilidades para gestionar tu dominio y para actualizar la IP pública de tu servidor en el dominio si cambia. Esto OnlyDomains, por ejemplo, no lo permite de una forma sencilla, por eso nosotros usamos los nameservers de FreeDNS en vez de los propios de OnlyDomains.
+Por defecto, los proveedores de dominios suelen usar sus propios nameservers, pero puedes configurar tu dominio para que use otros. Eso es básicamente como darle el control del dominio a otra página en vez de la página en la que has comprado el dominio. 
+
+Al principio nosotros decidimos usar los nameservers de [FreeDNS](https://freedns.afraid.org/) porque nos resultaba más fácil actualizar la IP pública del servidor si cambiaba a través de un enlace. Esto OnlyDomains, por ejemplo, no lo permitía de una forma sencilla.
+
+El problema que encontramos usando FreeDNS es que alcanzamos el límite de 26 subdominios y usando los nameservers de Namecheap el límite era mucho mayor, así que tuvimos que dejar de usarlo. Por suerte, Namecheap también ofrece la posibilidad de actualizar la IP pública del servidor si cambia a través de un enlace.
 
 ::: warning ADVERTENCIA
 Cambiar los nameservers de tu dominio puede tardar hasta 24 horas en hacerse efectivo en todo el mundo, hazlo solo si es necesario y tienes tiempo para esperar.
@@ -57,41 +61,61 @@ Cambiar los nameservers de tu dominio puede tardar hasta 24 horas en hacerse efe
 Así se ven los nameservers de nuestro dominio al cambiarlos a FreeDNS:
 ![nameservers](../images/nameservers.png)
 
-## Actualizando la IP pública en el domino automáticamente
+## Actualizando la IP pública en el dominio automáticamente
 
-FreeDNS nos permite gestionar todos los subdominios y actualizar la IP a la que apuntan simplemente con un enlace, que debemos abrir desde el servidor. Esto hará que dejemos de preocuparnos por si estamos fuera de casa y de repente nuestra IP pública cambia, ya que si no se actualizara automáticamente, perderíamos acceso al servidor a través del dominio y para poder conectarnos tendríamos que averiguar la nueva IP pública, cosa que no es precisamente sencilla.
+Lo más común en una casa es que la IP pública que tengamos asignada no sea fija y vaya cambiando con el tiempo. Esto es un problema porque el dominio apunta a la IP, pero si esta cambia quedará inservible y si estamos fuera de casa no tendremos forma de conectarnos al servidor sin saber la nueva IP. Para solucionar eso aprovecharemos que Namecheap nos ofrece la posibilidad de actualizar la IP del dominio (o de sus subdominios) a través de un enlace.
 
-Teniendo una cuenta de FreDNS y el dominio con sus nameservers, podemos ir al apartado de **Dynamic DNS** y copiar la **Direct URL** para actualizar la IP de nuestro dominio.
-![FreeDNS](../images/freedns.png)
-En este caso cualesquiera de las URLs nos serviría, ya que tanto el dominio como los subdominios apuntan a la misma IP y está activada la opción **Link updates of the same IP together**, haciendo que al actualizar un dominio o subdominio, se actualicen los demás que apuntaban a la misma IP.
+Para permitir que esto ocurra tenemos que utilizar el tipo especial de registro *A + Dynamic DNS Record* de Namecheap en el dominio y los subdominios.
+![Registros A + Dynamic DNS Record de Namecheap](../images/namecheap-ddns.png)
 
-Vayamos al servidor. Debemos tener instalado `crontab`, un software para ejecutar tareas cada cierto tiempo. Escribimos `sudo crontab -e` *(importante el sudo para que se asocie al usuario root, ya que nos será cómodo para un futuro)* y el archivo debería quedar más o menos así:
+Por desgracia, el cliente que tiene disponible Namecheap es solo para Windows, pero igualmente existe la posibilidad de utilizar un enlace para actualizar la IP. Aun así, no utilizaremos directamente el enlace, ya que podemos aprovecharnos de la existencia de scripts más elaborados que sirven para actualizar la IP en los dominios y subdominios de Namecheap. Concretamente usaremos [este](https://github.com/nickjer/namecheap-ddns).
 
-```bash
-# 
-# To define the time you can provide concrete values for
-# minute (m), hour (h), day of month (dom), month (mon),
-# and day of week (dow) or use '*' in these fields (for 'any').
-# 
-# Notice that tasks will be started based on the cron's system
-# daemon's notion of time and timezones.
-# 
-# Output of the crontab jobs (including errors) is sent through
-# email to the user the crontab file belongs to (unless redirected).
-# 
-# For example, you can run a backup of all your user accounts
-# at 5 a.m every week with:
-# 0 5 * * 1 tar -zcf /var/backups/home.tgz /home/
-# 
-# For more information see the manual pages of crontab(5) and cron(8)
-# 
-# m h  dom mon dow   command
-1,6,11,16,21,26,31,36,41,46,51,56 * * * * sleep 46 ; wget --no-check-certificate -O - UpdateURL > /tmp/freedns_@_dominio_com.log 2>&1 &
+Siguiendo su documentación vamos a instalarlo usando `cargo`, así que también tendremos que [instalar Rust](https://www.rust-lang.org/tools/install).
+
+Una vez instalado Rust, ejecutamos `cargo install namecheap-ddns` y tendremos el ejecutable en `/home/admin/.cargo/bin/namecheap-ddns`.
+
+Siguiendo nuevamente la documentación, vamos a crear un servicio de `systemd` para que se encargue de actualizar la IP del dominio y todos sus subdominios. Creamos el archivo `/etc/systemd/system/ddns-update.service`:
+
+```
+[Unit]
+Description=Update DDNS records for Namecheap
+After=network-online.target
+
+[Service]
+Type=simple
+Environment=NAMECHEAP_DDNS_TOKEN=passwd
+Environment=NAMECHEAP_DDNS_DOMAIN=wupp.dev
+Environment=NAMECHEAP_DDNS_SUBDOMAIN=mc,www
+ExecStart=/home/admin/.cargo/bin/namecheap-ddns
+User=admin
+
+[Install]
+WantedBy=default.target
 ```
 
-Donde `UpdateURL` es la URL copiada de FreeDNS, que se verá como `https://freedns.afraid.org/dynamic/update.php?cosas` y `dominio_com` es el dominio, que en nuestro caso sería `wupp_dev`.
+Ejecutamos `sudo chmod 600 /etc/systemd/system/ddns-update.service` y creamos el archivo `/etc/systemd/system/ddns-update.timer`:
 
-Esto hará que cada 5 minutos se compruebe si la IP pública del servidor ha cambiado y, si es así, se actualizará a la nueva. Además, el resultado se guarda en un archivo temporal en `/tmp/freedns_@_domino_com.log`.
+```
+[Unit]
+Description=Run DDNS update every 15 minutes
+Requires=ddns-update.service
+
+[Timer]
+Unit=ddns-update.service
+OnUnitInactiveSec=15m
+AccuracySec=1s
+
+[Install]
+WantedBy=timers.target
+```
+
+Y ejecutamos los siguientes comandos para ponerlo en funcionamiento y comprobar que todo va bien:
+
+```sh
+sudo systemctl daemon-reload
+sudo systemctl start ddns-update.service ddns-update.timer
+sudo journalctl -u ddns-update.service
+```
 
 ## Toqueteando en el router
 

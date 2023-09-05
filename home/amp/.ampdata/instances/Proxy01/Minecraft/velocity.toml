@@ -73,8 +73,8 @@ enable-player-address-logging = true
 # Configure your servers here. Each key represents the server's name, and the value
 # represents the IP address of the server to connect to.
 lobby = "127.0.0.1:25566"
-survival-vanilla-pvp = "127.0.0.1:25567"
-survival-vanilla-pve = "127.0.0.1:25568"
+survival-vanilla-pve = "127.0.0.1:25567"
+creativo-vanilla-parcelas = "127.0.0.1:25568"
 
 # In what order we should try servers when a player logs in or is kicked from a server.
 try = [
@@ -86,11 +86,11 @@ try = [
 "lobby.mc.wupp.dev" = [
     "lobby"
 ]
-"survival-vanilla-pvp.mc.wupp.dev" = [
-    "survival-vanilla-pvp"
-]
 "survival-vanilla-pve.mc.wupp.dev" = [
     "survival-vanilla-pve"
+]
+"survival-vanilla-pvp.mc.wupp.dev" = [
+    "creativo-vanilla-parcelas"
 ]
 
 [advanced]
@@ -132,7 +132,7 @@ show-ping-requests = true
 failover-on-unexpected-server-disconnect = true
 
 # Declares the proxy commands to 1.13+ clients.
-announce-proxy-commands = false
+announce-proxy-commands = true
 
 # Enables the logging of commands
 log-command-executions = false

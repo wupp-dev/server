@@ -1,0 +1,130 @@
+ConfigVersion: 12
+
+#Should the plugin auto download and install new versions when they are available
+UpdateDownload: true
+
+#Leave a command blank if you don't wish to use one, the commands are run during the process of setting the player to AFK
+#this may cause issues if you attempt to teleport or move the player etc.
+#The action command must either make the player no longer AFK or remove them from the server
+Commands:
+  Action: "kick [PLAYER] You were AFK for too long!"
+  AFKStart: ""
+  AFKStop: ""
+  Warn: ""
+
+#The server must have this many player before the action command will be run
+#When the server hits this limit the players who have been AFK longer than the normal action time will be kicked
+#Its also recommended that you edit the warning message to tell players that they will be kicked when the server reaches x players
+#Setting to 0 means that players will always be acted upon when they reach their time to action
+ActionPlayerRequirement: 0
+
+#Enabling this setting will make AFKPlus update a players AFK status in essentials to match their AFKPlus AFK state
+#This may be useful for other plugins that check if a player is AFK by checking with Essentials
+EssentialsAFKHook: false
+
+#The sound to be played when a player is warned
+#Set to blank if you don't want a sound e.g. ""
+#A list of sounds for the latest spigot version is available at
+#https://github.com/CryptoMorin/XSeries/blob/master/src/main/java/com/cryptomorin/xseries/XSound.java#L64
+WarningSound: "ENTITY_PLAYER_LEVELUP"
+
+#The sound to be played to a player when they become AFK
+#Set to blank if you don't want a sound
+AFKStartSound: "BLOCK_ANVIL_HIT"
+
+#A player will be set as AFK if they don't interact with the world
+#What should be counted as an interaction?
+#Set too false to ignore
+EnabledDetections:
+  #Sending chat messages
+  Chat: true
+  #The players head/body rotating in place
+  Look: false
+  #Moving in the x,y,z directions
+  Move: true
+  #Attacking entities
+  Attack: true
+  #Running commands
+  Command: false
+  #Right-clicking blocks
+  Interact: true
+  #Placing blocks
+  BlockPlace: true
+  #Breaking blocks
+  BlockBreak: true
+
+#Movement magnitude means that players need to move or look a certain distance before they will be marked as not AFK
+MovementMagnitude:
+  #Should the movement magnitude system be enabled
+  Enabled: true
+  #How far does the player need to move every second to be counted as moving
+  PositionTrigger: 1.0
+  #What angle does the player need to look every second to be counted as looking
+  LookTrigger: 3.0
+
+Protections:
+  #When enabled AFK players will not be able to move in the x and z directions while AFK.
+  #This stops them being pushed out of AFK by players bumping into them
+  #This is implemented better in AFKPlusPrefix, but that addon is not compatible with all servers
+  #so this is a different implementation of the fix
+  Bump: true
+  #When enabled AFK players will be invincible to attacks from other players
+  HurtByPlayer: true
+  #When enabled AFK players will be invincible to attacks from mobs
+  HurtByMob: true
+  #Same as HurtByPlayer but stops any non-player damage
+  HurtByOther: true
+  #When enabled, mobs will not spawn if the AFK player is the cause of the spawning
+  #This only applies to natural and spawner spawning
+  #This may cause minor lag on high-end servers
+  MobSpawning: false
+  #When enabled AFK players will not be targeted by mobs
+  MobTargeting: false
+
+#Who should receive messages when players AFK status changes
+#Self = the player whose status has changed
+#Vanish = if the player whose status has changed is vanished
+Broadcast:
+  Console: true
+  OtherPlayers: true
+  Self: true
+  Vanish: false
+
+#Enabling aggressive AFK detection will tighten tolerances on AFK machines but may slow down the reaction time of
+#removing players from AFK and may also mark players as AFK when they are simply not moving much, this should only
+#be enabled if you are having trouble with players using machines like AFK fishing farms
+AggressiveAFKDetection: false
+
+#Setting this to true will mean AFK players are ignored when calculating if night should be skipped
+#See this page for info on how it works
+#https://hub.spigotmc.org/javadocs/spigot/org/bukkit/entity/Player.html#setSleepingIgnored(boolean)
+IgnoreAFKPlayersForSleep: false
+
+#Permissions can be true/false/value
+#0 = false, 1 = true or any whole number for a value
+#e.g. AFKSelf = 0 or 1 whereas TimeToAFK can be any number of seconds
+#Action and warning times are how long the player has been AFK, not how long since the last interact
+
+#You no longer need to list values that differ from the default values below
+# Default=0, Priority=0, AFKSelf=1, AFKOthers=0, FakeAFK=0, TimeToAFK=30, TimeToWarning=90, TimeToAction=120 and CanUpdate=0
+Permissions:
+  afkplus,player:
+    #Who should get this permission without it being given, 0 = no one, 1 = everyone, 2 = Ops
+    Default: 1
+    #If a player has more than 1 permission they will be given the one with the highest priority
+    Priority: 1
+    #Can the player set themselves as AFK with the /afk command
+    AFKSelf: 1
+    #Can the player set others as AFK with the /afk command
+    AFKOthers: 0
+    #How many seconds of inactivity are required before they will automatically be set as AFK
+    #Set to -1 if the player shouldn't be automatically placed in AFK
+    TimeToAFK: 120
+    #How many seconds of AFK are required before the player is warned about action being taken
+    #Set to -1 to disable warnings for this permission
+    TimeToWarning: -1
+    #How many seconds of AFK are required before the player is acted upon
+    #Set to -1 to disable actions for this permission
+    TimeToAction: -1
+    #Can this player use the update command to install new versions
+    CanUpdate: 0

@@ -1,0 +1,21 @@
+adepto:
+  tabprefix: " <color:#5bc0de>[Adepto]</color> "
+  tagprefix: "<color:#5bc0de>[Adepto]</color> "
+acolito:
+  tabprefix: " <color:#5cb85c>[Acólito]</color> "
+  tagprefix: "<color:#5cb85c>[Acólito]</color> "
+predicador:
+  tabprefix: " <color:#fc913a>[Predicador]</color> "
+  tagprefix: "<color:#fc913a>[Predicador]</color> "
+ceremoniador:
+  tabprefix: " <color:#f6546a>[Ceremoniador]</color> "
+  tagprefix: "<color:#f6546a>[Ceremoniador]</color> "
+maestro:
+  tabprefix: " <color:#ff55ff>[Maestro]</color> <gold>"
+  tagprefix: "<color:#ff55ff>[Maestro]</color> <gold>"
+
+ # default settings for all groups, all groups will take properties from this section unless player's primary group overrides a specific setting
+_DEFAULT_:
+  tabprefix: " "
+  tabsuffix: "%AFKPlus_Status%"
+  tagsuffix: "%AFKPlus_Status%"

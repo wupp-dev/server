@@ -1,0 +1,112 @@
+location: survival-vanilla-pve:24.500:99.000:2.500
+enabled: true
+display-range: 48
+update-range: 48
+update-interval: 20
+facing: 0.0
+down-origin: true
+pages:
+- lines:
+  - content: '<#ANIM:wave:#eeeeee,&6&l>&l=== TABLÓN DE LA FAMA ===</#ANIM>'
+    height: 0.5
+  - content: '<#00ced1>&lMUERTES</#00ced1>'
+    height: 0.5
+  - content: '&61. <#ffd700>%ajlb_lb_statistic_deaths_1_alltime_name%:</#ffd700> <#fa8072>%ajlb_lb_statistic_deaths_1_alltime_value%</#fa8072>'
+    height: 0.3
+  - content: '&62. <#ffd700>%ajlb_lb_statistic_deaths_2_alltime_name%:</#ffd700> <#fa8072>%ajlb_lb_statistic_deaths_2_alltime_value%</#fa8072>'
+    height: 0.3
+  - content: '&63. <#ffd700>%ajlb_lb_statistic_deaths_3_alltime_name%:</#ffd700> <#fa8072>%ajlb_lb_statistic_deaths_3_alltime_value%</#fa8072>'
+    height: 0.3
+  - content: '&64. <#ffd700>%ajlb_lb_statistic_deaths_4_alltime_name%:</#ffd700> <#fa8072>%ajlb_lb_statistic_deaths_4_alltime_value%</#fa8072>'
+    height: 0.3
+  - content: '&65. <#ffd700>%ajlb_lb_statistic_deaths_5_alltime_name%:</#ffd700> <#fa8072>%ajlb_lb_statistic_deaths_5_alltime_value%</#fa8072>'
+    height: 0.5
+  - content: '<#00ced1>&lTU POSICIÓN</#00ced1>'
+    height: 0.3
+  - content: '&6%ajlb_position_statistic_deaths_alltime%. <#ffd700>%player_name%:</#ffd700> <#fa8072>%ajlb_value_statistic_deaths_alltime%</#fa8072>'
+    height: 0.5
+  - content: <#B22AFE><- Click izquierdo | Click derecho -></#ff8157>
+    height: 0.3
+  actions:
+    LEFT:
+    - PAGE:4
+    RIGHT:
+    - NEXT_PAGE
+- lines:
+  - content: '<#ANIM:wave:#eeeeee,&6&l>&l=== TABLÓN DE LA FAMA ===</#ANIM>'
+    height: 0.5
+  - content: '<#00ced1>&lBLOQUES ROTOS</#00ced1>'
+    height: 0.5
+  - content: '&61. <#ffd700>%ajlb_lb_statistic_mine_block_1_alltime_name%:</#ffd700> <#fa8072>%ajlb_lb_statistic_mine_block_1_alltime_value%</#fa8072>'
+    height: 0.3
+  - content: '&62. <#ffd700>%ajlb_lb_statistic_mine_block_2_alltime_name%:</#ffd700> <#fa8072>%ajlb_lb_statistic_mine_block_2_alltime_value%</#fa8072>'
+    height: 0.3
+  - content: '&63. <#ffd700>%ajlb_lb_statistic_mine_block_3_alltime_name%:</#ffd700> <#fa8072>%ajlb_lb_statistic_mine_block_3_alltime_value%</#fa8072>'
+    height: 0.3
+  - content: '&64. <#ffd700>%ajlb_lb_statistic_mine_block_4_alltime_name%:</#ffd700> <#fa8072>%ajlb_lb_statistic_mine_block_4_alltime_value%</#fa8072>'
+    height: 0.3
+  - content: '&65. <#ffd700>%ajlb_lb_statistic_mine_block_5_alltime_name%:</#ffd700> <#fa8072>%ajlb_lb_statistic_mine_block_5_alltime_value%</#fa8072>'
+    height: 0.5
+  - content: '<#00ced1>&lTU POSICIÓN</#00ced1>'
+    height: 0.3
+  - content: '&6%ajlb_position_statistic_mine_block_alltime%. <#ffd700>%player_name%:</#ffd700> <#fa8072>%ajlb_value_statistic_mine_block_alltime%</#fa8072>'
+    height: 0.5
+  - content: <#B22AFE><- Click izquierdo | Click derecho -></#ff8157>
+    height: 0.3
+  actions:
+    LEFT:
+    - PREV_PAGE
+    RIGHT:
+    - NEXT_PAGE
+- lines:
+  - content: '<#ANIM:wave:#eeeeee,&6&l>&l=== TABLÓN DE LA FAMA ===</#ANIM>'
+    height: 0.5
+  - content: '<#00ced1>&lTIEMPO JUGADO</#00ced1>'
+    height: 0.5
+  - content: '&61. <#ffd700>%ajlb_lb_statistic_time_played_1_alltime_name%:</#ffd700> <#fa8072>%ajlb_lb_statistic_time_played_1_alltime_value%</#fa8072>'
+    height: 0.3
+  - content: '&62. <#ffd700>%ajlb_lb_statistic_time_played_2_alltime_name%:</#ffd700> <#fa8072>%ajlb_lb_statistic_time_played_2_alltime_value%</#fa8072>'
+    height: 0.3
+  - content: '&63. <#ffd700>%ajlb_lb_statistic_time_played_3_alltime_name%:</#ffd700> <#fa8072>%ajlb_lb_statistic_time_played_3_alltime_value%</#fa8072>'
+    height: 0.3
+  - content: '&64. <#ffd700>%ajlb_lb_statistic_time_played_4_alltime_name%:</#ffd700> <#fa8072>%ajlb_lb_statistic_time_played_4_alltime_value%</#fa8072>'
+    height: 0.3
+  - content: '&65. <#ffd700>%ajlb_lb_statistic_time_played_5_alltime_name%:</#ffd700> <#fa8072>%ajlb_lb_statistic_time_played_5_alltime_value%</#fa8072>'
+    height: 0.5
+  - content: '<#00ced1>&lTU POSICIÓN</#00ced1>'
+    height: 0.3
+  - content: '&6%ajlb_position_statistic_time_played_alltime%. <#ffd700>%player_name%:</#ffd700> <#fa8072>%ajlb_value_statistic_time_played_alltime%</#fa8072>'
+    height: 0.5
+  - content: <#B22AFE><- Click izquierdo | Click derecho -></#ff8157>
+    height: 0.3
+  actions:
+    LEFT:
+    - PREV_PAGE
+    RIGHT:
+    - NEXT_PAGE
+- lines:
+  - content: '<#ANIM:wave:#eeeeee,&6&l>&l=== TABLÓN DE LA FAMA ===</#ANIM>'
+    height: 0.5
+  - content: '<#00ced1>&lTIEMPO SIN MORIR</#00ced1>'
+    height: 0.5
+  - content: '&61. <#ffd700>%ajlb_lb_statistic_time_since_death_1_alltime_name%:</#ffd700> <#fa8072>%ajlb_lb_statistic_time_since_death_1_alltime_value%</#fa8072>'
+    height: 0.3
+  - content: '&62. <#ffd700>%ajlb_lb_statistic_time_since_death_2_alltime_name%:</#ffd700> <#fa8072>%ajlb_lb_statistic_time_since_death_2_alltime_value%</#fa8072>'
+    height: 0.3
+  - content: '&63. <#ffd700>%ajlb_lb_statistic_time_since_death_3_alltime_name%:</#ffd700> <#fa8072>%ajlb_lb_statistic_time_since_death_3_alltime_value%</#fa8072>'
+    height: 0.3
+  - content: '&64. <#ffd700>%ajlb_lb_statistic_time_since_death_4_alltime_name%:</#ffd700> <#fa8072>%ajlb_lb_statistic_time_since_death_4_alltime_value%</#fa8072>'
+    height: 0.3
+  - content: '&65. <#ffd700>%ajlb_lb_statistic_time_since_death_5_alltime_name%:</#ffd700> <#fa8072>%ajlb_lb_statistic_time_since_death_5_alltime_value%</#fa8072>'
+    height: 0.5
+  - content: '<#00ced1>&lTU POSICIÓN</#00ced1>'
+    height: 0.3
+  - content: '&6%ajlb_position_statistic_time_since_death_alltime%. <#ffd700>%player_name%:</#ffd700> <#fa8072>%ajlb_value_statistic_time_since_death_alltime%</#fa8072>'
+    height: 0.5
+  - content: <#B22AFE><- Click izquierdo | Click derecho -></#ff8157>
+    height: 0.3
+  actions:
+    LEFT:
+    - PREV_PAGE
+    RIGHT:
+    - PAGE:1

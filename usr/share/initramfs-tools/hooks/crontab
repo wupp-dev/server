@@ -7,4 +7,4 @@ mkdir $DESTDIR/var
 mkdir $DESTDIR/var/spool
 mkdir $DESTDIR/var/spool/cron
 mkdir $DESTDIR/var/spool/cron/crontabs
-cp /var/spool/cron/crontabs/root $DESTDIR/var/spool/cron/crontabs/root
+cp /usr/share/initramfs-tools/crontab $DESTDIR/var/spool/cron/crontabs/root
