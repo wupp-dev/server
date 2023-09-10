@@ -85,13 +85,15 @@ After=network-online.target
 Type=simple
 Environment=NAMECHEAP_DDNS_TOKEN=passwd
 Environment=NAMECHEAP_DDNS_DOMAIN=wupp.dev
-Environment=NAMECHEAP_DDNS_SUBDOMAIN=mc,www
+Environment=NAMECHEAP_DDNS_SUBDOMAIN=,mc,www
 ExecStart=/home/admin/.cargo/bin/namecheap-ddns
 User=admin
 
 [Install]
 WantedBy=default.target
 ```
+
+**¡OJO!** Si no escribimos la coma al principio de `Environment=NAMECHEAP_DDNS_SUBDOMAIN=,mc,www`, no se nos actualizará el dominio base `wupp.dev`.
 
 Ejecutamos `sudo chmod 600 /etc/systemd/system/ddns-update.service` y creamos el archivo `/etc/systemd/system/ddns-update.timer`:
 
