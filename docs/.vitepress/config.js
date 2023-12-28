@@ -23,9 +23,10 @@ let guideSidebar = [
         text: "Configurando MariaDB con Docker",
         link: "/equipo/mariadb-docker",
       },
-      { text: "Conectando varios servidores",
+      {
+        text: "Conectando varios servidores",
         link: "/equipo/conectando-servidores",
-      }
+      },
     ],
   },
   {
@@ -55,7 +56,10 @@ let guideSidebar = [
       { text: "Gitea - Servicio git", link: "/servicios/gogs" },
       { text: "Navidrome - Streaming de música", link: "/servicios/navidrome" },
       { text: "Overleaf - Editor de LaTeX", link: "/servicios/sharelatex" },
-      { text: "Docker Mailserver - Servidor de correo", link: "/servicios/docker-mailserver" },
+      {
+        text: "Docker Mailserver - Servidor de correo",
+        link: "/servicios/docker-mailserver",
+      },
     ],
   },
   {
@@ -95,7 +99,7 @@ export default {
       },
       {
         text: "Archivos de configuración",
-        link: "https://github.com/ComicIvans/server",
+        link: "https://github.com/wupp-dev/server",
       },
     ],
     socialLinks: [{ icon: "discord", link: "https://discord.gg/2pdbaf6Ugz" }],
@@ -110,4 +114,4 @@ export default {
         "Copyright © 2022-presente Lucas de Uña Ocampo e Iván Salido Cobo",
     },
   },
-}
+};

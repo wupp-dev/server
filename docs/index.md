@@ -12,7 +12,7 @@ hero:
       link: equipo/historia
     - theme: alt
       text: Repositorio de GitHub
-      link: https://github.com/ComicIvans/server
+      link: https://github.com/wupp-dev/server
 
 features:
   - icon: 🖥
