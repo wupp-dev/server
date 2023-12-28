@@ -8,7 +8,7 @@ Esa guía se divide en dos partes y tiene una tercera de relatos:
 
 1. [Preparación del equipo](https://wupp-dev.github.io/server/equipo/historia)
 2. [Instalación de servicios específicos](https://wupp-dev.github.io/server/servicios/nextcloud)
-3. [Relatos de dramas ocurridos](https://wupp-dev.github.io/server/relatos/initramfs-vs-router)
+3. [Relatos de dramas ocurridos](https://wupp-dev.github.io/server/relatos/bloqueo-ssh.html)
 
 ---
 
