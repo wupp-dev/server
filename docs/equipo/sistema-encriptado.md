@@ -243,7 +243,7 @@ Ahora toca desencriptar el disco con `sudo cryptsetup luksOpen /dev/sdb1 vault` 
 
 Ya podemos hacer que el disco se desencripte y se monte al encenderse el ordenador :D
 
-Lo primero es que se desencripte, para ello tendremos que añadir el disco a  `/etc/crypttab`, pero como ese queremos que se desencripte solo sin tener que ponerle nosotros la contraseña, tendremos que crear un archivo que servirá como contraseña para desencriptar el disco.
+Lo primero es que se desencripte, para ello tendremos que añadir el disco a `/etc/crypttab`, pero como ese queremos que se desencripte solo sin tener que ponerle nosotros la contraseña, tendremos que crear un archivo que servirá como contraseña para desencriptar el disco.
 
 ```sh
 sudo dd if=/dev/urandom of=/root/hdd_key bs=1024 count=4
@@ -251,8 +251,8 @@ sudo chmod 0400 /root/hdd_key
 sudo cryptsetup luksAddKey /dev/sdb1 /root/hdd_key
 ```
 
-Lo que acabamos de hacer es crear un archivo con caracteres aleatorios *(como una contraseña básicamente pero mucho más larga)* y añadirlo como clave para desencriptar el disco duro, ya que LUKS nos permite tener varias claves.
- 
+Lo que acabamos de hacer es crear un archivo con caracteres aleatorios _(como una contraseña básicamente pero mucho más larga)_ y añadirlo como clave para desencriptar el disco duro, ya que LUKS nos permite tener varias claves.
+
 Ahora hay que buscar la UUID del disco:
 
 ```sh
@@ -272,7 +272,7 @@ Que en este caso es `60e8d58f-cb05-47f1-85bc-38e5b0a05505`, así que vamos a edi
 vault UUID=60e8d58f-cb05-47f1-85bc-38e5b0a05505 /root/hdd_key luks
 ```
 
-Donde lo primero es el nombre que tendrá el volumen, lo segundo su UUID *(no olvidar comprobar que sea el correcto)*, lo tercero el archivo donde está la clave y lo cuarto especifica que utiliza LUKS.
+Donde lo primero es el nombre que tendrá el volumen, lo segundo su UUID _(no olvidar comprobar que sea el correcto)_, lo tercero el archivo donde está la clave y lo cuarto especifica que utiliza LUKS.
 
 Muy bien, con esto el disco se desencriptará al encenderse el servidor, solo nos queda añadirlo a `/etc/fstab` para que también se monte. Añadimos esta línea al final del archivo:
 
@@ -286,7 +286,7 @@ Que hará que el disco se monte en `/mnt/vault` cuando se encienda el servidor. 
 
 Hemos optado por mover toda la carpeta `/var` al disco duro grande por ser una carpeta donde se suelen almacenar logs y archivos más pesados. Para ello, vamos a montar directamente el disco grande en `/var`.
 
-Empezamos copiando todo el contenido al disco duro con `sudo cp -rf /var/* /mnt/vault/`. Después modificamos `/etc/fstab` para cambiar el punto de montaje del disco duro de `/mnt/vault` a `/var` y tenemos que reiniciar *daemon* de *systemclt* con `sudo systemctl daemon-reload`. Ahora podemos mover la actual carpeta a una copia y mantenerla durante un tiempo prudencial `sudo mv /var /var.old`, creamos la nueva carpeta `sudo mkdir /var` y remontamos el disco duro con `sudo umount /mnt/vault` y `sudo mount /dev/mapper/vault`.
+Empezamos copiando todo el contenido al disco duro con `sudo cp -rf /var/* /mnt/vault/`. Después modificamos `/etc/fstab` para cambiar el punto de montaje del disco duro de `/mnt/vault` a `/var` y tenemos que reiniciar _daemon_ de _systemclt_ con `sudo systemctl daemon-reload`. Ahora podemos mover la actual carpeta a una copia y mantenerla durante un tiempo prudencial `sudo mv /var /var.old`, creamos la nueva carpeta `sudo mkdir /var` y remontamos el disco duro con `sudo umount /mnt/vault` y `sudo mount /dev/mapper/vault`.
 
 Si después de esto obtuviésemos un error al usar `apt` similar a:
 
@@ -298,4 +298,13 @@ Si después de esto obtuviésemos un error al usar `apt` similar a:
 
 Podemos solucionarlo con `chown -R man: /var/cache/man/` y `chmod -R 755 /var/cache/man/`.
 
-También es posible que, después de eso, nos encontremos con que el servicio `lighdm` falla (posiblemente después de un reinicio y de escribir `sudo systemctl status lightdm`). Lo podemos solucionar con `sudo chown -R lightdm:lightdm /var/lib/lightdm/` y `sudo chmod -R 755 /var/lib/lightdm/`.
+También es posible que, después de eso, nos encontremos con que el servicio `lighdm` falla (posiblemente después de un reinicio). Lo podemos solucionar con `sudo chown -R lightdm:lightdm /var/lib/lightdm/` y `sudo chmod -R 755 /var/lib/lightdm/`.
+
+Otra de las cosas que pueden ocurrir es que el servicio `binfmt-support` falle también después de un reinicio. Lo podemos solucionar con `mkdir /etc/systemd/system/binfmt-support.service.d` y creando el archivo `/etc/systemd/system/binfmt-support.service.d/override.conf` con:
+
+```
+[Unit]
+RequiresMountsFor=/var
+```
+
+Que hará que el servicio se inicie una vez se haya montado la partición `/var`.
