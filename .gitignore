@@ -3,6 +3,7 @@ docs/.vitepress/dist/
 docs/.vitepress/cache/
 **/.env
 pnpm-lock.yaml
+package-lock.json
 
 # Docker FS volume mappings (just for testing)
 db/
