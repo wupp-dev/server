@@ -1,390 +1,82 @@
 version: "3.9"
 
-# volumes:
-# nextcloud:
-# nextcloud-db:
-# authentik-db:
-#   driver: local
-# authentik-geoip:
-#   driver: local
-# uptime-kuma:
-
-secrets:
-  mariadb_root_password:
-    file: "./path/to/screts/mariadbrootpassword.txt"
-  nextcloud_db_user:
-    file: "./path/to/screts/nextclouddbuser.txt"
-  nextcloud_db_password:
-    file: "./path/to/screts/nextclouddbpassword.txt"
-  authetik_db_user:
-    file: "./path/to/screts/authetikdbuser.txt"
-  authentik_db_password:
-    file: "./path/to/screts/authentikdbpassword.txt"
-
 services:
-  db:
-    image: mariadb:10.5
-    restart: always
-    ports:
-      - 3306:3306
+  nextcloud-db:
+    image: postgres
+    restart: unless-stopped
     volumes:
-      - ./db:/var/lib/mysql
-    secrets:
-      - mariadb_root_password
-      - nextcloud_db_user
-      - nextcloud_db_password
+      - /var/lib/nextcloud/postgresql/data:/var/lib/postgresql:Z
     environment:
-      - MARIADB_ROOT_PASSWORD_FILE=/run/secrets/mariadb_root_password
-      - MARIADB_USER_FILE=/run/secrets/nextcloud_db_user
-      - MARIADB_PASSWORD_FILE=/run/secrets/nextcloud_db_password
-      - MARIADB_DATABASE=${NEXTCLOUD_DB_NAME:?nextcloud database name required}
-    # entrypoint: |
-    #   sh -c "
-    #     echo 'CREATE DATABASE IF NOT EXISTS ${GITEA_DATABASE};' > /docker-entrypoint-initdb.d/init.sql;
-    #     /usr/local/bin/docker-entrypoint.sh --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
-    #   "
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=psswd
+      - POSTGRES_DB=nextcloud
 
-  adminer:
-    image: adminer
-    restart: always
-    ports:
-      - 8088:8080
+  nextcloud-redis:
+    image: redis
+    container_name: nextcloud-redis
+    command: redis-server
 
   nextcloud:
-    image: nextcloud:24-fpm
-    restart: always
+    image: nextcloud:fpm
+    container_name: nextcloud
+    restart: unless-stopped
+    depends_on:
+      - nextcloud-db
+      - nextcloud-redis
+    environment:
+      - POSTGRES_HOST=nextcloud-db
+      - NEXTCLOUD_TRUSTED_DOMAINS=cloud.wupp.dev
+      - REDIS_HOST=nextcloud-redis
+      - REDIS_HOST_PORT=6379
+      - PHP_MEMORY_LIMIT=50G
+      - PHP_UPLOAD_LIMIT=50G
     ports:
-      - 8080:80
+      - 26848:9000
+    volumes:
+      - /var/www/nextcloud:/var/www/html
+      - /var/www/nextcloud/manual-php.ini:/usr/local/etc/php/conf.d/manual-php.ini
+
+  nextcloud-cron:
+    image: nextcloud:fpm
+    container_name: nextcloud-cron
+    restart: unless-stopped
     depends_on:
       - db
+      - nextcloud-redis
     volumes:
-      - ./nextcloud:/var/www/html
-    secrets:
-      - nextcloud_db_password
-      - nextcloud_db_user
-    environment:
-      - MYSQL_PASSWORD=/run/secrets/nextcloud_db_password
-      - MYSQL_USER=/run/secrets/nextcloud_db_user
-      - MYSQL_DATABASE=${NEXTCLOUD_DB_NAME:?nextcloud database name required}
-      - MYSQL_HOST=db
-      - NEXTCLOUD_TRUSTED_DOMAINS=${NEXTCLOUD_TRUSTED_DOMAINS}
-      - PHP_UPLOAD_LIMIT=${NEXTCLOUD_UPLOAD_LIMIT:-50G}
+      - /var/www/nextcloud:/var/www/html
+    entrypoint: /cron.sh
 
-  dash:
-    image: mauricenino/dashdot:latest
+  nextcloud-imaginary:
+    image: nextcloud/aio-imaginary:latest
     restart: unless-stopped
-    privileged: true
-    environment:
-      - DASHDOT_SHOW_HOST=true
-      - DASHDOT_ENABLE_CPU_TEMPS=true
-      - DASHDOT_ENABLE_STORAGE_SPLIT_VIEW=true
     ports:
-      - "7676:3001"
-    volumes:
-      - /:/mnt/host:ro
+      - 22394:9000
+    command: -concurrency 20 -enable-url-source -return-size
+    cap_add:
+      - SYS_NICE
 
-  homarr:
-    image: ghcr.io/ajnart/homarr:0.9.2
-    restart: unless-stopped
-    volumes:
-      - ./homarr/configs:/app/data/configs
-      - ./homarr/icons:/app/public/icons
-    ports:
-      - "7575:7575"
-
-  # authentik-db:
-  #   image: postgres:12-alpine
-  #   restart: unless-stopped
-  #   healthcheck:
-  #     test: ["CMD", "pg_isready"]
-  #     start_period: 20s
-  #     interval: 30s
-  #     retries: 5
-  #     timeout: 5s
-  #   volumes:
-  #     - authentik-db:/var/lib/postgresql/data
-  #   environment:
-  #     - POSTGRES_PASSWORD=/run/secrets/authentik_db_password
-  #     - POSTGRES_USER=/run/secrets/authentik_db_user
-  #     - POSTGRES_DB=${AUTHENTIK_DB_NAME:-authentik}
-  #     # - POSTGRES_DB=${AUTHENTIK_DB_NAME:?authentik database name required}
-  #   # env_file:
-  #   #   - .env
-
-  # authentik-redis:
-  #   image: redis:alpine
-  #   restart: unless-stopped
-  #   healthcheck:
-  #     test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
-  #     start_period: 20s
-  #     interval: 30s
-  #     retries: 5
-  #     timeout: 3s
-
-  # authentik-server:
-  #   image: ${AUTHENTIK_IMAGE:-ghcr.io/goauthentik/server}:${AUTHENTIK_TAG:-2022.6.1}
-  #   restart: unless-stopped
-  #   command: server
-  #   environment:
-  #     AUTHENTIK_REDIS__HOST: authentik-redis
-  #     AUTHENTIK_POSTGRESQL__HOST: authentik-db
-  #     AUTHENTIK_POSTGRESQL__USER: ${PG_USER:-authentik}
-  #     AUTHENTIK_POSTGRESQL__NAME: ${PG_DB:-authentik}
-  #     AUTHENTIK_POSTGRESQL__PASSWORD: ${PG_PASS}
-  #     AUTHENTIK_SECRET_KEY: m39XwRw99dUL76rYIMY6Z7xBLxMLpCJiWHyMnYCpSQWIj4KVqq
-  #     # AUTHENTIK_ERROR_REPORTING__ENABLED: "true"
-  #     # WORKERS: 2
-  #   volumes:
-  #     - ./media:/media
-  #     - ./custom-templates:/templates
-  #     - authentik-geoip:/geoip
-  #   # env_file:
-  #   #   - .env
-  #   ports:
-  #     - 9000:9000
-  #     - 9443:9443
-
-  # authentik-worker:
-  #   image: ${AUTHENTIK_IMAGE:-ghcr.io/goauthentik/server}:${AUTHENTIK_TAG:-2022.6.1}
-  #   restart: unless-stopped
-  #   command: worker
-  #   environment:
-  #     AUTHENTIK_REDIS__HOST: authentik-redis
-  #     AUTHENTIK_POSTGRESQL__HOST: authentik-db
-  #     AUTHENTIK_POSTGRESQL__USER: ${PG_USER:-authentik}
-  #     AUTHENTIK_POSTGRESQL__NAME: ${PG_DB:-authentik}
-  #     AUTHENTIK_POSTGRESQL__PASSWORD: ${PG_PASS}
-  #     # AUTHENTIK_ERROR_REPORTING__ENABLED: "true"
-  #   # This is optional, and can be removed. If you remove this, the following will happen
-  #   # - The permissions for the /media folders aren't fixed, so make sure they are 1000:1000
-  #   # - The docker socket can't be accessed anymore
-  #   user: root
-  #   volumes:
-  #     - ./media:/media
-  #     - ./certs:/certs
-  #     - /var/run/docker.sock:/var/run/docker.sock
-  #     - ./custom-templates:/templates
-  #     - authentik-geoip:/geoip
-  #   # env_file:
-  #   #   - .env
-
-  # authentik-geoipupdate:
-  #   image: "maxmindinc/geoipupdate:latest"
-  #   volumes:
-  #     - "authentik-geoip:/usr/share/GeoIP"
-  #   environment:
-  #     GEOIPUPDATE_EDITION_IDS: "GeoLite2-City"
-  #     GEOIPUPDATE_FREQUENCY: "8"
-  #   # env_file:
-  #   # - .env
-
-  gitea:
-    image: gitea/gitea:1.16.8
-    environment:
-      - USER_UID=${GITEA_USER_UID}
-      - USER_GID=${GITEA_USER_GID}
-      - GITEA__database__DB_TYPE=mysql
-      - GITEA__database__HOST=db:3306
-      - GITEA__database__NAME=${GITEA_DATABASE}
-      - GITEA__database__USER=${MARIADB_USER}
-      - GITEA__database__PASSWD=${MARIADB_PASSWORD}
-    restart: always
-    volumes:
-      - ./gitea:/data
-      - /etc/timezone:/etc/timezone:ro
-      - /etc/localtime:/etc/localtime:ro
-    ports:
-      - "3000:3000"
-      - "222:22"
-    depends_on:
-      - db
-
-  dozzle:
-    image: amir20/dozzle:latest
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    ports:
-      - 9999:8080
-
-  uptime-kuma:
-    image: louislam/uptime-kuma:1
-    restart: unless-stopped
-    volumes:
-      - ./uptime-kuma:/app/data
-    ports:
-      - 3001:3001
-
-  navidrome:
-    image: deluan/navidrome:latest
-    user: 1001:1001
-    restart: unless-stopped
-    volumes:
-      - /home/hipy/Music:/music:ro
-      - /home/hipy/navidrom/data:/data:rw
-    ports:
-      - "4533:4533"
-    environment:
-      - ND_LOGLEVEL=info
-      - ND_CONFIGFILE=/data/navidrome.toml
-  immich-server:
-    image: altran1502/immich-server:release
-    container_name: immich-server
-    entrypoint: ["/bin/sh", "./start-server.sh"]
-    volumes:
-      - ${UPLOAD_LOCATION}:/usr/src/app/upload
-    environment:
-      - NODE_ENV=production
-      - DB_USERNAME=${DB_USERNAME:?immich server db username not set}
-      - DB_PASSWORD=${DB_PASSWORD:?immich server db password not set}
-      - DB_DATABASE_NAME=${DB_DATABASE_NAME:?server db name not set}
-      - JWT_SECRET=${JWT_SECRET}
-      - ENABLE_MAPBOX=${ENABLE_MAPBOX}
-      - MAPBOX_KEY=${MAPBOX_KEY}
-    depends_on:
-      - immich-redis
-      - immich-database
-    restart: unless-stopped
-
-  immich-microservices:
-    image: altran1502/immich-server:release
-    entrypoint: ["/bin/sh", "./start-microservices.sh"]
-    volumes:
-      - ${UPLOAD_LOCATION}:/usr/src/app/upload
-    environment:
-      - NODE_ENV=production
-      - DB_USERNAME=${DB_USERNAME}
-      - DB_PASSWORD=${DB_PASSWORD}
-      - DB_DATABASE_NAME=${DB_DATABASE_NAME}
-      - JWT_SECRET=${JWT_SECRET}
-      - ENABLE_MAPBOX=${ENABLE_MAPBOX}
-      - MAPBOX_KEY=${MAPBOX_KEY}
-    depends_on:
-      - immich-redis
-      - immich-database
-    restart: unless-stopped
-
-  immich-machine-learning:
-    image: altran1502/immich-machine-learning:release
-    entrypoint: ["/bin/sh", "./entrypoint.sh"]
-    volumes:
-      - ${UPLOAD_LOCATION}:/usr/src/app/upload
-    environment:
-      - NODE_ENV=production
-    depends_on:
-      - immich-database
-    restart: unless-stopped
-
-  immich-web:
-    image: altran1502/immich-web:release
-    entrypoint: ["/bin/sh", "./entrypoint.sh"]
-    environment:
-      - PUBLIC_TZ=${TZ}
-    restart: unless-stopped
-
-  immich-redis:
-    container_name: immich_redis
-    image: redis:6.2
-    restart: unless-stopped
-    mem_limit: 2G
-
-  immich-database:
-    container_name: immich_postgres
-    image: postgres:14
-    environment:
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_USER: ${DB_USERNAME}
-      POSTGRES_DB: ${DB_DATABASE_NAME}
-      PG_DATA: /var/lib/postgresql/data
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-    restart: unless-stopped
-
-  immich-proxy:
-    container_name: immich_proxy
-    image: altran1502/immich-proxy:release
-    ports:
-      - 8080:8080
-    logging:
-      driver: none
-    depends_on:
-      - immich-server
-    restart: unless-stopped
-  sharelatex:
-    restart: always
-    image: sharelatex/sharelatex
-    container_name: sharelatex
-    depends_on:
-      sharelatex-mongo:
-        condition: service_healthy
-      sharelatex-redis:
-        condition: service_started
-    ports:
-      - 80:80
-    links:
-      - sharelatex-mongo
-      - sharelatex-redis
-    volumes:
-      - ~/sharelatex_data:/mnt/vault/sharelatex
-    environment:
-      SHARELATEX_APP_NAME: Overleaf Community Edition
-      SHARELATEX_MONGO_URL: mongodb://sharelatex-mongo/sharelatex
-      SHARELATEX_REDIS_HOST: sharelatex-redis
-      REDIS_HOST: sharelatex-redis
-      ENABLED_LINKED_FILE_TYPES: 'project_file,project_output_file'
-      ENABLE_CONVERSIONS: 'true'
-      EMAIL_CONFIRMATION_DISABLED: 'true'
-      TEXMFVAR: /var/lib/sharelatex/tmp/texmf-var
-      SHARELATEX_SITE_URL: https://tex.wupp.dev
-      SHARELATEX_NAV_TITLE: LaTeX MAMADÍSIMO
-      SHARELATEX_HEADER_IMAGE_URL: https://cdn.overleaf.com/img/ol-brand/overleaf_og_logo.png
-      SHARELATEX_ADMIN_EMAIL: soporte@wupp.dev
-      SHARELATEX_LEFT_FOOTER: '[{"text": "<a href=\"https://www.sharelatex.com\">ShareLaTeX</a>"},{"text": "Más información <a href=\"github.com/ComicIvans/server\">aquí</a>"} ]'
-      SHARELATEX_RIGHT_FOOTER: '[{"text": "WTF! Una polla con peluca"} ]'
-  sharelatex-mongo:
-    restart: always
-    image: mongo:4.4
-    container_name: sharelatex_mongo
-    expose:
-      - 27017
-    volumes:
-      - ~/mongo_data:/mnt/vault/sharelatex-db
-    healthcheck:
-      test: echo 'db.stats().ok' | mongo localhost:27017/test --quiet
-      interval: 10s
-      timeout: 10s
-      retries: 5
-  sharelatex-redis:
-    restart: always
-    image: redis:5
-    container_name: sharelatex_redis
-    expose:
-      - 6379
-    volumes:
-      - ~/redis_data:/data
   mailserver:
-    image: docker.io/mailserver/docker-mailserver:latest
+    image: mailserver/docker-mailserver
     container_name: mailserver
-    # If the FQDN for your mail-server is only two labels (eg: example.com),
-    # you can assign this entirely to `hostname` and remove `domainname`.
-    hostname: mail
-    domainname: wupp.dev
+    restart: unless-stopped
     env_file: mailserver.env
-    # More information about the mail-server ports:
-    # https://docker-mailserver.github.io/docker-mailserver/edge/config/security/understanding-the-ports/
-    # To avoid conflicts with yaml base-60 float, DO NOT remove the quotation marks.
     ports:
-      - "25:25"    # SMTP  (explicit TLS => STARTTLS)
-      - "143:143"  # IMAP4 (explicit TLS => STARTTLS)
-      - "465:465"  # ESMTP (implicit TLS)
-      - "587:587"  # ESMTP (explicit TLS => STARTTLS)
-      - "993:993"  # IMAP4 (implicit TLS)
+      - "25:25" # SMTP  (explicit TLS => STARTTLS)
+      - "143:143" # IMAP4 (explicit TLS => STARTTLS)
+      - "465:465" # ESMTP (implicit TLS)
+      - "587:587" # ESMTP (explicit TLS => STARTTLS)
+      - "993:993" # IMAP4 (implicit TLS)
+      - "11334:11334" # RSPAMD web
     volumes:
-      - ./docker-data/dms/mail-data/:/var/mail/
-      - ./docker-data/dms/mail-state/:/var/mail-state/
-      - ./docker-data/dms/mail-logs/:/var/log/mail/
-      - ./docker-data/dms/config/:/tmp/docker-mailserver/
+      - /var/dms/mail-data/:/var/mail/
+      - /var/dms/mail-state/:/var/mail-state/
+      - /var/dms/mail-logs/:/var/log/mail/
+      - /var/dms/config/:/tmp/docker-mailserver/
       - /etc/localtime:/etc/localtime:ro
-    restart: always
+      - /etc/letsencrypt:/etc/letsencrypt
+      - /etc/rspamd/local.d/worker-controller.inc:/etc/rspamd/local.d/worker-controller.inc
+    hostname: mail.wupp.dev
     stop_grace_period: 1m
     cap_add:
       - NET_ADMIN
