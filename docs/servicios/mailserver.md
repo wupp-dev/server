@@ -31,11 +31,11 @@ services:
     restart: always
     env_file: mailserver.env
     ports:
-      - "25:25"    # SMTP  (explicit TLS => STARTTLS)
-      - "143:143"  # IMAP4 (explicit TLS => STARTTLS)
-      - "465:465"  # ESMTP (implicit TLS)
-      - "587:587"  # ESMTP (explicit TLS => STARTTLS)
-      - "993:993"  # IMAP4 (implicit TLS)
+      - "25:25" # SMTP  (explicit TLS => STARTTLS)
+      - "143:143" # IMAP4 (explicit TLS => STARTTLS)
+      - "465:465" # ESMTP (implicit TLS)
+      - "587:587" # ESMTP (explicit TLS => STARTTLS)
+      - "993:993" # IMAP4 (implicit TLS)
     volumes:
       - /var/dms/mail-data/:/var/mail/
       - /var/dms/mail-state/:/var/mail-state/
@@ -109,12 +109,20 @@ Como primera recomendación, crearemos un alias para postmaster:
 docker exec -ti mailserver setup alias add postmaster@wupp.dev admin@wupp.dev
 ```
 
-Queda configurar DMARC, DKIM y SPF.
+Queda configurar DMARC, DKIM y SPF. ¿Qué son? Puedes aprenderlo con [este artículo de Cloudflare](https://www.cloudflare.com/learning/email-security/dmarc-dkim-spf/). Vamos un por uno.
+
+### SPF
+
+Este es relativamente sencillo de configurar, simplemente debemos añadir un registro a nuestro dominio de tipo TXT con el siguiente contenido: `v=spf1 mx -all`. Esto indica que solo las direcciones IP que hemos incluído en los registros MX están autorizadas para mandar correos desde nuestro dominio y que el resto deben ser rechazadas.
+
+### DKIM
+
+...
 
 ## ¿Cliente web?
 
-*Posible sección.*
+_Posible sección._
 
 ## ¿Autenticación?
 
-*Posible sección.*
+_Posible sección._
