@@ -4,17 +4,24 @@ services:
   mariadb:
     image: mariadb:10.6.14
     container_name: mariadb
-    restart: unless-stopped
+    restart: always
     env_file: mariadb.env
     ports:
       - "3306:3306"
     volumes:
       - /var/lib/mysql:/var/lib/mysql
 
+  adminer:
+    image: adminer
+    container_name: adminer
+    restart: always
+    ports:
+      - "8787:8080"
+
   minio:
     image: minio/minio
     container_name: minio
-    restart: unless-stopped
+    restart: always
     command: minio server --address ':9000' --console-address ':9001' /data
     ports:
       - "9000:9000" # API

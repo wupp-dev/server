@@ -3,23 +3,21 @@ version: "3.9"
 services:
   nextcloud-db:
     image: postgres
-    restart: unless-stopped
+    restart: always
+    environment:
+      - POSTGRES_USER=nextcloud
+      - POSTGRES_PASSWORD=pwd
+      - POSTGRES_DB=nextcloud
     volumes:
       - /var/lib/nextcloud/postgresql/data:/var/lib/postgresql:Z
-    environment:
-      - POSTGRES_USER=user
-      - POSTGRES_PASSWORD=psswd
-      - POSTGRES_DB=nextcloud
 
   nextcloud-redis:
     image: redis
-    container_name: nextcloud-redis
-    command: redis-server
+    command: redis-server --requirepass pwd
 
   nextcloud:
     image: nextcloud:fpm
-    container_name: nextcloud
-    restart: unless-stopped
+    restart: always
     depends_on:
       - nextcloud-db
       - nextcloud-redis
@@ -28,20 +26,19 @@ services:
       - NEXTCLOUD_TRUSTED_DOMAINS=cloud.wupp.dev
       - REDIS_HOST=nextcloud-redis
       - REDIS_HOST_PORT=6379
+      - REDIS_HOST_PASSWORD=pwd
       - PHP_MEMORY_LIMIT=50G
       - PHP_UPLOAD_LIMIT=50G
     ports:
-      - 26848:9000
+      - 9000:9000
     volumes:
       - /var/www/nextcloud:/var/www/html
-      - /var/www/nextcloud/manual-php.ini:/usr/local/etc/php/conf.d/manual-php.ini
 
   nextcloud-cron:
     image: nextcloud:fpm
-    container_name: nextcloud-cron
-    restart: unless-stopped
+    restart: always
     depends_on:
-      - db
+      - nextcloud-db
       - nextcloud-redis
     volumes:
       - /var/www/nextcloud:/var/www/html
@@ -49,9 +46,9 @@ services:
 
   nextcloud-imaginary:
     image: nextcloud/aio-imaginary:latest
-    restart: unless-stopped
+    restart: always
     ports:
-      - 22394:9000
+      - 9090:9000
     command: -concurrency 20 -enable-url-source -return-size
     cap_add:
       - SYS_NICE
@@ -59,7 +56,7 @@ services:
   mailserver:
     image: mailserver/docker-mailserver
     container_name: mailserver
-    restart: unless-stopped
+    restart: always
     env_file: mailserver.env
     ports:
       - "25:25" # SMTP  (explicit TLS => STARTTLS)
@@ -67,7 +64,6 @@ services:
       - "465:465" # ESMTP (implicit TLS)
       - "587:587" # ESMTP (explicit TLS => STARTTLS)
       - "993:993" # IMAP4 (implicit TLS)
-      - "11334:11334" # RSPAMD web
     volumes:
       - /var/dms/mail-data/:/var/mail/
       - /var/dms/mail-state/:/var/mail-state/
@@ -75,7 +71,6 @@ services:
       - /var/dms/config/:/tmp/docker-mailserver/
       - /etc/localtime:/etc/localtime:ro
       - /etc/letsencrypt:/etc/letsencrypt
-      - /etc/rspamd/local.d/worker-controller.inc:/etc/rspamd/local.d/worker-controller.inc
     hostname: mail.wupp.dev
     stop_grace_period: 1m
     cap_add:

@@ -1,0 +1,8 @@
+[
+  {
+    "DeploymentArgs": {
+      "FileManagerPlugin.SFTP.SFTPPortNumber": "2223"
+    },
+    "InstanceName": "ADS01"
+  }
+]
