@@ -5,23 +5,3 @@ docs/.vitepress/cache/
 pnpm-lock.yaml
 package-lock.json
 .vscode/
-
-# Docker FS volume mappings (just for testing)
-db/
-gitea/
-homarr/
-media/
-nextcloud/
-nhost-test/
-onlyoffice/
-send/
-uptime-kuma/
-custom-templates/
-certs/
-navidrome/
-/docker-compose.yml
-amat-strapi
-
-# Test files (docker compose e.g.)
-*.test.*
-*-test
