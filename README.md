@@ -28,5 +28,5 @@ Además, se publica automáticamente tras cada cambio gracias a [esta guía](htt
 
 ---
 
-[!IMPORTANT] Aviso de seguridad
+[!IMPORTANT]
 A lo largo de la guía se hace mención a prácticas que son recomendables para mejorar la seguridad del servidor. Es por ello que los archivos de configuración pueden no estar completos o diferir de como realmente son en nuestro servidor, así que mucho ojo a la hora de copiarlos sin editar.
