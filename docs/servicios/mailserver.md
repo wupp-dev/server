@@ -117,12 +117,88 @@ Este es relativamente sencillo de configurar, simplemente debemos añadir un reg
 
 ### DKIM
 
-...
+Tenemos que asegurarnos que, entre los volúmenes montados en el `docker-compose.yml`, está `/var/dms/config/:/tmp/docker-mailserver/` para que las claves persistan. Desde el usuario _dockeruser_ ejecutamos `docker compose exec -ti mailserver setup config dkim keytype ed25519 selector dkim-ed25519` para generar las claves principales y `docker compose exec -ti mailserver setup config dkim keysize 4096 selector dkim-rsa` para generar unas segundas claves porque no todos los servidores de correo aceptan aun el otro tipo de clave.
 
-## ¿Cliente web?
+Vamos a mover y renombrar los archivos generados para mayor comodidad. Actualmente tenemos estos archivos en el contenedor en `/tmp/docker-mailserver/rspamd/dkim`:
 
-_Posible sección._
+```
+ed25519-dkim-ed25519-wupp.dev.private.txt
+ed25519-dkim-ed25519-wupp.dev.public.dns.txt
+ed25519-dkim-ed25519-wupp.dev.public.txt
+rsa-4096-dkim-rsa-wupp.dev.private.txt
+rsa-4096-dkim-rsa-wupp.dev.public.dns.txt
+rsa-4096-dkim-rsa-wupp.dev.public.txt
+```
 
-## ¿Autenticación?
+Vamos a cambiarlos a `/tmp/docker-mailserver/rspamd/dkim/wupp.dev` con el siguiente nombre cada uno:
 
-_Posible sección._
+```
+dkim-ed25519.private
+dkim-ed25519.public.dns
+dkim-ed25519.public
+dkim-rsa.private
+dkim-rsa.public.dns
+dkim-rsa.public
+```
+
+Ahora toca crear el archivo de configuración (en el servidor, no en el contenedor). Primero creamos la carpeta con `sudo mkdir /var/dms/config/rspamd/override.d` y dentro el archivo `dkim_signing.conf` con:
+
+```conf
+# documentation: https://rspamd.com/doc/modules/dkim_signing.html
+
+enabled = true;
+
+sign_authenticated = true;
+sign_local = true;
+
+use_domain = "header";
+use_redis = false; # don't change unless Redis also provides the DKIM keys
+use_esld = true;
+check_pubkey = true; # you want to use this in the beginning
+
+selector = "dkim-rsa";
+# The path location is searched for a DKIM key with these variables:
+# - `$domain` is sourced from the MIME mail message `From` header
+# - `$selector` is configured for `mail` (as a default fallback)
+path = "/tmp/docker-mailserver/rspamd/dkim/$domain/$selector.private";
+
+# domain specific configurations can be provided below:
+domain {
+    wupp.dev {
+        selectors [
+            {
+                path = "/tmp/docker-mailserver/rspamd/dkim/wupp.dev/dkim-rsa.private";
+                selector = "dkim-rsa";
+            },
+            {
+                path = "/tmp/docker-mailserver/rspamd/dkim/wupp.dev/dkim-ed25519.private";
+                selector = "dkim-ed25519";
+            }
+        ]
+    }
+}
+```
+
+Y para que el archivo de configuración se copie al lugar correcto ejecutamos `docker compose down mailserver` y `docker compose up -d mailserver`. El archivo debería estar ahora (en el contenedor) en `/etc/rspamd/override.d/dkim_signing.conf`.
+
+Por último, tenemos que añadir cada clave pública a un registro nuevo en el dominio. Igual que para la SPF, creamos un registro de tipo TXT con el contenido del archivo `/tmp/docker-mailserver/rspamd/dkim/wupp.dev/dkim-ed25519.public.dns` y `dkim-ed25519._domainkey` como subdominio y otro con el de `/tmp/docker-mailserver/rspamd/dkim/wupp.dev/dkim-rsa.public.dns` y `dkim-rsa._domainkey` como subdominio.
+
+Podemos comprobar que funciona con [esta página](https://mxtoolbox.com/dkim.aspx).
+
+### DMARC
+
+Este último es sencillo de configurar, utilizamos [esta página](https://dmarcguide.globalcyberalliance.org/) para generar la configuración que en nuestro caso es esta:
+
+```
+_dmarc.wupp.dev. IN TXT "v=DMARC1; p=quarantine; rua=mailto:admin@wupp.dev; ruf=mailto:admin@wupp.dev; sp=none; fo=1; ri=86400"
+```
+
+Y creamos un último registro TXT en el dominio con `_dmarc` como subdominio y el contenido entre comillas.
+
+### Información adicional
+
+Es posible que, aun habiendo configurado SPF, DKIM y DMARC, algunos servidores de correos nos bloqueen el correo al intentar enviarlo a una de sus direcciones. A nosotros nos pasó con las direcciones de Outlook porque la IP del servidor estaba en la lista de Spamhaus y hubo que solicitar que se retirase desde [este enlace](https://check.spamhaus.org/).
+
+## Cliente web
+
+Por ahora no hemos visto ninguno interesante ni hemos tenido la necesidad.
