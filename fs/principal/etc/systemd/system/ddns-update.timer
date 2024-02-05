@@ -1,0 +1,11 @@
+[Unit]
+Description=Run DDNS update every 15 minutes
+Requires=ddns-update.service
+
+[Timer]
+Unit=ddns-update.service
+OnUnitInactiveSec=15m
+AccuracySec=1s
+
+[Install]
+WantedBy=timers.target

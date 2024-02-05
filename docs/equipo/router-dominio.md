@@ -2,16 +2,19 @@
 title: Router y dominio
 lang: es-ES
 ---
+
 # Configuración del router y del dominio
 
 Aquí nuestro objetivo será no tener que preocuparnos de nada que no sea el propio servidor. Para ello, hay que preocuparse momentáneamente de dos elementos externos:
+
 - Configurar el router de tu casa para que deje que el servidor sea un servidor.
 - Adquirir un dominio para que sea más cómodo conectarte al servidor y poder usar subdominios.
 
 ## Breve introducción sobre las IPs
 
 Aquí vamos a hablar de dos tipos de IPs:
-- **IP Pública:** Esta es la IP con la que se puede acceder al servidor *(o cualquier otro dispositivo de tu red, si lo permites)* desde cualquier parte de internet.
+
+- **IP Pública:** Esta es la IP con la que se puede acceder al servidor _(o cualquier otro dispositivo de tu red, si lo permites)_ desde cualquier parte de internet.
 - **IP Local:** Esta IP identifica al servidor dentro de la red a la que está conectado, pero no sirve fuera.
 
 ![IPs Públicas vs Privadas](../images/ips-pub-priv.png)
@@ -22,11 +25,11 @@ Lo que nos interesa aquí es la IP pública. Cuando queramos conectarnos al serv
 
 ## Dominio, ¿qué es y para qué sirve?
 
-Un dominio es un pseudónimo para la IP, que es más bonito y fácil de recordar que la propia IP. Cuando nos conectamos a cualquier web, lo hacemos mediante el Uniform Resource Locator *(URL)*, que se divide en:
+Un dominio es un pseudónimo para la IP, que es más bonito y fácil de recordar que la propia IP. Cuando nos conectamos a cualquier web, lo hacemos mediante el Uniform Resource Locator _(URL)_, que se divide en:
 
 ![URL](../images/url.png)
 
-En nuestro caso, el dominio es `wupp.dev`, aunque antes era `servermamadisimo.xyz` y, cuando te intentas conectar a esa dirección, el ordenador le pregunta qué IP es a la que apunta la dirección a unos servidores especiales que se llaman nameservers. Estos servidores son una parte fundamental del DNS *(Domain Name System)*, que permite utilizar las direcciones en vez de las IPs. Normalmente los nameservers que se usan son los del propio proveedor de internet, pero se pueden cambiar para que sean a otros como [NextDNS](https://my.nextdns.io).
+En nuestro caso, el dominio es `wupp.dev`, aunque antes era `servermamadisimo.xyz` y, cuando te intentas conectar a esa dirección, el ordenador le pregunta qué IP es a la que apunta la dirección a unos servidores especiales que se llaman nameservers. Estos servidores son una parte fundamental del DNS _(Domain Name System)_, que permite utilizar las direcciones en vez de las IPs. Normalmente los nameservers que se usan son los del propio proveedor de internet, pero se pueden cambiar para que sean a otros como [NextDNS](https://my.nextdns.io).
 
 Los dominios **hay que pagarlos**, esta es la parte mala. Los más baratos suelen estar entre 10€ y 15€ anuales, aunque el primer año suele costar menos.
 
@@ -36,7 +39,7 @@ Una vez compras un dominio, puedes elegir a qué IP apunta e incluso puedes crea
 
 Pues lo que va antes del dominio claro, por ejemplo, para `wupp.dev` podemos crear los subdominios `www.wupp.dev`, `mc.wupp.dev` o `cloud.wupp.dev`. Esto es útil para separar los servicios que tienes en el servidor. Además, te permite apuntar a distintas IPs o incluso hacer redirecciones para cada subdominio.
 
-Pero el hecho de tener un dominio no solo ayuda a la comodidad de recordarlo y escribirlo; a parte de que es necesario para poder usar subdominios, también nos permite no preocuparnos de qué pasa si la IP pública del servidor cambia *(que puede ocurrir)*, solo tienes que decirle al dominio que señale a la nueva IP. De no tener un dominio, tendrías que decirle a todas las personas que se conectan al servidor la nueva IP para que la cambien.
+Pero el hecho de tener un dominio no solo ayuda a la comodidad de recordarlo y escribirlo; a parte de que es necesario para poder usar subdominios, también nos permite no preocuparnos de qué pasa si la IP pública del servidor cambia _(que puede ocurrir)_, solo tienes que decirle al dominio que señale a la nueva IP. De no tener un dominio, tendrías que decirle a todas las personas que se conectan al servidor la nueva IP para que la cambien.
 
 ### Adquiriendo el dominio
 
@@ -48,7 +51,7 @@ Una cosa muy importante a la hora de registrar un dominio es tener la protecció
 
 Cada dominio está asociado a unos nameservers, que serán los que digan a qué IP apunta el dominio y cada subdominio que haya.
 
-Por defecto, los proveedores de dominios suelen usar sus propios nameservers, pero puedes configurar tu dominio para que use otros. Eso es básicamente como darle el control del dominio a otra página en vez de la página en la que has comprado el dominio. 
+Por defecto, los proveedores de dominios suelen usar sus propios nameservers, pero puedes configurar tu dominio para que use otros. Eso es básicamente como darle el control del dominio a otra página en vez de la página en la que has comprado el dominio.
 
 Al principio nosotros decidimos usar los nameservers de [FreeDNS](https://freedns.afraid.org/) porque nos resultaba más fácil actualizar la IP pública del servidor si cambiaba a través de un enlace. Esto OnlyDomains, por ejemplo, no lo permitía de una forma sencilla.
 
@@ -65,7 +68,7 @@ Así se ven los nameservers de nuestro dominio al cambiarlos a FreeDNS:
 
 Lo más común en una casa es que la IP pública que tengamos asignada no sea fija y vaya cambiando con el tiempo. Esto es un problema porque el dominio apunta a la IP, pero si esta cambia quedará inservible y si estamos fuera de casa no tendremos forma de conectarnos al servidor sin saber la nueva IP. Para solucionar eso aprovecharemos que Namecheap nos ofrece la posibilidad de actualizar la IP del dominio (o de sus subdominios) a través de un enlace.
 
-Para permitir que esto ocurra tenemos que utilizar el tipo especial de registro *A + Dynamic DNS Record* de Namecheap en el dominio y los subdominios.
+Para permitir que esto ocurra tenemos que utilizar el tipo especial de registro _A + Dynamic DNS Record_ de Namecheap en el dominio y los subdominios.
 ![Registros A + Dynamic DNS Record de Namecheap](../images/namecheap-ddns.png)
 
 Por desgracia, el cliente que tiene disponible Namecheap es solo para Windows, pero igualmente existe la posibilidad de utilizar un enlace para actualizar la IP. Aun así, no utilizaremos directamente el enlace, ya que podemos aprovecharnos de la existencia de scripts más elaborados que sirven para actualizar la IP en los dominios y subdominios de Namecheap. Concretamente usaremos [este](https://github.com/nickjer/namecheap-ddns).
@@ -79,13 +82,14 @@ Siguiendo nuevamente la documentación, vamos a crear un servicio de `systemd` p
 ```
 [Unit]
 Description=Update DDNS records for Namecheap
-After=network-online.target
+After=nss-user-lookup.target
+Wants=nss-user-lookup.target
 
 [Service]
 Type=simple
 Environment=NAMECHEAP_DDNS_TOKEN=passwd
 Environment=NAMECHEAP_DDNS_DOMAIN=wupp.dev
-Environment=NAMECHEAP_DDNS_SUBDOMAIN=,mc,www
+Environment=NAMECHEAP_DDNS_SUBDOMAIN=mc,www
 ExecStart=/home/admin/.cargo/bin/namecheap-ddns
 User=admin
 
@@ -127,12 +131,13 @@ Por defecto, el router no deja que alguien se conecte mediante la IP pública a 
 
 ### Breve introducción sobre los puertos
 
-Para que varios programas puedan conectarse a internet y hacer cosas distintas simultáneamente se utilizan los puertos. Los puertos son puntos de transmisión y recepción de datos *(no son nada físico, solo un número que ayuda a gestionar mejor las conexiones)*, están numerados del 0 al 65535 y algunos de ellos están reservados o son los más habituales para un uso específico, por ejemplo:
+Para que varios programas puedan conectarse a internet y hacer cosas distintas simultáneamente se utilizan los puertos. Los puertos son puntos de transmisión y recepción de datos _(no son nada físico, solo un número que ayuda a gestionar mejor las conexiones)_, están numerados del 0 al 65535 y algunos de ellos están reservados o son los más habituales para un uso específico, por ejemplo:
+
 - Los puertos 20 y 21 se utilizan para transferencia de archivos.
-- El puerto 22 se utiliza para las conexiones de Secure Shell *(SSH)* de las que hablaremos en la siguiente sección.
-- El puerto 80 se utiliza para las conexiones de Hypertext Transfer Protocol *(HTTP)*, que es el protocolo por el que funcionan las páginas web.
-- El puerto 123 se utiliza para el Network Time Protocol *(NTP)* para que los relojes de los ordenadores estén sincronizados.
-- El puerto 443 se utiliza para las conexiones HTTP Secure *(HTTPS)*, actuando como sustituto del puerto *HTTP*, ya que todas las conexiones deberían ir cifradas.
+- El puerto 22 se utiliza para las conexiones de Secure Shell _(SSH)_ de las que hablaremos en la siguiente sección.
+- El puerto 80 se utiliza para las conexiones de Hypertext Transfer Protocol _(HTTP)_, que es el protocolo por el que funcionan las páginas web.
+- El puerto 123 se utiliza para el Network Time Protocol _(NTP)_ para que los relojes de los ordenadores estén sincronizados.
+- El puerto 443 se utiliza para las conexiones HTTP Secure _(HTTPS)_, actuando como sustituto del puerto _HTTP_, ya que todas las conexiones deberían ir cifradas.
 - El puerto 25565 es el más común para los servidores de Minecraft.
 
 **Nota:** Puedes ver los puertos mejor explicados [aquí](https://www.adslzone.net/como-se-hace/internet/abrir-puertos-router/).
@@ -142,7 +147,7 @@ Pues bien, por defecto estos puertos no están abiertos para que un dispositivo 
 En nuestro caso, como tenemos un servidor, sí que necesitamos que los puertos estén abiertos, así que debemos configurar el router para que permita conexiones externas a los puertos que digamos.
 
 ::: info
-Esto no quiere decir que de aquí en adelante cualquier persona se vaya a poder conectar a los puertos que quiera de cualquier dispositivo de tu red. Normalmente el router permite abrir los puertos solo para una IP local *(que en este caso será nuestro servidor)*, siguiendo cerrados para los demás dispositivos. Además, los ordenadores y teléfonos suelen venir con un firewall instalado, que también bloquea por defecto las conexiones externas en cualquier puerto. De hecho, tendremos que vérnoslas también con el firewall del servidor aunque los puertos estén abiertos desde el router.
+Esto no quiere decir que de aquí en adelante cualquier persona se vaya a poder conectar a los puertos que quiera de cualquier dispositivo de tu red. Normalmente el router permite abrir los puertos solo para una IP local _(que en este caso será nuestro servidor)_, siguiendo cerrados para los demás dispositivos. Además, los ordenadores y teléfonos suelen venir con un firewall instalado, que también bloquea por defecto las conexiones externas en cualquier puerto. De hecho, tendremos que vérnoslas también con el firewall del servidor aunque los puertos estén abiertos desde el router.
 :::
 
 ### Abriendo puertos en el router
@@ -153,12 +158,12 @@ Lo primero es saber si tú desde tu casa puedes configurar tu router o debes con
 
 Para configurarlo tienes que conectarte a la IP de la puerta de enlace del router, que suele ser `192.168.1.1`. Puedes conectarte simplemente abriendo el navegador y poniendo la IP en la barra superior como si de una URL se tratara.
 
-Una vez conectado, te pedirá un nombre de usuario y una contraseña, que deberían estar escritos en el router *(no estaría mal cambiar la contraseña después de abrir los puertos)*.
+Una vez conectado, te pedirá un nombre de usuario y una contraseña, que deberían estar escritos en el router _(no estaría mal cambiar la contraseña después de abrir los puertos)_.
 
 ![Router LogIn](../images/router-login.png)
 
 ::: warning ADVERTENCIA
-Hay proveedores de internet como Digi, que te permiten configurar el router, pero los cambios que le hagas a los puertos no van a funcionar a no ser que contactes con ellos y les pidas que te permitan abrir puertos *(cosa por la que te cobrarán 1€ más al mes)*.
+Hay proveedores de internet como Digi, que te permiten configurar el router, pero los cambios que le hagas a los puertos no van a funcionar a no ser que contactes con ellos y les pidas que te permitan abrir puertos _(cosa por la que te cobrarán 1€ más al mes)_.
 :::
 
 Vamos a abrir los puertos necesarios, un ejemplo pueden ser los de HTTP, HTTPS, Minecraft y SSH, podemos abrirlos tanto para TCP como para UDP especificando la IP local del servidor o su dirección MAC para que se abran solo para el servidor y quedaría así:
