@@ -294,9 +294,12 @@ Ya habiendo instalado Nextcloud, podemos navegar por los ajustes y configurarlo,
   'OC\\Preview\\Imaginary',
 ],
 'preview_imaginary_url' => 'http://127.0.0.1:9090',
+'maintenance_window_start' => 1,
 ```
 
 Concretamente, la línea `'bulkupload.enabled' => false,` ayuda a solucionar un [bug](https://github.com/nextcloud/desktop/issues/5094) que hay actualmente con el cliente de Nextcloud al tener la velocidad de subida ilimitada. Y las últimas líneas son la configuración de Imaginary.
+
+La última línea `'maintenance_window_start' => 1,` especifica el horario habilitado para que Nextcloud realize tareas cron de mantenimiento. Esta configuración concreta indica que será de 1:00 a 5:00 horas en UTC, que en España (UTC+1) será 2:00 a 6:00 horas, horas en las que se usa poco el servicio.
 
 A parte de eso, como Nextcloud funciona con PHP, nos conviene modificar también la configuración de PHP. Y esto puede ser un poco lioso, porque en la imagen de docker que tenemos hay muchos archivos que modifican la configuración de PHP. Además, esos archivos no los podemos modificar directamente porque al reiniciar el contenedor se borran. La solución es crear un nuevo archivo con las opciones que queremos cambiar y copiarlo dentro del contenedor de docker cada vez que se inicie.
 
