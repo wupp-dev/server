@@ -85,11 +85,13 @@ SSL_TYPE=letsencrypt
 DOVECOT_MAILBOX_FORMAT=sdbox
 ```
 
-Como vamos a habilitar `TLS` mediante letsencrypt, tendremos que general el certificado. Nosotros hicimos temporalmente una copia de la configuración de `www.wupp.dev.conf` en Nginx para `mail.wupp.dev` y para así poder general el certificado con el comando:
+Como vamos a habilitar `TLS` mediante letsencrypt, vamos a expandir el certificado base con el comando:
 
 ```sh
-sudo certbot --key-type ecdsa --elliptic-curve secp384r1 --nginx -d mail.wupp.dev
+sudo certbot --key-type ecdsa --elliptic-curve secp384r1 --nginx -d wupp.dev -d www.wupp.dev -d mail.wupp.dev
 ```
+
+Nos preguntará si queremos expandir el certificado existente, a lo que diremos que sí.
 
 Si aquí intentásemos ejecutar el contenedor, puede ser que salga un error diciendo que el puerto 25 ya está en uso. En nuestro caso, estaba en uso por `exim4`, que es un servicio para el correo que viene instalado en Debian. Nosotros lo que hicimos fue parar el servicio y desactivarlo con `sudo systemctl stop exim4.service` y `sudo systemctl disable exim4-base.timer`.
 
@@ -160,7 +162,7 @@ selector = "dkim-rsa";
 # The path location is searched for a DKIM key with these variables:
 # - `$domain` is sourced from the MIME mail message `From` header
 # - `$selector` is configured for `mail` (as a default fallback)
-path = "/tmp/docker-mailserver/rspamd/dkim/$domain/$selector.private";
+path = "/tmp/docker-mailserver/rspamd/dkim/wupp.dev/dkim-rsa.private";
 
 # domain specific configurations can be provided below:
 domain {
