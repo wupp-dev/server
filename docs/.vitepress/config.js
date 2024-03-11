@@ -75,6 +75,10 @@ let guideSidebar = [
         text: "Resolución de dominios en initramfs",
         link: "/relatos/dns-initramfs",
       },
+      {
+        text: "Túnel SSH en la UGR LAN Party de 2024",
+        link: "/relatos/tunel-ssh-ulp",
+      },
     ],
   },
 ];
