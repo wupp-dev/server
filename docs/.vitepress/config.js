@@ -84,7 +84,7 @@ let guideSidebar = [
 ];
 
 export default {
-  title: "Servidor mamadísimo",
+  title: "WUPP",
   description: "Guía del servidor.",
   lang: "es-ES",
   base: "/server/",
