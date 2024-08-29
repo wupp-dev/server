@@ -24,6 +24,10 @@ let guideSidebar = [
         link: "/equipo/mariadb-docker",
       },
       {
+        text: "Monitorizando el equipo y los servicios",
+        link: "/equipo/monitorizacion",
+      },
+      {
         text: "Conectando varios servidores",
         link: "/equipo/conectando-servidores",
       },
@@ -68,8 +72,8 @@ let guideSidebar = [
     items: [
       { text: "Bloqueo de SSH", link: "/relatos/bloqueo-ssh" },
       {
-        text: "Lucas vs. Debian & Docker & etc.",
-        link: "/relatos/usuario-docker",
+        text: "Docker y sus cosas",
+        link: "/relatos/docker",
       },
       {
         text: "Resolución de dominios en initramfs",
@@ -83,6 +87,9 @@ let guideSidebar = [
   },
 ];
 
+/**
+ * @type {import('vitepress').SiteConfig}
+ */
 export default {
   title: "WUPP",
   description: "Guía del servidor.",
@@ -106,7 +113,13 @@ export default {
         link: "https://github.com/wupp-dev/server",
       },
     ],
-    socialLinks: [{ icon: "discord", link: "https://discord.gg/2pdbaf6Ugz" }],
+    socialLinks: [
+      { icon: "discord", link: "https://discord.gg/2pdbaf6Ugz" },
+      {
+        icon: "github",
+        link: "https://github.com/wupp-dev/",
+      },
+    ],
     sidebar: {
       "/equipo/": guideSidebar,
       "/servicios/": guideSidebar,
