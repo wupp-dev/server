@@ -1,15 +1,15 @@
 ---
-title: Lucas vs. Debian & Docker & etc.
+title: Docker y sus cosas
 lang: es-ES
 ---
 
-# Lucas vs. Debian & Docker & etc.
+# Docker y sus cosas
 
-De cuando Lucas intentó instalar Docker y Debian decidió que no iba a ir.
+Inicialmente, este relato viene de intentar instalar Docker que y Debian decidiese que no lo iba a hacer, pero tras una larga meditación y que Docker no funcione muchas veces porque porqué no, he decidido que puedo incluir aquí todas esas anécdotas de cuando Docker no es maravilloso.
 
 ## Instalación de Docker
 
-Esto es simple, fué bien, sin problema.
+Sorprendentemente, fué bien, sin problema.
 
 ## Vamos a crear el usuario _docker_
 
@@ -37,7 +37,7 @@ Contraseñas largas para los usuarios por favor y gracias
 Normalmente las herramientas base del sistema de Debian y todas estas distros, GNU utils vamos, no suelen cambiar la API, así que realmente desconozco por completo que ha podido ocurrir con `adduser` para que no me funcionase una opción que se supone que existe.
 :::
 
-## Nos queda el grupo
+## Nos queda crear el grupo
 
 Por si crear el usuario no hubiese sido ya difícil, toca gestionar el añadir el usuario al grupo de Docker. Quiero que veáis lo que pone en la documentación oficial de Docker antes de nada:
 
@@ -50,3 +50,43 @@ Así que lo dicho, lo que ocurrió es que al **contrario de lo que dice la docum
 ## Secrets: ¿funcionarán o no?
 
 De cuando los `secret: external: true` no fué
+
+## Resolviendo URLs a su manera
+
+Probando de manera local Grafana, seguí la configuración lógica y recomendada para una instalación completamente local, es decir usando `http://localhost:9090` para conectar con Prometheus. Y resulta que a Grafana no le gustó la idea, prefirió no conectarse.
+
+::: tip
+Grafana al ir a guardar comprueba la condición, concretamente utilizando la dirección `<URL_INDICADA>/api/v1/query`. Igual os tenta a decir _"Bueno voy a acceder a la dirección desde el navegador a ver que pasa"_. Ya os adelanto que os va a dar un error, pero ese no es el error, simplemente que Grafana está llamando a esa dirección de otra forma. Empezamos bien.
+:::
+
+Me puse por tanto a investigar. Lo primero es cambiar `localhost` por, por ejemplo, la IP del ordenador. Igual te preguntarás que qué cambia esto.
+
+Resulta que al parecer Docker, cuando indicas `locahost` en una URL que se resuleve dentro del contenedor, se refiere al propio contenedor. ¿Me había dado alguna vez este problema? Pues no, pero bueno ahora sí. Por tanto, cambiamos esto por la IP.
+
+Tampoco funciona. Ahora ya si que desconozco completamente el porqué, dado que el puerto estaba expuesto. Para resolverlo, podemos utilizar la **IP del contenedor**.
+
+Para esto, utilizamos `docker network inspect <NETWORK_NAME>`, lo cual nos dará una salida en JSON tal que así, en la que lo que queremos es el campo `IPv4Addres` de nuestro contenedor de Prometheus:
+
+```json {11}
+[
+  {
+    "Name": "<NETWORK_NAME>",
+    // ...
+    "Containers": {
+      // ...
+      "dab612af78aad409569df2dba82a4b4eb5fba7f112e678834c091334a52be3b2": {
+        "Name": "prometheus-1",
+        "EndpointID": "fea6ee17f8403a1de08769a602bd8175bdc7fdr6a23983a49bc0b5f7bf1994e1",
+        "MacAddress": "02:42:ac:14:00:03",
+        "IPv4Address": "172.20.0.3/16",
+        "IPv6Address": ""
+      }
+    }
+    // ...
+  }
+]
+```
+
+Ahora, si en Grafana reemplazamos `localhost` por `172.20.0.3` (ignorando lo que hay después de la `/`), ¡ya funciona! Esto se debe a que esa dirección IPv4 es la del contenedor en la red aislada que monta Docker, por tanto estamos accediendo al contenedor de Prometheus directamente.
+
+¿Debería de haber funcionado poniendo `localhost` por que estamos exponiendo el puerto? Sí. ¿Por qué no lo hace? Buena pregunta. Si en algún momento lo descubro, aquí veréis la respuesta.
