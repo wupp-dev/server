@@ -11,6 +11,18 @@ Aquí hay una guía de cómo instalar y configurar todo, pero si te quedas con d
 
 **Cositas generales**: para seguir esta instalación tienes que ya haber [configurado lo básico del sistema operativo](./sistema-encriptado) (`apt` en realidad) y tener una terminal abierta. A parte, cualquier comando de `apt` se puede sustituir por su correspondiente `apt-get` (o `apt-cache`, pero que no vamos a usar realmente).
 
+## Antes de empezar
+
+Antes de ponernos a configurar todo el Docker, para que nos sea más cómodo utilizarlo y todo, hemos establecido cómo vamos a trabajar con él en varios aspectos.
+
+### Volúmenes vs vinculaciones al FS
+
+Para almacenar de manera permanente archivos de un volumen de docker, puedes usar o volúmenes propios de docker o vincularlos a un punto de tu sistema de archivos. Por comodidad para integrarlo con otras cosas así como para ver lo que va pasando, como normal general vamos a utilizar vinculaciones al FS (sistema de archivos). Si prefieres usar volúmenes de Docker, libre eres de ello.
+
+### Varios docker-compose agregados
+
+### Orden de las claves de configuración
+
 ## TL;DR
 
 Si vas con prisa o te da pereza leer, aunque no lo recomiendo para nada, copia y pega lo siguiente en tu terminal, dale a intro y que se haga la magia:
@@ -71,7 +83,7 @@ De nuevo, si no confías lo suficiente en `apt`, comprueba que todo está bien e
 
 ::: tip RELATO
 
-Cuando estaba en esto, que parecía muy simple, Debian decidió que se iba a poner en mi contra y no funcionar, así que tenéis la historia de como colapsé en [un relato](../relatos/usuario-docker) (si veis que la guía y los comandos han cambiado, es por lo ocurrido en ese relato).
+Cuando estaba en esto, que parecía muy simple, Debian decidió que se iba a poner en mi contra y no funcionar, así que tenéis la historia de como colapsé en [un relato](../relatos/docker) (si veis que la guía y los comandos han cambiado, es por lo ocurrido en ese relato).
 :::
 
 Vamos a crear un usuario diferente para ejecutar Docker, así mejoramos ligeramente la seguridad. Para que un usuario pueda ejecutar Docker sin tener que hacer `sudo` y ejecutarlo como _root_, hay que añadirlo al grupo _docker_. Desde tu usuario de administración con `sudo` aún instalado, vamos a ello entonces:
