@@ -60,10 +60,6 @@ let guideSidebar = [
       { text: "Gitea - Servicio git", link: "/servicios/gogs" },
       { text: "Navidrome - Streaming de música", link: "/servicios/navidrome" },
       { text: "Overleaf - Editor de LaTeX", link: "/servicios/sharelatex" },
-      {
-        text: "Docker Mailserver - Servidor de correo",
-        link: "/servicios/docker-mailserver",
-      },
     ],
   },
   {
