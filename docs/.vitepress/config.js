@@ -88,6 +88,7 @@ let guideSidebar = [
  */
 export default {
   title: "WUPP",
+  title: "WUPP",
   description: "Guía del servidor.",
   lang: "es-ES",
   base: "/server/",

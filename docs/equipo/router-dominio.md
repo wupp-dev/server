@@ -14,7 +14,7 @@ Aquí nuestro objetivo será no tener que preocuparnos de nada que no sea el pro
 
 Aquí vamos a hablar de dos tipos de IPs:
 
-- **IP Pública:** Esta es la IP con la que se puede acceder al servidor _(o cualquier otro dispositivo de tu red, si lo permites)_ desde cualquier parte de internet.
+- **IP Pública:** Esta es la IP con la que se puede acceder al servidor _(o cualquier otro dispositivo de tu red, si lo permites)_ desde cualquier parte de Internet.
 - **IP Local:** Esta IP identifica al servidor dentro de la red a la que está conectado, pero no sirve fuera.
 
 ![IPs Públicas vs Privadas](../images/ips-pub-priv.png)
@@ -29,7 +29,7 @@ Un dominio es un pseudónimo para la IP, que es más bonito y fácil de recordar
 
 ![URL](../images/url.png)
 
-En nuestro caso, el dominio es `wupp.dev`, aunque antes era `servermamadisimo.xyz` y, cuando te intentas conectar a esa dirección, el ordenador le pregunta qué IP es a la que apunta la dirección a unos servidores especiales que se llaman nameservers. Estos servidores son una parte fundamental del DNS _(Domain Name System)_, que permite utilizar las direcciones en vez de las IPs. Normalmente los nameservers que se usan son los del propio proveedor de internet, pero se pueden cambiar para que sean a otros como [NextDNS](https://my.nextdns.io).
+En nuestro caso, el dominio es `wupp.dev`, aunque antes era `servermamadisimo.xyz` y, cuando te intentas conectar a esa dirección, el ordenador le pregunta qué IP es a la que apunta la dirección a unos servidores especiales que se llaman nameservers. Estos servidores son una parte fundamental del DNS _(Domain Name System)_, que permite utilizar las direcciones en vez de las IPs. Normalmente los nameservers que se usan son los del propio proveedor de Internet, pero se pueden cambiar para que sean a otros como [NextDNS](https://my.nextdns.io).
 
 Los dominios **hay que pagarlos**, esta es la parte mala. Los más baratos suelen estar entre 10€ y 15€ anuales, aunque el primer año suele costar menos.
 
@@ -61,7 +61,7 @@ El problema que encontramos usando FreeDNS es que alcanzamos el límite de 26 su
 Cambiar los nameservers de tu dominio puede tardar hasta 24 horas en hacerse efectivo en todo el mundo, hazlo solo si es necesario y tienes tiempo para esperar.
 :::
 
-Así se ven los nameservers de nuestro dominio al cambiarlos a FreeDNS:
+Así se veían los nameservers de nuestro dominio cuando estaban cambiados a FreeDNS:
 ![nameservers](../images/nameservers.png)
 
 ## Actualizando la IP pública en el dominio automáticamente
@@ -97,7 +97,7 @@ User=admin
 WantedBy=default.target
 ```
 
-**¡OJO!** Si no escribimos la coma al principio de `Environment=NAMECHEAP_DDNS_SUBDOMAIN=,mc,www`, no se nos actualizará el dominio base `wupp.dev`.
+**¡OJO!** Si no escribimos el arroba al principio de `Environment=NAMECHEAP_DDNS_SUBDOMAIN=@,mc,www`, no se nos actualizará el dominio base `wupp.dev`.
 
 Ejecutamos `sudo chmod 600 /etc/systemd/system/ddns-update.service` y creamos el archivo `/etc/systemd/system/ddns-update.timer`:
 
@@ -119,7 +119,7 @@ Y ejecutamos los siguientes comandos para ponerlo en funcionamiento y comprobar 
 
 ```sh
 sudo systemctl daemon-reload
-sudo systemctl start ddns-update.service ddns-update.timer
+sudo systemctl enable --now ddns-update.service ddns-update.timer
 sudo journalctl -u ddns-update.service
 ```
 
@@ -127,11 +127,11 @@ sudo journalctl -u ddns-update.service
 
 Muy bien, ya tenemos el dominio apuntando a la IP pública de nuestro router y al servidor actualizándola si esta cambia. Pero queda todavía un problema externo al servidor que resolver.
 
-Por defecto, el router no deja que alguien se conecte mediante la IP pública a algún dispositivo de la red porque es algo que solo debería ocurrir si estamos ofreciendo un servicio a través de internet.
+Por defecto, el router no deja que alguien se conecte mediante la IP pública a algún dispositivo de la red porque es algo que solo debería ocurrir si estamos ofreciendo un servicio a través de Internet.
 
 ### Breve introducción sobre los puertos
 
-Para que varios programas puedan conectarse a internet y hacer cosas distintas simultáneamente se utilizan los puertos. Los puertos son puntos de transmisión y recepción de datos _(no son nada físico, solo un número que ayuda a gestionar mejor las conexiones)_, están numerados del 0 al 65535 y algunos de ellos están reservados o son los más habituales para un uso específico, por ejemplo:
+Para que varios programas puedan conectarse a Internet y hacer cosas distintas simultáneamente se utilizan los puertos. Los puertos son puntos de transmisión y recepción de datos _(no son nada físico, solo un número que ayuda a gestionar mejor las conexiones)_, están numerados del 0 al 65535 y algunos de ellos están reservados o son los más habituales para un uso específico, por ejemplo:
 
 - Los puertos 20 y 21 se utilizan para transferencia de archivos.
 - El puerto 22 se utiliza para las conexiones de Secure Shell _(SSH)_ de las que hablaremos en la siguiente sección.
@@ -140,34 +140,38 @@ Para que varios programas puedan conectarse a internet y hacer cosas distintas s
 - El puerto 443 se utiliza para las conexiones HTTP Secure _(HTTPS)_, actuando como sustituto del puerto _HTTP_, ya que todas las conexiones deberían ir cifradas.
 - El puerto 25565 es el más común para los servidores de Minecraft.
 
-**Nota:** Puedes ver los puertos mejor explicados [aquí](https://www.adslzone.net/como-se-hace/internet/abrir-puertos-router/).
+**Nota:** Puedes ver los puertos mejor explicados [aquí](https://www.adslzone.net/como-se-hace/Internet/abrir-puertos-router/).
 
-Pues bien, por defecto estos puertos no están abiertos para que un dispositivo cualquiera de internet pueda llegar y conectarse a nuestro ordenador a través de ellos. Esto está bien, porque, a no ser que tengas un servidor en tu casa, si alguien intenta conectarse a alguno de los puertos de tu ordenador no suele ser con buenas intenciones.
+Pues bien, por defecto estos puertos no están abiertos para que un dispositivo cualquiera de Internet pueda llegar y conectarse a nuestro ordenador a través de ellos. Esto está bien, porque, a no ser que tengas un servidor en tu casa, si alguien intenta conectarse a alguno de los puertos de tu ordenador no suele ser con buenas intenciones.
 
 En nuestro caso, como tenemos un servidor, sí que necesitamos que los puertos estén abiertos, así que debemos configurar el router para que permita conexiones externas a los puertos que digamos.
 
 ::: info
-Esto no quiere decir que de aquí en adelante cualquier persona se vaya a poder conectar a los puertos que quiera de cualquier dispositivo de tu red. Normalmente el router permite abrir los puertos solo para una IP local _(que en este caso será nuestro servidor)_, siguiendo cerrados para los demás dispositivos. Además, los ordenadores y teléfonos suelen venir con un firewall instalado, que también bloquea por defecto las conexiones externas en cualquier puerto. De hecho, tendremos que vérnoslas también con el firewall del servidor aunque los puertos estén abiertos desde el router.
+Esto no quiere decir que de aquí en adelante cualquier persona se vaya a poder conectar a los puertos que quiera de cualquier dispositivo de tu red. El router permite abrir los puertos solo para una IP local _(que en este caso será nuestro servidor)_, siguiendo cerrados para los demás dispositivos. Además, los ordenadores y teléfonos suelen venir con un firewall instalado, que también bloquea por defecto las conexiones externas en cualquier puerto. De hecho, tendremos que vérnoslas también con el firewall del servidor aunque los puertos estén abiertos desde el router.
 :::
 
 ### Abriendo puertos en el router
 
-Lo primero es saber si tú desde tu casa puedes configurar tu router o debes contactar con el proveedor de internet para que lo haga, aunque lo más común es que sí puedas configurarlo.
+Lo primero es saber si tú desde tu casa puedes configurar tu router o debes contactar con el proveedor de Internet para que lo haga, aunque lo más común es que sí puedas configurarlo.
 
-**Nota:** Nuevamente, en [esta página](https://www.adslzone.net/como-se-hace/internet/abrir-puertos-router/) está mejor explicado cómo abrir los puertos.
+**Nota:** Nuevamente, en [esta página](https://www.adslzone.net/como-se-hace/Internet/abrir-puertos-router/) está mejor explicado cómo abrir los puertos.
 
-Para configurarlo tienes que conectarte a la IP de la puerta de enlace del router, que suele ser `192.168.1.1`. Puedes conectarte simplemente abriendo el navegador y poniendo la IP en la barra superior como si de una URL se tratara.
+Para configurarlo tienes que conectarte a la IP de la puerta de enlace de tu dispositivo, que suele ser `192.168.1.1`. Puedes conectarte simplemente abriendo el navegador y poniendo la IP en la barra superior como si de una URL se tratara.
 
 Una vez conectado, te pedirá un nombre de usuario y una contraseña, que deberían estar escritos en el router _(no estaría mal cambiar la contraseña después de abrir los puertos)_.
 
 ![Router LogIn](../images/router-login.png)
 
 ::: warning ADVERTENCIA
-Hay proveedores de internet como Digi, que te permiten configurar el router, pero los cambios que le hagas a los puertos no van a funcionar a no ser que contactes con ellos y les pidas que te permitan abrir puertos _(cosa por la que te cobrarán 1€ más al mes)_.
+Hay proveedores de Internet como Digi, que te permiten configurar el router, pero los cambios que le hagas a los puertos no van a funcionar a no ser que contactes con ellos y les pidas que te permitan abrir puertos _(cosa por la que te cobrarán 1€ más al mes)_. Esto se debe a porque, por defecto, utilizan CGNAT, que puedes averiguar de qué va en [este enlace](https://www.adslzone.net/reportajes/operadores/que-es-cg-nat-operadores/), y debes pedir que te saquen de ella.
 :::
 
-Vamos a abrir los puertos necesarios, un ejemplo pueden ser los de HTTP, HTTPS, Minecraft y SSH, podemos abrirlos tanto para TCP como para UDP especificando la IP local del servidor o su dirección MAC para que se abran solo para el servidor y quedaría así:
+Vamos a abrir los puertos necesarios, un ejemplo pueden ser los de HTTP, HTTPS, Minecraft y SSH, podemos abrirlos tanto para TCP como para UDP (puedes leer [aquí](https://nordvpn.com/es/blog/protocolo-tcp-udp/) las diferencias entre ambos protocolos) especificando la IP local del servidor o su dirección MAC para que se abran solo para el servidor y quedaría así:
 
 ![Router Port Fowarding](../images/router-puertos.png)
 
 Si, para abrir los puertos, eliges usar la IP local del servidor en vez de la dirección MAC, es importante que dejes fija esa IP local al servidor, ya sea desde la configuración del router o desde el propio servidor, porque si no, en algún momento cambiará y los puertos dejarán de estar abiertos para el servidor.
+
+::: warning ADVERTENCIA
+Aunque la mayoría de las comunicaciones en Internet funcionan bajo TCP, si queremos hacer uso de HTTP/3, debemos asegurarnos de que los puertos 80 y 443 están abiertos para UDP también, ya que esta versión hace uso de QUIC, un protocolo de red sobre UDP.
+:::

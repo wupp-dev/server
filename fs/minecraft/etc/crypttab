@@ -1,0 +1,2 @@
+nvme0n1p3_crypt UUID=872ae34e-f7d8-4ad3-9cbf-d071ffe37f83 none luks,discard
+vault UUID=39ad033e-82a0-4575-aa79-c31930bb9f36 /root/hdd_key luks

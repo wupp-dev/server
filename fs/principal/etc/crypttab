@@ -1,0 +1,2 @@
+sda3_crypt UUID=0053a965-9146-4e52-b842-0ba1a756c4c5 none luks,discard
+vault UUID=60e8d58f-cb05-47f1-85bc-38e5b0a05505 /root/hdd_key luks

@@ -5,11 +5,11 @@ lang: es-ES
 
 # Gestión remota con SSH y VNC
 
-Esta sección incluye todas las cosas que hay que hacer en el servidor antes de poder guardarlo, olvidarte de él y no volver a necesitar enchufarle un monitor y un teclado para gestionarlo.
+Esta sección incluye todas las cosas que hay que hacer en el servidor antes de poder guardarlo, olvidarte de él y, con suerte, no volver a necesitar enchufarle un monitor y un teclado para gestionarlo.
 
 ## Breve introducción
 
-Un servidor es un ordenador al que no quieres tenerle conectado ni un monitor ni un teclado _(el ratón no existe)_ porque no deberías tener que tocarlo directamente salvo para el mantenimiento físico y cambios en la BIOS o en el sistema operativo.
+Un servidor es un ordenador al que no quieres tenerle conectado ni un monitor ni un teclado _(el ratón no existe)_ porque no deberías tener que tocarlo directamente salvo para el mantenimiento físico y cambios en la UEFI o en el sistema operativo.
 
 Pero sí que hay que conectarse a él habitualmente para instalar y desinstalar software y para configurarlo. Esto lo haremos desde otro dispositivo usando el protocolo _Secure Shell (SSH)_, que nos permitirá ejecutar comandos en el servidor, transferir archivos y otras cosas más chulas que veremos después. Todo ello con una conexión cifrada :D
 
@@ -18,7 +18,7 @@ Es aquí donde se nos plantea un gran problema: Cuando nos podemos conectar al s
 Este problema lo resolveremos tras preparar el servidor para el uso habitual.
 
 ::: warning ADVERTENCIA
-Aunque estoy seguro de que es por culpa del router que usamos. En nuestro caso, si el servidor no tiene ningún tipo de interacción a través de internet durante unos minutos, el router deja de permitir conexiones a él. Para ahorrarnos el disgusto de intentar conectarnos y descubrir que el router no nos lo va a permitir porque el servidor haya estado "inactivo", tendremos que forzar una actividad periódica mínima (como hacer un ping) tanto cuando el ordenador esté encendido como cuando esté esperando a que se introduzca la contraseña para desencriptar los discos.
+Aunque estoy seguro de que es por culpa del router que usamos. En nuestro caso, si el servidor no tiene ningún tipo de interacción a través de Internet durante unos minutos, el router deja de permitir conexiones a él. Para ahorrarnos el disgusto de intentar conectarnos y descubrir que el router no nos lo va a permitir porque el servidor haya estado "inactivo", tendremos que forzar una actividad periódica mínima (como hacer un ping) tanto cuando el ordenador esté encendido como cuando esté esperando a que se introduzca la contraseña para desencriptar los discos.
 :::
 
 ## Uso habitual
@@ -28,7 +28,7 @@ Vamos a empezar dejando lista nuestra vía para poder gestionar remotamente el s
 Como lo elegimos a la hora de instalar Debian, el servidor ya viene con OpenSSH Server instalado, que por defecto se ejecuta en el puerto `22`.
 
 ::: warning ADVERTENCIA
-Es recomendable no usar el puerto 22 para SSH, porque, al ser el puerto por defecto, muchos ataques automatizados solo intentan conectarse a ese puerto, así que cambiándolo a otro nos ahorraremos posibles problemas. Quien quiera averiguar en qué puerto tienes el SSH podrá hacerlo con un escaneo de puertos igualmente, pero ya tendrá que querer atacarte a ti en concreto.
+Es recomendable no usar el puerto 22 para SSH, porque, al ser el puerto por defecto, muchos ataques automatizados solo intentan conectarse a ese puerto, así que cambiándolo a otro nos quitamos ruido de fondo. Quien quiera averiguar en qué puerto tienes el SSH podrá hacerlo con un escaneo de puertos igualmente, pero ya tendrá que querer atacarte a ti en concreto.
 :::
 
 Sin embargo, si intentamos conectarnos desde otro ordenador, no nos dejará, por dos motivos:
@@ -44,13 +44,13 @@ sudo ufw allow 22/tcp
 sudo ufw enable
 ```
 
-Donde `22` es el puerto de SSH y `tcp` el protocolo, que puedes leer [aquí](https://nordvpn.com/es/blog/protocolo-tcp-udp/) las diferencias entre el protocolo TCP y el UDP. Con esto ya tenemos el firewall configurado para aceptar conexiones SSH.
+Donde `22` es el puerto de SSH y `tcp` el protocolo. Con esto ya tenemos el firewall configurado para aceptar conexiones SSH.
 
-Ahora ya podríamos conectarnos al servidor desde otro ordenador, pero tendría que ser con la contraseña del usuario administrador, cosa que es poco segura, así que vamos a utilizar la autenticación por claves SSH.
+Ahora ya podríamos conectarnos al servidor desde otro ordenador, con con la contraseña del usuario administrador. Eso quiere decir que alguien que conozca el nombre del usuario puede ponerse a intentar probar contraseñas, cosa que queremos evitar, así que vamos a utilizar la autenticación por clave pública.
 
 ![Conexión SSH](../images/conexion-ssh.jpg)
 
-Para configurarlo en el ordenador del que nos vayamos a conectar, seguiremos [este tutorial](https://www.digitalocean.com/community/tutorials/how-to-configure-ssh-key-based-authentication-on-a-linux-server). Además, tiene al final una parte de configuración que también se debe hacer y viene incluido más adelante en la guía.
+Para configurarla en el ordenador del que nos vayamos a conectar, seguiremos [este tutorial](https://www.digitalocean.com/community/tutorials/how-to-configure-ssh-key-based-authentication-on-a-linux-server). Además, tiene al final una parte de configuración que también se debe hacer y viene incluido más adelante en la guía.
 
 ## Reinicios y desencriptación del disco
 
@@ -68,7 +68,7 @@ sudo apt install dropbear-initramfs
 
 **¿Eso es todo?** Obviamente no, hay que configurarlo.
 
-Vamos a editar el archivo de configuración, que está en `/etc/dropbear/initramfs/dropbear.conf` y vamos a descomentar y editar la línea:
+Vamos a editar el archivo de configuración, que está en `/etc/dropbear-initramfs/config` (o `/etc/dropbear/initramfs/dropbear.conf` dependiendo de la versión) y vamos a descomentar y editar la línea:
 
 ```ssh-config
 DROPBEAR_OPTIONS="-I 300 -j -k -p 22 -s"
@@ -85,7 +85,7 @@ DROPBEAR_OPTIONS="-I 300 -j -k -p 22 -s"
 Como indica el último parámetro, la autenticación por contraseña está deshabilitada, así que utilizaremos también las claves públicas que hayamos autorizado para OpenSSH Server, podemos copiarlas y hacer que los cambios tengan efecto con los comandos:
 
 ```sh
-sudo cp /home/admin/.ssh/authorized_keys /etc/dropbear-initramfs/etc/dropbear/initramfs/
+sudo cp /home/admin/.ssh/authorized_keys /etc/dropbear-initramfs/
 sudo update-initramfs -u
 ```
 
@@ -161,7 +161,7 @@ Que no se nos olvide hacer el archivo ejecutable escribiendo `sudo chmod +x /usr
 Genial, ahora si probamos a reiniciar el ordenador nos encontraremos con otro problema, y es que la resolución de dominios no funciona. Podemos comprobarlo con un comando tan sencillo como `wget google.com`, que nos dará un error.
 
 ::: tip RELATO
-La información que hay en internet sobre cómo hacer funcionar la resolución de dominios en `initramfs` es casi nula, así que la forma en la que lo conseguimos fue con varias pruebas que puedes consultar [aquí](../relatos/dns-initramfs).
+La información que hay en Internet sobre cómo hacer funcionar la resolución de dominios en `initramfs` es casi nula, así que la forma en la que lo conseguimos fue con varias pruebas que puedes consultar [aquí](../relatos/dns-initramfs).
 :::
 
 Para arreglarlo, crearemos un último archivo `/usr/share/initramfs-tools/hooks/dns` con el contenido:
@@ -208,10 +208,6 @@ Para que nos deje conectarnos es tan sencillo como eliminar el archivo de `known
 
 Por suerte, hay un apaño. Si ponemos Dropbear y OpenSSH Server en puertos distintos en el servidor, podemos utilizar una identidad distinta para cada puerto cuando nos conectemos.
 
-::: danger PELIGRO
-Una solución que se nos podría ocurrir es utilizar la misma clave pública y privada para Dropbear y para OpenSSH Server. Esto es una malísima idea porque la clave privada de OpenSSH Server es algo que quieres proteger más que a tu gato y, por otro lado, la de Dropbear se va a guardar en una parte desencriptada del sistema operativo, porque necesita usarse antes de desencriptar los discos, así que no está muy protegida.
-:::
-
 Lo primero para esto es utilizar un puerto distinto para OpenSSH Server al que usamos para Dropbear. Para ello, editamos el archivo `/etc/ssh/sshd_config` y descomentamos la línea `#Port 22` y cambiamos el número, quedando por ejemplo `Port 2222`.
 
 Antes de reiniciar el servidor SSH, debemos asegurarnos de que:
@@ -239,7 +235,7 @@ ssh -p 2222 admin@wupp.dev
 
 ## Reforzando la seguridad
 
-Todavía tenemos que desactivar el acceso con usuario y contraseña por SSH, que es muy poco seguro, para solo permitir el acceso con las claves públicas permitidas. Vamos a editar el archivo `/etc/ssh/sshd_config` y a cambiar las siguientes líneas:
+Todavía tenemos que desactivar el acceso con usuario y contraseña por SSH, que es muy poco seguro, para restringir el acceso a las claves públicas permitidas. Vamos a editar el archivo `/etc/ssh/sshd_config` y a cambiar las siguientes líneas:
 
 ```ssh-config
 PasswordAuthentication no
@@ -271,11 +267,11 @@ Y ya deberíamos de poder conectarnos sin que nos pida la contraseña del usuari
 
 ¿Qué mierdas es un VNC? Pues básicamente un entorno gráfico de escritorio remoto. Se utiliza para controlar remotamente otros ordenadores con un escritorio como si fuese realmente tu propio ordenador. ¿No acabamos de desactivar eso en la configuración del servidor SSH? Pues sí, pero vamos a usarlo de otra forma que es más segura y no necesita esa opción activada.
 
-Hemos seguido [este tutorial](https://www.digitalocean.com/community/tutorials/how-to-install-and-configure-vnc-on-debian-10).
+Nosotros seguimos [este tutorial](https://www.digitalocean.com/community/tutorials/how-to-install-and-configure-vnc-on-debian-10). Aunque puede haber algunos más actualizados como [este](https://www.digitalocean.com/community/tutorials/how-to-install-and-configure-vnc-on-debian-11).
 
 Como detalles, no hemos establecido una contraseña para solo vista.
 
-Aquí da igual cambiar o no el puerto por defecto, ya que no estará expuesto directamente a internet.
+Aquí da igual cambiar o no el puerto por defecto, ya que no estará expuesto directamente a Internet.
 
 En nuestro ordenador podemos instalar `xtightvncviewer` para conectarnos. Solo tendremos que conectarnos mediante SSH al servidor indicando que queremos redirigir el puerto 5901 de nuestro ordenador al 5901 del del servidor. Esto lo podemos hacer con `ssh -L 5901:127.0.0.1:5901 admin@wupp.dev`. Una vez estemos conectados, podemos ejecutar `xtightvncviewer` desde la terminal, conectarnos a `localhost:5901` y poner la contraseña del VNC.
 
@@ -328,7 +324,7 @@ Last login: Mon May 24 01:23:45 2032 from 192.168.1.1
 
 Que no es muy bonito la verdad, así que podemos hacer unos cambios para que quede un mensaje mucho más lindo.
 
-1. Editamos `/etc/ssh/sshd_config` para poner los siguientes ajustes:
+1. Editamos `/etc/ssh/sshd_config` para cambiar los siguientes ajustes:
 
 ```ssh-config
 PrintMotd no

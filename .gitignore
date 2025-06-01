@@ -2,6 +2,3 @@ node_modules/
 docs/.vitepress/dist/
 docs/.vitepress/cache/
 **/.env
-pnpm-lock.yaml
-package-lock.json
-.vscode/
