@@ -90,3 +90,62 @@ Para esto, utilizamos `docker network inspect <NETWORK_NAME>`, lo cual nos dará
 Ahora, si en Grafana reemplazamos `localhost` por `172.20.0.3` (ignorando lo que hay después de la `/`), ¡ya funciona! Esto se debe a que esa dirección IPv4 es la del contenedor en la red aislada que monta Docker, por tanto estamos accediendo al contenedor de Prometheus directamente.
 
 ¿Debería de haber funcionado poniendo `localhost` por que estamos exponiendo el puerto? Sí. ¿Por qué no lo hace? Buena pregunta. Si en algún momento lo descubro, aquí veréis la respuesta.
+
+## Cuando `up` parezca que si pero se pille
+
+Tras un reinicio forzado tras haberse ido la luz, y tras haber funcionado todos los contenedores perfectamente, en algún momento docker dejó de funcionar. La mayoría de los contenedores no aparecían ejecutándose (`docker ps`), al subirlos no se subían más que los que se mostraban anteriormente y si hacía `down` se bajaban todos aunque no apareciesen antes.
+
+El mayor problema resultaba al hacer `up`. Todos se veían subirse perfectamente y de repente, se pillaba. Si cancelaba con Ctrl+C, tenía que pulsarlo varias veces hasta que volviese a la prompt. Pensé que igual era un problema con la entropía ([principalmente por esta pregunta de StackOverflow](https://stackoverflow.com/questions/59941911/docker-compose-up-hangs-forever-how-to-debug)). Tras volver a ejecutarlo mientras veía los `dmesg` a ver si aparecía algo, me di cuenta de que si lo dejaba ejecutar lo siguiente, entre todo el texto que mal se estaba renderizando en mi terminal, veo _(con un poco más de texto seguido por el mal renderizado)_:
+
+```
+Error response from daemon: failed to create task for container: Unimplemented: failed to start shim: start failed: unsupported shim version (3): not implemented
+```
+
+Una simple consulta en DuckDuckGo me lleva a un [issue en GitHub](https://github.com/containerd/containerd/issues/10984). Primera solución propuesta, reiniciar `containerd`: **no funciona**. Segunda solución propuesta, reiniciar `docker` (service): tras un largo rato, **FUNCIONA**. Igual tiene que ver también que primero se haya reiniciado `containerd`, pero no puedo asegurarlo. En resumen, se solucionón con:
+
+```bash
+sudo systemctl restart containerd && sudo systemctl restart docker.service
+```
+
+Bueno, resulta que no había terminado ahí la cosa. Watchtower, el contenedor para actualizar automáticamente las imágenes, nos estaba enviando una notificación con el siguiente error:
+
+```
+Watchtower updates on 27a8135c0c5a
+Error response from daemon: client version 1.25 is too old. Minimum supported API version is 1.44, please upgrade your client to a newer version
+```
+
+Entendiendo que tenía que ver con la versión de docker, consulté eso, pero lo extraño es el único sitio donde aparecía la versión `1.25`:
+
+```
+[...]
+Server: Docker Engine - Community
+ Engine:
+  [...]
+  API version:      1.52 (minimum version 1.44)
+  Go version:       go1.25.5
+  [...]
+```
+
+Según esto, la API version es mayor que 1.25, de hecho especifica también ese
+mínimo, y docker funciona correctamente. El 1.25 se puede ver en la versión de
+go, pero resulta que tampoco tenemos go instalado, por lo que esa versión es de
+alguna forma interna de Docker.
+
+El problema? Watchtower. Al momento de escribir esto (Diciembre 2025), el
+repositorio e imagen llevan más de 2 años sin actualizarse. Cambiando a un fork
+encontrado en [este issue de
+GitHub](https://github.com/containrrr/watchtower/issues/2126), todo funciona :).
+El fork en cuestión es `nickfedor/watchtower`.
+
+El mismo problema lo encontramos con cAdvisor (aunque con unos números de API
+especificados diferentes). El problema, resuelto también a través de un [issue
+de
+GitHub](https://github.com/google/cadvisor/issues/3749#issuecomment-3524798186)
+resultaba ser que Google decidió, sin dar ningún aviso ni actualizar
+correctamente la documentación respectiva, cambiar del uso de su propio registro
+de contenedores (gcr.io) al de GitHub (g**h**cr.io), por lo que la imagen que
+estábamos usando teóricamente como `latest` realmente era un tanto antigua (para
+ser precisos era `gcr.io/cadvisor/cadvisor:latest`). Una vez cambiado a la nueva
+imagen, el problema de nuevo se soluciona sólo :D (la nueva imagen es la
+especificada en la documentación correspondiente, en el apartado de
+Monitorización).
