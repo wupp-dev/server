@@ -2,28 +2,40 @@ name: Build and Deplow Web
 
 on:
   push:
-    branches: [ "main" ]
-
+    branches: ["main"]
   workflow_dispatch:
 
+permissions:
+  contents: write
+
+concurrency:
+  group: pages-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
-    concurrency: ci-${{ github.ref }}
     steps:
       - name: Checkout 🛎️
-        uses: actions/checkout@v2
-    
-      - uses: actions/setup-node@v1
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
-          node-version: '20.10.0'
+          node-version: 24
+          cache: pnpm
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
 
       - name: Install and Build 🔧
         run: |
-          npm install
-          npm run docs:build
+          pnpm install --frozen-lockfile
+          pnpm run build
 
       - name: Deploy 🚀
+        if: github.ref == 'refs/heads/main'
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           branch: gh-pages

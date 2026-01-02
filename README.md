@@ -15,9 +15,9 @@ La guía se divide en dos partes y tiene una tercera de relatos:
 
 Puedes **consultar la guía** en [este enlace](https://wupp-dev.github.io/server/) o puedes compilarla tú mismo descargando el repositorio:
 
-1. Necesitarás `npm` o `pnpm` instalado. Puedes descargar NPM [aquí](https://github.com/nodesource/distributions) y PNPM [aquí](https://pnpm.io/installation). Si decides instalar PNPM, cuando en un comando haya que poner `npm` tendrás que sustituirlo por `pnpm`.
-2. Abre una terminal en la carpeta raíz del repositorio y escribe `npm install`
-3. Ejecuta `npm run docs:build` y `npm run docs:serve` _(si esto no funciona, utiliza en su lugar `npm run docs:dev`)_
+1. Necesitarás `npm` o `pnpm` instalado. Puedes descargar NPM [aquí](https://github.com/nodesource/distributions) y PNPM [aquí](https://pnpm.io/installation).
+2. Abre una terminal en la carpeta raíz del repositorio y escribe `pnpm install`
+3. Ejecuta `pnpm run build` y `pnpm run serve` _(si esto no funciona, utiliza en su lugar `pnpm run dev`)_
 4. Abre el enlace que aparezca en la consola y podrás ver la guía.
 
 ---
