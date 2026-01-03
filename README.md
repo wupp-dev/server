@@ -2,7 +2,7 @@
 
 Este repositorio contiene:
 
-- Los **archivos de configuración** que se han usado en el servidor de casita, dentro de la carpeta `fs`.
+- Los **archivos de configuración** que se han usado en cada servidor. Consulta la [carpeta `fs/`](./fs/) para más detalles sobre su estructura.
 - Una **guía detallada de todo el proceso** que se ha seguido para poner el servidor en funcionamiento.
 
 La guía se divide en dos partes y tiene una tercera de relatos:
