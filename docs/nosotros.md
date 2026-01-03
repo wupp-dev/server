@@ -1,6 +1,7 @@
 ---
 layout: page
 title: Nosotros
+sidebar: false
 ---
 <script setup>
 import {
