@@ -1,6 +1,5 @@
 ---
-title: Minecraft con AMP
-lang: es-ES
+order: 4
 ---
 
 # Minecraft con AMP

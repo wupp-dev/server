@@ -1,6 +1,5 @@
 ---
-title: Nextcloud
-lang: es-ES
+order: 1
 ---
 
 # Nextcloud - Almacenamiento

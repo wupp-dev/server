@@ -1,6 +1,5 @@
 ---
-title: MinIO para almacenamiento
-lang: es-ES
+order: 3
 ---
 
 # MinIO - Almacenamiento S3

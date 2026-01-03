@@ -1,6 +1,6 @@
 ---
-title: Configurando MariaDB con Docker
-lang: es-ES
+title: Base de datos
+order: 7
 ---
 
 # Configurando MariaDB con Docker

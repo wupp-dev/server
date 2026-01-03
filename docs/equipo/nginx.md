@@ -1,6 +1,5 @@
 ---
-title: Nginx como servidor web
-lang: es-ES
+order: 6
 ---
 
 # Nginx como servidor web

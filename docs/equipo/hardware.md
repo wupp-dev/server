@@ -1,6 +1,5 @@
 ---
-title: Hardware
-lang: es-ES
+order: 2
 ---
 
 # Hardware
@@ -27,9 +26,9 @@ Los datos sobre este servidor son menos precisos, pero son lo suficientemente in
 - **Ventiladores extra:** _Ninguno_
 - **Caja:** _Desconocida_
 
-Para un servidor genérico en el que principalmente se ofrecerán servicios web, un Xeon es un procesador adecuado por tener una buena cantidad de núcleos. Pero ese no es el caso si el servidor se quiere usar para Minecraft, ya que no aprovecha los múltiples núcleos, beneficiándose únicamente de la velocidad del reloj.
+La verdad es que ya se le notan los años, pero para un servidor genérico en el que principalmente se ofrecerán servicios web sigue funcionando. Si el servidor se quisiera usar para Minecraft, tendríamos que centrarnos en que tuviese un procesador más rápido, ya que Minecraft no aprovecha los múltiples núcleos.
 
-La velocidad a la que funcionan los discos duros mecánicos es importante, ya que **uno de 7200 RMP será más rápido que uno de 5400 RPM, pero se calentará más y tendrá una vida más corta.** Por eso, para el almacenamiento de archivos como los de Nextcloud y fotos, es más recomendable usar un disco de 5400 RPM, ya que no necesitas una gran velocidad _(te limita normalmente la de transferencia de Internet)_ y te interesa que el disco duro dure más tiempo.
+La velocidad a la que funcionan los discos duros mecánicos es importante, ya que **uno de 7200 RMP será más rápido que uno de 5400 RPM, pero se calentará más y durará menos.** Por eso, para el almacenamiento de archivos como los de Nextcloud y fotos, es más recomendable usar un disco de 5400 RPM, ya que no necesitas una gran velocidad _(te limita normalmente la de transferencia de Internet)_ y te interesa que el disco duro dure más tiempo.
 
 ::: warning ADVERTENCIA
 Aunque no sepa qué tarjeta de red tiene, es importante que sea una decente. No quieres que el servidor vaya lento porque la tarjeta de red es una castaña.
@@ -57,11 +56,11 @@ Este servidor costó en total 928,96€.
 
 ## Hardware externo
 
-A parte de tener un ordenador decente para el servidor, necesitas una buena conexión a Internet. Una de las cosas **obligatorias** es tener el servidor **conectado por cable**, no por WiFi.
+Además de tener un ordenador decente para el servidor, necesitas una buena conexión a Internet. Una de las cosas **obligatorias** es tener el servidor **conectado por cable**, no por WiFi.
 
 En nuestro caso, también tenemos ambos servidores conectados al router a través de un switch. Concretamente, un [TP-Link LS105G](https://www.tp-link.com/es/business-networking/litewave-switch/ls105g/).
 
-Por último, siempre puede beneficiar comprar un router distinto al que te da la compañía de Internet. Esto es, principalmente, porque puede que te de más facilidades _(o posibilidades)_ para configurarlo y sí, es necesario toquetear en el router para que el servidor funcione.
+Por último, siempre puede beneficiar comprar un router distinto al que te da la compañía de Internet. Esto es, principalmente, porque puede que te de más facilidades _(o posibilidades)_ para configurarlo, cosa que habrá que hacer.
 
 ::: info
 A no ser que se diga lo contrario, en el resto de documentación se puede asumir que nos estamos refiriendo al servidor general.

@@ -1,6 +1,5 @@
 ---
-title: Instalación del SO encriptado
-lang: es-ES
+order: 3
 ---
 
 # Instalación del SO encriptado

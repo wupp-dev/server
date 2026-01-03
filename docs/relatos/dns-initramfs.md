@@ -1,6 +1,5 @@
 ---
-title: Resolución de dominios en initramfs
-lang: es-ES
+order: 3
 ---
 
 # Resolución de dominios en initramfs

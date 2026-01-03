@@ -1,6 +1,5 @@
 ---
-title: Bloqueo de SSH
-lang: es-ES
+order: 1
 ---
 
 # Bloqueo de SSH

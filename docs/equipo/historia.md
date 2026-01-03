@@ -1,6 +1,6 @@
 ---
 title: Historia
-lang: es-ES
+order: 1
 ---
 
 # Historia del servidor

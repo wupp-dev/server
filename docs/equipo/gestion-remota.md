@@ -1,6 +1,6 @@
 ---
-title: Gestión remota con SSH y VNC
-lang: es-ES
+title: Gestión remota
+order: 5
 ---
 
 # Gestión remota con SSH y VNC

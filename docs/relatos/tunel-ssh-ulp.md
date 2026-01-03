@@ -1,6 +1,5 @@
 ---
-title: Túnel SSH en la UGR LAN Party de 2024
-lang: es-ES
+order: 4
 ---
 
 # Túnel SSH en la UGR LAN Party de 2024

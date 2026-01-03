@@ -1,4 +1,5 @@
 import { defineConfig } from "vitepress";
+import { generateSidebar } from "vitepress-sidebar";
 
 export default defineConfig({
   title: "WUPP",
@@ -29,108 +30,35 @@ export default defineConfig({
       },
       {
         text: "Archivos de configuración",
-        link: "https://github.com/wupp-dev/server",
+        link: "https://github.com/wupp-dev/server/tree/main/fs",
         target: "_blank",
       },
     ],
-    sidebar: [
-      {
-        text: "Equipo",
-        collapsed: false,
-        items: [
-          { text: "Historia", link: "/equipo/historia" },
-          { text: "Hardware", link: "/equipo/hardware" },
-          {
-            text: "Instalación del SO encriptado",
-            link: "/equipo/sistema-encriptado",
-          },
-          {
-            text: "Configuración del router y dominio",
-            link: "/equipo/router-dominio",
-          },
-          {
-            text: "Gestión remota con SSH y VNC",
-            link: "/equipo/gestion-remota",
-          },
-          { text: "Nginx como servidor web", link: "/equipo/nginx" },
-          { text: "Docker", link: "/equipo/docker" },
-          {
-            text: "Configurando MariaDB con Docker",
-            link: "/equipo/mariadb-docker",
-          },
-          {
-            text: "Monitorizando el equipo y los servicios",
-            link: "/equipo/monitorizacion",
-          },
-          {
-            text: "Conectando varios servidores",
-            link: "/equipo/conectando-servidores",
-          },
-        ],
-      },
-      {
-        text: "Servicios",
-        collapsed: false,
-        items: [
-          {
-            text: "Nextcloud - Almacenamiento",
-            link: "/servicios/nextcloud",
-          },
-          {
-            text: "Docker Mailserver - Correo electrónico",
-            link: "/servicios/mailserver",
-          },
-          {
-            text: "Minio - Almacenamiento S3",
-            link: "/servicios/minio",
-          },
-          { text: "Minecraft con AMP", link: "/servicios/minecraft" },
-          {
-            text: "Dozzle - Visualizador de logs",
-            link: "/servicios/dozzle",
-          },
-          { text: "Homarr - Dashboard", link: "/servicios/homarr" },
-          { text: "Uptime Kuma - Status", link: "/servicios/uptime-kuma" },
-          { text: "Authentik - Autenticación", link: "/servicios/authentik" },
-          { text: "Gitea - Servicio git", link: "/servicios/gogs" },
-          {
-            text: "Navidrome - Streaming de música",
-            link: "/servicios/navidrome",
-          },
-          { text: "Overleaf - Editor de LaTeX", link: "/servicios/sharelatex" },
-        ],
-      },
-      {
-        text: "Relatos",
-        collapsed: false,
-        items: [
-          { text: "Bloqueo de SSH", link: "/relatos/bloqueo-ssh" },
-          {
-            text: "Docker y sus cosas",
-            link: "/relatos/docker",
-          },
-          {
-            text: "Resolución de dominios en initramfs",
-            link: "/relatos/dns-initramfs",
-          },
-          {
-            text: "Túnel SSH en la UGR LAN Party de 2024",
-            link: "/relatos/tunel-ssh-ulp",
-          },
-        ],
-      },
-    ],
+    sidebar: generateSidebar({
+      documentRootPath: "docs",
+      useTitleFromFileHeading: true,
+      useTitleFromFrontmatter: true,
+      useFolderTitleFromIndexFile: true,
+      sortMenusByFrontmatterOrder: true,
+      excludePattern: ["nosotros.md", "shared/**"],
+    }),
     socialLinks: [
       {
         icon: "github",
-        link: "https://github.com/wupp-dev/",
-        ariaLabel: "GitHub WUPP-DEV",
+        link: "https://github.com/wupp-dev/server/",
+        ariaLabel: "Repositorio GitHub de este proyecto",
       },
     ],
     footer: {
       message: "Distribuido bajo la licencia CC BY.",
       copyright:
         "Copyright © 2022-presente Lucas de Uña Ocampo e Iván Salido Cobo",
+    },
+    notFound: {
+      title: "Página no encontrada",
+      quote: "Caminante, no hay camino, se hace camino al andar.",
+      linkLabel: "Volver al inicio",
+      linkText: "Volver al inicio",
     },
     lastUpdated: { text: "Actualizado por última vez" },
     docFooter: {

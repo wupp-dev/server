@@ -1,6 +1,5 @@
 ---
-title: Docker Mailserver
-lang: es-ES
+order: 2
 ---
 
 # Docker Mailserver - Correo electrónico

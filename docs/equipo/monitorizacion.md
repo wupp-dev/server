@@ -1,3 +1,8 @@
+---
+title: Monitorización
+order: 8
+---
+
 # Monitorizando el equipo y los servicios
 
 ::: info

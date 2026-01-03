@@ -1,6 +1,5 @@
 ---
-title: Navidrome
-lang: es-ES
+order: 5
 ---
 
 # Navidrome - Streaming de música

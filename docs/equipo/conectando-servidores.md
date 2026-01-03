@@ -1,6 +1,6 @@
 ---
-title: Conectando varios servidores
-lang: es-ES
+title: Conectando servidores
+order: 9
 ---
 
 # Conectando varios servidores

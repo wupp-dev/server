@@ -24,10 +24,8 @@
     "url": "https://github.com/wupp-dev/server/issues"
   },
   "homepage": "https://github.com/wupp-dev/server#readme",
-  "dependencies": {
-    "vitepress": "2.0.0-alpha.15"
-  },
   "devDependencies": {
-    "vue": "^3.5.26"
+    "vitepress": "2.0.0-alpha.15",
+    "vitepress-sidebar": "^1.33.1"
   }
 }
