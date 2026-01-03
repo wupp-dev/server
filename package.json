@@ -19,11 +19,15 @@
   ],
   "author": "Iván y Lucas",
   "license": "CC0-1.0",
+  "packageManager": "pnpm@10.27.0",
   "bugs": {
     "url": "https://github.com/wupp-dev/server/issues"
   },
   "homepage": "https://github.com/wupp-dev/server#readme",
   "dependencies": {
-    "vitepress": "^1.6.4"
+    "vitepress": "2.0.0-alpha.15"
+  },
+  "devDependencies": {
+    "vue": "^3.5.26"
   }
 }

@@ -25,3 +25,33 @@ features:
     title: Instalación y configuración del resto de servicios
     details: Cosas más específicas como la página web, el servidor de Minecraft, el correo electrónico, Nextcloud...
 ---
+
+<script setup>
+import { VPTeamMembers } from 'vitepress/theme'
+
+const members = [
+  {
+    avatar: 'https://www.github.com/ComicIvans.png',
+    name: 'Iván Salido Cobo',
+    title: 'Matemático',
+    links: [
+      { icon: 'github', link: 'https://github.com/ComicIvans' },
+      { icon: 'firefox', link: 'https://ivan.wupp.dev' }
+    ]
+  },
+  {
+    avatar: 'https://www.github.com/HipyCas.png',
+    name: 'Lucas de Uña Ocampo',
+    title: 'Ingeniero Informático',
+    links: [
+      { icon: 'github', link: 'https://github.com/HipyCas' },
+    ]
+  },
+]
+</script>
+
+## Nosotros
+
+Conoce a los creadores de WUPP.DEV.
+
+<VPTeamMembers size="medium" :members />

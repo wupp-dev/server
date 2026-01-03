@@ -1,7 +1,9 @@
-let guideSidebar = [
+import { defineConfig } from "vitepress";
+
+const guideSidebar = [
   {
     text: "Equipo",
-    collapsible: true,
+    collapsed: false,
     items: [
       { text: "Historia", link: "/equipo/historia" },
       { text: "Hardware", link: "/equipo/hardware" },
@@ -35,7 +37,7 @@ let guideSidebar = [
   },
   {
     text: "Servicios",
-    collapsible: true,
+    collapsed: false,
     items: [
       {
         text: "Nextcloud - Almacenamiento",
@@ -64,7 +66,7 @@ let guideSidebar = [
   },
   {
     text: "Relatos",
-    collapsible: true,
+    collapsed: false,
     items: [
       { text: "Bloqueo de SSH", link: "/relatos/bloqueo-ssh" },
       {
@@ -83,38 +85,33 @@ let guideSidebar = [
   },
 ];
 
-/**
- * @type {import('vitepress').SiteConfig}
- */
-export default {
-  title: "WUPP",
+export default defineConfig({
   title: "WUPP",
   description: "Guía del servidor.",
+  head: [["link", { rel: "icon", href: "/server/favicon.ico" }]],
   lang: "es-ES",
   base: "/server/",
+  cleanUrls: true,
+  appearance: true,
   lastUpdated: true,
-  // markdown: {
-  //   theme: "solarized-dark",
-  // },
   themeConfig: {
-    lastUpdatedText: "Actualizado por última vez",
+    logo: "/favicon.svg",
     nav: [
       { text: "Inicio", link: "/", activeMatch: "" },
       {
+        text: "Nosotros",
+        link: "/nosotros",
+        activeMatch: "^/nosotros$",
+      },
+      {
         text: "Guía del servidor",
         link: "/equipo/historia",
-        activeMatch: "/(equipo|servicios)/",
+        activeMatch: "^/(?!$|nosotros$)",
       },
       {
         text: "Archivos de configuración",
         link: "https://github.com/wupp-dev/server",
-      },
-    ],
-    socialLinks: [
-      { icon: "discord", link: "https://discord.gg/2pdbaf6Ugz" },
-      {
-        icon: "github",
-        link: "https://github.com/wupp-dev/",
+        target: "_blank",
       },
     ],
     sidebar: {
@@ -122,10 +119,55 @@ export default {
       "/servicios/": guideSidebar,
       "/relatos/": guideSidebar,
     },
+    socialLinks: [
+      {
+        icon: "github",
+        link: "https://github.com/wupp-dev/",
+        ariaLabel: "GitHub WUPP-DEV",
+      },
+    ],
     footer: {
       message: "Distribuido bajo la licencia CC BY.",
       copyright:
         "Copyright © 2022-presente Lucas de Uña Ocampo e Iván Salido Cobo",
     },
+    lastUpdated: { text: "Actualizado por última vez" },
+    docFooter: {
+      prev: "Página anterior",
+      next: "Página siguiente",
+    },
+    darkModeSwitchLabel: "Apariencia",
+    lightModeSwitchTitle: "Cambiar a modo claro",
+    darkModeSwitchTitle: "Cambiar a modo oscuro",
+    sidebarMenuLabel: "Menú",
+    returnToTopLabel: "Volver arriba",
+    skipToContentLabel: "Saltar al contenido",
+    externalLinkIcon: true,
+    search: {
+      provider: "local",
+      options: {
+        translations: {
+          button: {
+            buttonText: "Buscar",
+            buttonAriaLabel: "Buscar",
+          },
+          modal: {
+            displayDetails: "Mostrar detalles",
+            resetButtonTitle: "Restablecer",
+            backButtonTitle: "Volver",
+            noResultsText: "No se han encontrado resultados",
+            footer: {
+              selectText: "Seleccionar",
+              selectKeyAriaLabel: "Tecla Enter",
+              navigateText: "Navegar",
+              navigateUpKeyAriaLabel: "Tecla flecha arriba",
+              navigateDownKeyAriaLabel: "Tecla flecha abajo",
+              closeText: "Cerrar",
+              closeKeyAriaLabel: "Tecla Escape",
+            },
+          },
+        },
+      },
+    },
   },
-};
+});
