@@ -94,6 +94,9 @@ export default defineConfig({
   cleanUrls: true,
   appearance: true,
   lastUpdated: true,
+  sitemap: {
+    hostname: "https://wupp-dev.github.io/server/",
+  },
   themeConfig: {
     logo: "/favicon.svg",
     nav: [
