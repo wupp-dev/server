@@ -99,6 +99,7 @@ export default defineConfig({
   },
   themeConfig: {
     logo: "/favicon.svg",
+    outlineTitle: "En esta página",
     nav: [
       { text: "Inicio", link: "/", activeMatch: "" },
       {
