@@ -14,24 +14,20 @@ Para esta parte necesitarás:
 - Un ordenador con Internet.
 - Un pendrive de unos **4GB** vacío o con archivos que no te importe perder.
 - Una pantalla y teclado extra para el servidor.
-  :::
+:::
 
 Hay varias opciones para escoger como sistema operativo:
 
 - [Debian](https://www.debian.org/).
-- [Raspbian](https://www.raspbian.org/) _(para Raspberry)_.
+- [Raspberry Pi OS](https://www.raspberrypi.com/software/operating-systems/) _(para Raspberry)_.
 - [Ubuntu Server](https://ubuntu.com/download/server).
 - [Fedora Server](https://getfedora.org/en/server/).
 
 Esos son solo algunos ejemplos, pero hay muchas opciones. En nuestro caso, el servidor tuvo instalado al principio Ubuntu Server, pero Lucas se puso tonto, así que hubo que cambiarlo a **Debian**, que según él es mejor _(**Spoiler:** No ha probado Ubuntu Server)_.
 
-::: danger PELIGRO
-Toda persona que use Windows Server será perseguida y juzgada por sus crímenes contra la humanidad.
-:::
-
 ### Descarga y preparación del instalador de Debian
 
-Actualmente la versión de Debian del servidor es la 12, también llamada Bookworm. La forma más sencilla de instalarlo es descargar la ISO del principio de su [página de descarga](https://www.debian.org/download), ya que es un instalador muy ligero.
+Actualmente la versión de Debian del servidor es la 13, también llamada Trixie. La forma más sencilla de instalarlo es descargar la ISO del principio de su [página de descarga](https://www.debian.org/download), ya que es un instalador muy ligero.
 
 ::: warning ADVERTENCIA
 Esa ISO de Debian necesita que el servidor se pueda conectar a Internet en el momento de la instalación, así que ten preparado el cable para conectarlo.
@@ -47,22 +43,20 @@ Antes de instalar el sistema operativo, tenemos que hacer unos retoques en la UE
 
 Aquí hay **dos cambios muy importantes** que hacer:
 
-- **Desactivar**, si estuviera activado, el **Secure Boot**, ya que puede dar problemas para encender los ordenadores con Linux.
+- **Activar**, si estuviera desactivado, el **Secure Boot**, ya que nos aportará un extra de seguridad.
 - Establecer una **contraseña de administrador** de la UEFI.
 
 ::: info
 Puede que te encuentres con dos posibles contraseñas, la de **usuario** y la de **administrador**. La de usuario, si la creas, probablemente te la pida cada vez que el ordenador se encienda, cosa que no te conviene. La de administrador es la que nos interesa, que es la que se pide cuando se intenta acceder a la UEFI.
 :::
 
-Ahora hay que ir al apartado de **Boot** y cambiar el orden de inicio de los dispositivos para poner como primera opción el USB donde tenemos el instalador del sistema operativo.
-
 Una opción que nos puede interesar es la llamada `Restore on AC/Power loss`, que podremos encontrar por el apartado Boot o en avanzado. Podemos dejarla en `Last State` o `Memory` dependiendo de como salga, pero lo que viene a significar es que si se fuese la luz estando el ordenador encendido y luego volviese, el ordenador se encendería de nuevo. Esto es interesante por si hay un apagón y quieres que el servidor vuelva a estar encendido en cuanto vuelva la luz.
 
-Salimos guardando los cambios y el ordenador debería reiniciarse y mostrar el instalador del sistema.
+Salimos guardando los cambios y el ordenador debería reiniciarse y mostrar el instalador del sistema. Es posible que haya que seleccionar el pendrive como dispositivo de arranque manualmente, para ello habrá que pulsar una tecla concreta al encender el ordenador, como F12 o Esc, dependiendo del modelo.
 
 ## Instalación de Debian
 
-Así se verá nuestro instalador:
+Así se verá nuestro instalador *(si no lo han cambiado en las versiones posteriores)*:
 
 ![Instalador](../images/debian-inicio.png)
 
@@ -84,8 +78,8 @@ Puedes generar, guardar y gestionar contraseñas cómodamente con [Bitwarden](ht
 El usuario escogido en la guía es `admin`. Este nombre es de ejemplo y Debian no te dejará usarlo.
 :::
 
-1. La contraseña para el usuario `admin`. Una contraseña que sea buena, especialmente si vas a usar `sudo`, ya que sería equivalente a tener la contraseña de `root`.
-2. Configuración del reloj, de chill.
+5. La contraseña para el usuario `admin`. Una contraseña que sea buena, especialmente si vas a usar `sudo`, ya que sería equivalente a tener la contraseña de `root`.
+6. Configuración del reloj, de chill.
 
 Después de esto toca encriptar el disco de instalación.
 
@@ -95,9 +89,11 @@ Para no complicarnos la vida, aquí dejaremos que Debian haga la magia de gestio
 
 En el instalador, elegiremos el método de particionado **Guiado - utilizar todo el disco y configurar LVM cifrado**. Elegimos el disco donde queremos instalar el sistema operativo, que en nuestro caso es el SSD de 480GB y utilizamos como esquema de particionado **Todos los ficheros en una partición (recomendado para novatos)**.
 
+Si, como en nuestro caso, disponemos de un disco duro mecánico de gran tamaño, puede ser interesante utilizarlo para montar la partición `/var`, que es donde se almacenan los logs, archivos temporales del sistema y donde guardaremos los datos de nuestros servicios, que pueden llegar a ser bastante grandes. Lo único a tener en cuenta es que docker también almacena las imágenes en `/var/lib/docker`, por lo que si se van a usar contenedores docker, es recomendable mover esa carpeta al SSD, ya que notaremos un gran cambio en el rendimiento de los contenedores. Nosotros hicimos el cambio a posteriori, estando documentado en [Moviendo /var a otro disco](../relatos/moviendo-var.html).
+
 Ahora, si aprecias tu tiempo y no tenías archivos altamente sensibles en el disco donde vas a instalar Debian, puedes elegir no borrar el disco, ya que tardaría un buen rato.
 
-Tras eso, nos pedirá una **contraseña de cifrado** y esta sí que tiene que ser una tremenda contraseña. Igual o mejor que la de los usuarios.
+Tras eso, nos pedirá una **contraseña de cifrado** y esta sí que tiene que ser una tremenda contraseña. Mejor que la de los usuarios.
 
 Ahora toca lo interesante. Le decimos que use todo el disco para el particionado y nos aparecerá una lista con las particiones que se van a crear.
 
@@ -109,7 +105,7 @@ Las particiones más importantes son:
 - Una partición de **intercambio _(SWAP)_**, que se utiliza como una ampliación de la RAM.
 - Una partición `boot` que contiene los archivos necesarios para que el sistema operativo arranque.
 
-Se puede dejar tal y como está, pero nosotros hemos optado por usar `btrfs` en vez de `ext4` como sistema de archivos de la partición principal. Esto es por las grandes facilidades que da `btrfs` para hacer copias de seguridad del sistema al completo sin que ocupen casi espacio.
+Se puede dejar tal y como está, pero nosotros hemos optado por usar `btrfs` en vez de `ext4` como sistema de archivos de la partición principal. Esto es por las grandes facilidades que da `btrfs` para hacer copias de seguridad del sistema al completo sin que ocupen casi espacio (snapshots).
 
 Por suerte, cambiar el sistema de archivos es relativamente fácil, solo hay que ir a la línea donde aparece la palabra `ext4`, pulsar \<Intro\> y en **Utilizar como** elegir el sistema `btrfs`. Salimos y ahora debería aparecer `btrfs` en vez de `ext4` como sistema de archivos. Finalizamos el particionado confirmando que se hagan los cambios elegidos y empezará la instalación del sistema operativo.
 
@@ -123,10 +119,10 @@ Ahora nos dejará elegir unos cuantos paquetes extra que instalar, estos son los
 Si no quieres que se te quede la cara de tonto que se me quedó a mí ya en dos ocasiones, recuerda que para desmarcar opciones hay que usar \<Espacio\> y no \<Intro\>, que como le des sin querer te toca repetir todo el proceso de instalación.
 :::
 
-- Quitar el entorno de escritorio. El servidor no lo necesitará allá donde vas a dejarlo. _Salvo que vayas a configurar VNC._
+- Quitar el entorno de escritorio. El servidor no lo necesitará allá donde vas a dejarlo. _Salvo que vayas a configurar VNC o quieras terminar de configurarlo usando una interfaz gráfica._
 - Añadir el servidor SSH, que nos permitirá conectarnos al servidor remotamente desde otro dispositivo para hacer cualquier gestión.
 
-## Configuración básica y pequeñas mejoras
+## Instalando sudo
 
 Encendemos el servidor, iniciamos sesión con el nombre de usuario que creamos, con su contraseña y ya estaría.
 
@@ -173,74 +169,25 @@ admin  ALL=(ALL:ALL) ALL
 
 Donde `admin` será el usuario que creamos. Guardamos el archivo y ya podemos escribir `exit` para salirnos del usuario `root`. A partir de ahora lo normal será usar `sudo` para instalar cosas o editar archivos.
 
-### Optimizando el disco SSD
+## Añadiendo discos encriptados adicionales
 
-::: danger PELIGRO
-Ten cuidado con esta parte, ya que una configuración incorrecta puede causar que el ordenador deje de encenderse correctamente, con lo que tendrás que reiniciarlo en modo de recuperación, montar el sistema temporalmente y volver a cambiar la configuración.
-:::
+Si queremos utilizar algún disco duro adicional encriptado, necesitamos que se desencripte también y se monte al encenderse el servidor, así que vamos a ello.
 
-**Si tenemos el sistema operativo en un disco SSD SATA**, como es el caso, hay unos cambios que podemos hacer para mejorar el rendimiento y la durabilidad del disco, tenemos que editar `/etc/fstab`, concretamente la primera línea sin comentar, que debería ser la correspondiente al sistema de archivos `root`, añadiendo unas opciones extra para cuando se monte la partición:
+Vamos a asumir que tenemos el disco ya formateado en `btrfs` y encriptado con LUKS, así que utilzamos `lsblk` para identificarlo, que en este caso es `sdb1`.
 
 ```sh
-# /etc/fstab: static file system information.
-#
-# Use 'blkid' to print the universally unique identifier for a
-# device; this may be used with UUID= as a more robust way to name devices
-# that works even if disks are added and removed. See fstab(5).
-#
-# systemd generates mount units based on this file, see systemd.mount(5).
-# Please run 'systemctl daemon-reload' after making changes here.
-#
-# <file system>             <mount point>   <type>  <options>                                                                              <dump>  <pass>
-/dev/mapper/server--vg-root /               btrfs   defaults,subvol=@rootfs,ssd,noatime,space_cache,commit=120,compress=zstd,discard=async 0       0
-```
-
-**Si tenemos el sistema operativo en un disco SSD NVME M.2**, como es el caso para el servidor de Minecraft, podemos mejorar el rendimiento editando `/etc/fstab`, concretamente la primera línea sin comentar, que debería ser la correspondiente al sistema de archivos `root`, añadiendo unas opciones extra para cuando se monte la partición:
-
-```sh
-# /etc/fstab: static file system information.
-#
-# Use 'blkid' to print the universally unique identifier for a
-# device; this may be used with UUID= as a more robust way to name devices
-# that works even if disks are added and removed. See fstab(5).
-#
-# systemd generates mount units based on this file, see systemd.mount(5).
-# Please run 'systemctl daemon-reload' after making changes here.
-#
-# <file system>             <mount point>   <type>  <options>                                                                              <dump>  <pass>
-/dev/mapper/mcserver--vg-root /               btrfs   defaults,subvol=@rootfs,compress=zstd:1,discard=async 0       0
-```
-
-El resto de líneas que haya debajo las dejamos intactas.
-
-### Montando el disco grande al inicio
-
-Como tenemos un disco duro de 4TB que vamos a usar para almacenar archivos, necesitamos que se desencripte también y se monte al encenderse el servidor, así que vamos a ello.
-
-Si el disco es recién comprado, es probable que no tenga ninguna partición, así que habrá que crearla antes de poder hacer nada. Para ello, instalaremos GParted `apt install gparted` y lo primero que haremos es, si no tiene tabla de particiones, crear una tabla de particiones `gpt`.
-
-Ahora podremos localizar el disco, que en este caso es `sdb1`.
-
-```sh
-$ lsblk
+lsblk
 # NAME                    MAJ:MIN RM   SIZE RO TYPE  MOUNTPOINT
 # sda                       8:0    0 447,1G  0 disk
 # ├─sda1                    8:1    0   512M  0 part  /boot/efi
 # ├─sda2                    8:2    0   488M  0 part  /boot
 # └─sda3                    8:3    0 446,2G  0 part
 #   └─sda3_crypt          254:0    0 446,1G  0 crypt
-#     ├─server--vg-root   254:1    0 445,1G  0 lvm   /var/lib/docker/btrfs
 #     └─server--vg-swap_1 254:2    0   976M  0 lvm   [SWAP]
 # sdb                       8:16   0   3,6T  0 disk
 # └─sdb1                    8:17   0   3,6T  0 part
 # sr0                      11:0    1  1024M  0 rom
 ```
-
-Una vez hecho esto, si queremos encriptar el disco, tendremos que hacerlo desde la terminal, escribiendo `sudo cryptsetup luksFormat /dev/sdb1` y escribiendo la contraseña.
-
-Ahora toca desencriptar el disco con `sudo cryptsetup luksOpen /dev/sdb1 vault` y escribiendo la contraseña. Volvemos a GParted y creamos una nueva partición que ocupe todo el volumen del disco y elegimos como sistema de archivos `btrfs`. Hecho esto, podemos desencriptar el disco.
-
-Ya podemos hacer que el disco se desencripte y se monte al encenderse el ordenador :D
 
 Lo primero es que se desencripte, para ello tendremos que añadir el disco a `/etc/crypttab`, pero como ese queremos que se desencripte solo sin tener que ponerle nosotros la contraseña, tendremos que crear un archivo que servirá como contraseña para desencriptar el disco.
 
@@ -255,7 +202,7 @@ Lo que acabamos de hacer es crear un archivo con caracteres aleatorios _(como un
 Ahora hay que buscar la UUID del disco:
 
 ```sh
-$ ls -l /dev/disk/by-uuid
+ls -l /dev/disk/by-uuid
 # total 0
 # lrwxrwxrwx 1 root root 10 ago 10 17:47 0053a965-9146-4e52-b842-0ba1a756c4c5 -> ../../sda3
 # lrwxrwxrwx 1 root root 10 ago 10 17:47 1e28c433-5bf5-41e5-9708-5730bb18d0ef -> ../../dm-2
@@ -271,7 +218,7 @@ Que en este caso es `60e8d58f-cb05-47f1-85bc-38e5b0a05505`, así que vamos a edi
 vault UUID=60e8d58f-cb05-47f1-85bc-38e5b0a05505 /root/hdd_key luks
 ```
 
-Donde lo primero es el nombre que tendrá el volumen, lo segundo su UUID _(no olvidar comprobar que sea el correcto)_, lo tercero el archivo donde está la clave y lo cuarto especifica que utiliza LUKS.
+Donde lo primero es el nombre que tendrá el volumen, lo segundo su UUID, lo tercero el archivo donde está la clave y lo cuarto especifica que utiliza LUKS.
 
 Muy bien, con esto el disco se desencriptará al encenderse el servidor, solo nos queda añadirlo a `/etc/fstab` para que también se monte. Añadimos esta línea al final del archivo:
 
@@ -279,31 +226,165 @@ Muy bien, con esto el disco se desencriptará al encenderse el servidor, solo no
 /dev/mapper/vault /mnt/vault btrfs defaults,nofail 0 0
 ```
 
-Que hará que el disco se monte en `/mnt/vault` cuando se encienda el servidor. La opción `nofail` hace que, aunque no se pueda montar el disco, el ordenador se siga encendiendo en vez de fallar.
+Que hará que el disco se monte en `/mnt/vault` cuando se encienda el servidor. La opción `nofail` evita que el sistema bloquee el arranque si este disco no está disponible.
 
-### Alternativa de montaje del disco grande
+## Optimizando discos
 
-Hemos optado por mover toda la carpeta `/var` al disco duro grande por ser una carpeta donde se suelen almacenar logs y archivos más pesados. Para ello, vamos a montar directamente el disco grande en `/var`.
+::: danger PELIGRO
+Ten cuidado con esta parte, ya que una configuración incorrecta puede causar que el ordenador deje de encenderse correctamente, con lo que tendrás que reiniciarlo en modo de recuperación, montar el sistema temporalmente y volver a cambiar la configuración.
+:::
 
-Empezamos copiando todo el contenido al disco duro con `sudo cp -rf /var/* /mnt/vault/`. Después modificamos `/etc/fstab` para cambiar el punto de montaje del disco duro de `/mnt/vault` a `/var` y tenemos que reiniciar _daemon_ de _systemclt_ con `sudo systemctl daemon-reload`. Ahora podemos mover la actual carpeta a una copia y mantenerla durante un tiempo prudencial `sudo mv /var /var.old`, creamos la nueva carpeta `sudo mkdir /var` y remontamos el disco duro con `sudo umount /mnt/vault` y `sudo mount /dev/mapper/vault`.
+**Si tenemos el sistema operativo en un disco SSD SATA**, como es el caso, hay unos cambios que podemos hacer para mejorar el rendimiento y la durabilidad del disco, tenemos que editar `/etc/fstab`, concretamente la primera línea sin comentar, que debería ser la correspondiente a la partición `root`, añadiendo unas opciones extra para cuando se monte:
 
-Si después de esto obtuviésemos un error al usar `apt` similar a:
-
-```
-/usr/bin/mandb: can't chmod /var/cache/man/CACHEDIR.TAG: Operation not permitted
-/usr/bin/mandb: can't remove /var/cache/man/CACHEDIR.TAG: Permission denied
-/usr/bin/mandb: fopen /var/cache/man/28371: Permission denied
+```sh
+/dev/mapper/server--vg-root / btrfs  defaults,subvol=@rootfs,ssd,noatime,space_cache=v2,compress=zstd:2,discard=async,commit=30 0 0
 ```
 
-Podemos solucionarlo con `chown -R man: /var/cache/man/` y `chmod -R 755 /var/cache/man/`.
+Aquí detallamos lo que hace cada opción:
+- `ssd`: Fuerza el uso de heurísticas optimizadas para SSD *(normalmente btrfs ya lo detecta automáticamente)*.
+- `noatime`: Evita actualizar la fecha de último acceso a los archivos, reduciendo escrituras innecesarias.
+- `space_cache=v2`: Usa el formato moderno del space cache, recomendado y por defecto en kernels recientes.
+- `compress=zstd:2`: Activa compresión ZSTD con un buen equilibrio entre velocidad y ratio de compresión para SSD SATA.
+- `discard=async`: Habilita TRIM de forma asíncrona, mejorando el rendimiento y la longevidad del SSD.
+- `commit=30`: Aumenta el intervalo de escritura de metadatos a 30 segundos, reduciendo escrituras a costa de un mayor riesgo ante cortes de energía.
 
-También es posible que, después de eso, nos encontremos con que el servicio `lighdm` falla (posiblemente después de un reinicio). Lo podemos solucionar con `sudo chown -R lightdm:lightdm /var/lib/lightdm/` y `sudo chmod -R 755 /var/lib/lightdm/`.
+**Si tenemos el sistema operativo en un disco SSD NVME M.2**, como es el caso para el servidor de Minecraft, podemos utilizar las mismas opciones pero cambiando `compress=zstd:1`. En NVMe, niveles bajos de compresión suelen ofrecer el mejor equilibrio para cargas intensivas.
 
-Otra de las cosas que pueden ocurrir es que el servicio `binfmt-support` falle también después de un reinicio. Lo podemos solucionar con `mkdir /etc/systemd/system/binfmt-support.service.d` y creando el archivo `/etc/systemd/system/binfmt-support.service.d/override.conf` con:
+Para los **discos duros mecánicos con btrfs**, como el que vamos a usar para la partición `/var`, podemos usar estas opciones al montarlo:
 
+```sh
+/dev/mapper/vault /var btrfs  defaults,noatime,space_cache=v2,compress=zstd:3,nofail 0 0
 ```
+
+En HDD la compresión aporta más beneficios. Si el procesador lo permite, se puede subir a `5` o `7`, aunque `3` es un valor equilibrado y habitual.
+
+El resto de líneas que haya las dejamos intactas.
+
+## Desencriptando el sistema automáticamente
+
+### Con TPM 2.0
+
+Si tenemos un TPM 2.0 en el servidor, como es el caso del servidor de Minecraft, podemos hacer que el disco duro se desencripte automáticamente al encender el servidor sin necesidad de poner la contraseña.
+
+Lo primero es verificar que el disco duro *(la partición donde está el sistema)* está encriptado con LUKS2, para ello usamos:
+
+```sh
+sudo cryptsetup luksDump /dev/sda3 | grep Version
+```
+
+Debería salir `Version: 2`, si no es así, nos tocará cambiarla desde un pendrive con un Linux live y ejecutar `sudo cryptsetup convert --type luks2 /dev/sda3`.
+
+Ahora necesitamos instalar `clevis`:
+
+```sh
+sudo apt update
+sudo apt install clevis clevis-tpm2 clevis-luks clevis-initramfs
+```
+
+Y enlazar el volumen LUKS con el TPM:
+
+```sh
+sudo clevis luks bind -d /dev/sda3 tpm2 '{"pcr_bank":"sha256","pcr_ids":"2,7,11,12,14"}'
+```
+
+Los PCRs usados son los siguientes:
+
+- `2` **Hardware conectable (pluggable hardware):** Registra cambios en la enumeración de dispositivos detectados durante el arranque temprano (PCIe, USB, Thunderbolt, controladoras, NICs, HBAs, etc.). Cambia ante modificaciones físicas relevantes del sistema, lo que permite bloquear el arranque automático si se altera el hardware.
+- `7` **Secure Boot policy:** Mide si Secure Boot está habilitado y qué claves UEFI (PK, KEK, db, dbx) están activas. Garantiza que el arranque solo se desbloquee si se mantiene la política de Secure Boot esperada.
+- `11` **Imagen EFI del kernel y payload asociado:** Mide el binario EFI cargado por el cargador de arranque, incluyendo el kernel como PE y cualquier initrd embebido. Detecta manipulaciones del kernel sin verse afectado por actualizaciones normales en la mayoría de configuraciones estándar.
+- `12` **Parámetros del kernel (cmdline):** Registra la línea de comandos del kernel. Protege frente a cambios en parámetros críticos (`init=`, `root=`, desactivación de mitigaciones, etc.), a costa de requerir la clave si se modifica la configuración de arranque.
+- `14` **Shim y primeros componentes UEFI:** Mide el binario `shim` y el inicio de la cadena de confianza UEFI. Asegura que el proceso de arranque comienza desde componentes firmados y no manipulados.
+
+Hay muchos más PCRs, pero se han seleccionado estos para equilibrar seguridad y estabilidad: el sistema se desencripta automáticamente en arranques normales, pero requiere la clave si se manipula el hardware, Secure Boot o la cadena de arranque, evitando bloqueos innecesarios por actualizaciones legítimas del sistema.
+
+Ahora actualizamos el initramfs para que los cambios tengan efecto:
+
+```sh
+sudo update-initramfs -u -k all
+```
+
+Y verificamos:
+
+```sh
+sudo clevis luks list -d /dev/sda3
+```
+
+Con esto, al reiniciar el servidor, el disco debería desencriptarse automáticamente usando el TPM.
+
+### Sin TPM 2.0
+
+Si tenemos un TPM 1.2, podemos utilizar [esta release](https://github.com/oldium/clevis/releases/tag/v21_tpm1u7) de clevis que soporta TPM 1.2, pero a nosotros nos dio problemas el propio TPM, así que tomamos otro enfoque.
+
+Aprovechando que que tenemos el servidor de Minecraft que sí se desencripta solo, creamos un servicio de systemd que, al iniciarse el servidor, use `ssh` para conectarse al servidor principal y desencripte el disco. Para ello, hay que haber configurado Dropbear en el servidor principal *(ver [Reinicios y desencriptación del disco](./gestion-remota.html#reinicios-y-desencriptacion-del-disco))* y tener añadida la clave del servidor de Minecraft para que se pueda conectar.
+
+Con todo eso, creamos un archivo llamado `/usr/local/bin/auto_unlock_server.sh` con el siguiente contenido:
+
+```sh
+#!/bin/bash
+
+# CONFIGURACIÓN
+TARGET_IP="192.168.1.XXX"           # IP del servidor
+TARGET_PORT="2222"                  # El puerto dropbear configurado en servidor
+KEY_PATH="/root/.ssh/id_ed25519"    # Ruta a la clave privada para autenticación SSH
+LUKS_PASSWORD="CONTRASEÑA_DE_LUKS"  # Cuidado con los caracteres especiales como $ o !
+
+# COMPROBACIÓN DE PUERTO
+# nc (netcat) verifica si el puerto está abierto. 
+# -z: modo escaneo (sin enviar datos), -w 2: timeout de 2 segundos
+if nc -z -w 2 "$TARGET_IP" "$TARGET_PORT"; then
+    echo "El servidor está esperando desbloqueo. Intentando desbloquear..."
+
+    # COMANDO DE DESBLOQUEO
+    # Añade -o StrictHostKeyChecking=no si Dropbear está en el mismo puerto que OpenSSH
+    printf '%s' "$LUKS_PASSWORD" | ssh -p "$TARGET_PORT" -i "$KEY_PATH" \
+        -o ConnectTimeout=10 \
+        -o UserKnownHostsFile=/dev/null \
+        root@"$TARGET_IP" "cryptroot-unlock"
+    
+    if [ $? -eq 0 ]; then
+        echo "Comando enviado correctamente."
+    else
+        echo "Fallo al enviar el comando de desbloqueo."
+    fi
+else
+    echo "Puerto $TARGET_PORT cerrado o inalcanzable. El servidor probablemente ya está encendido o apagado."
+fi
+```
+
+Nos aseguramos de que solo root pueda leerlo con `sudo chmod 700 /usr/local/bin/auto_unlock_server.sh`.
+
+Y ahora creamos un servicio de systemd en `/etc/systemd/system/auto-unlock-server.service` con este contenido:
+
+```ini
 [Unit]
-RequiresMountsFor=/var
+Description=Verificar y desbloquear servidor
+After=network.target
+
+[Service]
+Type=oneshot
+ExecStart=/bin/bash /usr/local/bin/auto_unlock_server.sh
+User=root
 ```
 
-Que hará que el servicio se inicie una vez se haya montado la partición `/var`.
+Y un temporizador en `/etc/systemd/system/auto-unlock-server.timer`:
+
+```ini
+[Unit]
+Description=Ejecutar desbloqueo de servidor cada 5 minutos
+
+[Timer]
+# Ejecutar 1 minuto después de arrancar el servidor
+OnBootSec=1min
+# Ejecutar cada 5 minutos después de la última ejecución
+OnUnitActiveSec=5min
+
+[Install]
+WantedBy=timers.target
+```
+
+Finalmente, activamos el servicio y el temporizador:
+
+```sh
+sudo systemctl daemon-reload
+sudo systemctl enable --now auto-unlock-server.timer
+```
