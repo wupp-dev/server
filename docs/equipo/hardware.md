@@ -15,7 +15,7 @@ Los datos sobre este servidor son menos precisos, pero son lo suficientemente in
 
 - **CPU:** [Intel Xeon E3-1230 v2 Quad 3,3GHz](https://www.intel.la/content/www/xl/es/products/sku/65732/intel-xeon-processor-e31230-v2-8m-cache-3-30-ghz/specifications.html)
 - **CPU Cooler:** _Por defecto_
-- **Placa base:** Asus TUF Gaming A620M-PLUS
+- **Placa base:** Fujitsu D3167-A11 GS1 ATX Mainboard
 - **GPU:** _Desconocida_
 - **RAM:** 24GB DDR3
 - **SSD:** Kingston A400 SATA 480GB
@@ -53,6 +53,11 @@ Este servidor se montó comprando los componentes individuales, así que esta es
 - **Caja:** [Cooler Master MasterBox Q300L](https://www.coolermaster.com/la/es-la/catalog/cases/mini-tower/masterbox-q300l/)
 
 Este servidor costó en total 928,96€.
+
+::: info
+Aunque nosotros no lo consideramos, si el servidor va a almacenar datos importantes, utilizar máquinas virtuales y queremos garantizar la estabilidad e integridad del sistema, es recomendable comprar una memoria RAM con ECC (Error-Correcting Code). La RAM ECC corrige errores de memoria silenciosos que, aunque poco frecuentes, existen y pueden provocar corrupción de datos con el tiempo. Aunque, junto a esta decisión, se debería de considerar el uso de varios discos duros con un sistema de archivos RAID o ZFS con snapshots para mayor seguridad.
+:::
+
 
 ## Hardware externo
 
