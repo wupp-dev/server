@@ -1,0 +1,28 @@
+services:
+  tandoor-db:
+    restart: unless-stopped
+    image: postgres:16-alpine
+    volumes:
+      - ${DB_DATA_LOCATION:-/var/tandoor/postgres}:/var/lib/postgresql/data
+    networks:
+      - tandoor
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+
+  tandoor:
+    image: vabene1111/recipes
+    restart: unless-stopped
+    depends_on:
+      - tandoor-db
+    ports:
+      - 30192:80
+    volumes:
+      - ${STATIC_FILES_LOCATION:-/var/tandoor/staticfiles}:/opt/recipes/staticfiles
+      - ${MEDIA_FILES_LOCATION:-/var/tandoor/mediafiles}:/opt/recipes/mediafiles
+    networks:
+      - tandoor
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+
+networks:
+  tandoor:

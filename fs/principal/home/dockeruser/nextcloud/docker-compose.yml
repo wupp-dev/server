@@ -1,0 +1,62 @@
+services:
+  nextcloud-db:
+    image: postgres
+    restart: always
+    volumes:
+      - /var/lib/nextcloud/postgresql/data:/var/lib/postgresql:Z
+    networks:
+      - nextcloud
+
+  nextcloud-redis:
+    image: redis
+    restart: unless-stopped
+    command: redis-server --requirepass ${REDIS_PASSWORD}
+    networks:
+      - nextcloud
+
+  nextcloud:
+    image: nextcloud:${NEXTCLOUD_VERSION}-fpm
+    restart: unless-stopped
+    depends_on:
+      - nextcloud-db
+      - nextcloud-redis
+    environment:
+      - POSTGRES_HOST=nextcloud-db
+      - REDIS_HOST=nextcloud-redis
+      - REDIS_HOST_PORT=6379
+      - REDIS_HOST_PASSWORD=${REDIS_PASSWORD}
+      - PHP_MEMORY_LIMIT=50G
+      - PHP_UPLOAD_LIMIT=50G
+    ports:
+      - "127.0.0.1:${PORT_NEXTCLOUD}:9000"
+    volumes:
+      - /var/www/nextcloud:/var/www/html
+      - /var/www/nextcloud/manual-php.ini:/usr/local/etc/php/conf.d/manual-php.ini
+    networks:
+      - nextcloud
+
+  nextcloud-cron:
+    image: nextcloud:fpm
+    restart: always
+    depends_on:
+      - nextcloud-db
+      - nextcloud-redis
+    volumes:
+      - /var/www/nextcloud:/var/www/html
+    entrypoint: /cron.sh
+    networks:
+      - nextcloud
+
+  nextcloud-imaginary:
+    image: nextcloud/aio-imaginary:latest
+    restart: always
+    ports:
+      - "127.0.0.1:${PORT_NEXTCLOUD_IMAGINARY}:9000"
+    command: -concurrency 20 -enable-url-source -return-size
+    cap_add:
+      - SYS_NICE
+    networks:
+      - nextcloud
+
+networks:
+  nextcloud:

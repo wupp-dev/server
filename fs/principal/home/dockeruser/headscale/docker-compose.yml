@@ -1,0 +1,41 @@
+services:
+  headscale:
+    image: docker.io/headscale/headscale:<VERSION>
+    restart: unless-stopped
+    container_name: headscale
+    ports:
+      - "127.0.0.1:8080:8080"
+      - "127.0.0.1:9090:9090"
+    volumes:
+      # Please set <HEADSCALE_PATH> to the absolute path
+      # of the previously created headscale directory.
+      - ${HEADSCALE_PATH:-/var/headscale}/config:/etc/headscale
+      - ${HEADSCALE_PATH:-/var/headscale}/lib:/var/lib/headscale
+      - ${HEADSCALE_PATH:-/var/headscale}/run:/var/run/headscale
+    command: serve
+    healthcheck:
+      test: ["CMD", "headscale", "health"]
+
+  headplane:
+    image: ghcr.io/tale/headplane:latest
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    volumes:
+      # Same as before
+      - "${HEADPLANE_PATH:-/var/headplane}/config.yaml:/etc/headplane/config.yaml"
+      - "${HEADPLANE_PATH:-/var/headplane}/storage:/var/lib/headplane"
+
+      # A shared path to the Headscale config file. It is important that the
+      # path you mount this on matches `headscale.config_path` in your
+      # Headplane config.yaml file.
+      - "${HEADSCALE_PATH:-/var/headscale}/config/config.yaml:/etc/headscale/config.yaml"
+
+      # If you are using dns.extra_records in Headscale (recommended), you
+      # should also mount that file here so Headplane can read and write it.
+      # Ensure that the path matches `headscale.dns_records_path` in your
+      # Headplane config.yaml file.
+      - "${HEADSCALE_PATH:-/var/headscale}/config/dns_records.json:/etc/headscale/dns_records.json"
+
+      # Read-only access to the Docker socket (or a proxy)
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"

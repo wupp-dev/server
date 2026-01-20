@@ -1,81 +1,37 @@
 version: "3.9"
 
+include:
+  - formbricks/docker-compose.yml
+  - immich/docker-compose.yml
+  - mailserver/docker-compose.yml
+  - monitor/docker-compose.yml
+  - navidrome/docker-compose.yml
+  - nextcloud/docker-compose.yml
+  - readeck/docker-compose.yml
+  - tandoor/docker-compose.yml
+  - umami/docker-compose.yml
+  - vaultwarden/docker-compose.yml
+
 services:
-  nextcloud-db:
-    image: postgres
-    restart: always
+  adminer:
+    image: adminer
+    ports:
+      - "127.0.0.1:${PORT_ADMINER}:8080"
+    networks:
+      - formbricks
+      - immich
+      - nextcloud
+      - readeck
+      - tandoor
+      - umami
+
+  watchtower:
+    image: containrrr/watchtower
+    restart: unless-stopped
     environment:
-      - POSTGRES_USER=nextcloud
-      - POSTGRES_PASSWORD=pwd
-      - POSTGRES_DB=nextcloud
+      WATCHTOWER_LABEL_ENABLE: true # only update those with image (excludes amp and customs)
+      WATCHTOWER_CLEANUP: true # clean old image after update
+      WATCHTOWER_NOTIFICATION_REPORT: true
+      WATCHTOWER_SCHEDULE: "0 0 5 * * *" # update images everyday at 5:00
     volumes:
-      - /var/lib/nextcloud/postgresql/data:/var/lib/postgresql:Z
-
-  nextcloud-redis:
-    image: redis
-    command: redis-server --requirepass pwd
-
-  nextcloud:
-    image: nextcloud:fpm
-    restart: always
-    depends_on:
-      - nextcloud-db
-      - nextcloud-redis
-    environment:
-      - POSTGRES_HOST=nextcloud-db
-      - NEXTCLOUD_TRUSTED_DOMAINS=cloud.wupp.dev
-      - REDIS_HOST=nextcloud-redis
-      - REDIS_HOST_PORT=6379
-      - REDIS_HOST_PASSWORD=pwd
-      - PHP_MEMORY_LIMIT=50G
-      - PHP_UPLOAD_LIMIT=50G
-    ports:
-      - 9000:9000
-    volumes:
-      - /var/www/nextcloud:/var/www/html
-
-  nextcloud-cron:
-    image: nextcloud:fpm
-    restart: always
-    depends_on:
-      - nextcloud-db
-      - nextcloud-redis
-    volumes:
-      - /var/www/nextcloud:/var/www/html
-    entrypoint: /cron.sh
-
-  nextcloud-imaginary:
-    image: nextcloud/aio-imaginary:latest
-    restart: always
-    ports:
-      - 9090:9000
-    command: -concurrency 20 -enable-url-source -return-size
-    cap_add:
-      - SYS_NICE
-
-  mailserver:
-    image: mailserver/docker-mailserver
-    container_name: mailserver
-    restart: always
-    env_file: mailserver.env
-    ports:
-      - "25:25" # SMTP  (explicit TLS => STARTTLS)
-      - "143:143" # IMAP4 (explicit TLS => STARTTLS)
-      - "465:465" # ESMTP (implicit TLS)
-      - "587:587" # ESMTP (explicit TLS => STARTTLS)
-      - "993:993" # IMAP4 (implicit TLS)
-    volumes:
-      - /var/dms/mail-data/:/var/mail/
-      - /var/dms/mail-state/:/var/mail-state/
-      - /var/dms/mail-logs/:/var/log/mail/
-      - /var/dms/config/:/tmp/docker-mailserver/
-      - /etc/localtime:/etc/localtime:ro
-      - /etc/letsencrypt:/etc/letsencrypt
-    hostname: mail.wupp.dev
-    stop_grace_period: 1m
-    cap_add:
-      - NET_ADMIN
-    healthcheck:
-      test: "ss --listening --tcp | grep -P 'LISTEN.+:smtp' || exit 1"
-      timeout: 3s
-      retries: 0
+      - /var/run/docker.sock:/var/run/docker.sock

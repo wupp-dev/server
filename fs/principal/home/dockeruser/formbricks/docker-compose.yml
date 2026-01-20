@@ -1,0 +1,29 @@
+services:
+  formbricks:
+    image: ghcr.io/formbricks/formbricks:latest
+    restart: unless-stopped
+    depends_on:
+      - formbricks-postgres
+    ports:
+      - "127.0.0.1:${PORT_FORMBRICKS}:3000"
+    volumes:
+      - ${UPLOAD_LOCATION:-/var/formbricks/uploads}:/home/nextjs/apps/web/uploads/
+    networks:
+      - formbricks
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+
+  formbricks-postgres:
+    image: pgvector/pgvector:pg17
+    restart: unless-stopped
+    volumes:
+      - ${DB_DATA_LOCATION:-/var/formbricks/postgres}:/var/lib/postgresql/data
+    expose:
+      - 5432
+    networks:
+      - formbricks
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+
+networks:
+  formbricks:

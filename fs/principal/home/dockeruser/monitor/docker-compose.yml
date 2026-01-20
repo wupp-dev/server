@@ -1,0 +1,50 @@
+services:
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    restart: unless-stopped
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /dev/disk/:/dev/disk:ro
+    ports:
+      - "127.0.0.1:${PORT_CADVISOR}:8080"
+
+  prometheus:
+    image: prom/prometheus
+    restart: unless-stopped
+    volumes:
+      - "./prometheus/data:/prometheus" # Persist data
+      - "./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml"
+    network_mode: "host"
+
+  grafana:
+    image: grafana/grafana
+    restart: unless-stopped
+    user: "1001:1001"
+    volumes:
+      - "./grafana/data:/var/lib/grafana"
+    env_file:
+      - ".env.d/grafana.env"
+    network_mode: "host"
+
+  loki:
+    image: grafana/loki
+    restart: unless-stopped
+    user: "1001:1001" # Necesario para que pueda acceder a los archivos de config creados
+    volumes:
+      - "./loki/loki-config.yaml:/etc/loki/local-config.yaml"
+      - "./loki/loki-data:/loki"
+    network_mode: "host" # Como antes, tenemos que darle acceso al host para poder contactar con promtail correctamente
+
+  promtail:
+    image: grafana/promtail
+    restart: unless-stopped
+    user: "1001:4"
+    volumes:
+      - "/var/log:/var/log"
+      - "/var/www/nextcloud/data/nextcloud.log:/var/www/nextcloud/data/nextcloud.log"
+      - "./loki/promtail:/mnt/config"
+    command: "-config.file=/mnt/config/promtail-config.yaml"
+    network_mode: "host"

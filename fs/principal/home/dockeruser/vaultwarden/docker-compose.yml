@@ -1,0 +1,15 @@
+services:
+  vaultwarden:
+    image: vaultwarden/server:latest
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${PORT_VAULTWARDEN}:80"
+    volumes:
+      - ${DATA_LOCATION:-/var/vw-data}:/data
+    networks:
+      - vaultwarden
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+
+networks:
+  vaultwarden:

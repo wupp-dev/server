@@ -1,0 +1,20 @@
+services:
+  navidrome:
+    image: deluan/navidrome:latest
+    user: 1001:1001
+    restart: unless-stopped
+    volumes:
+      - /var/navidrome-music:/music:ro
+      - /var/navidrome-data:/data
+    ports:
+      - "127.0.0.1:${PORT_NAVIDROME}:4533"
+    environment:
+      - ND_LOGLEVEL=info
+      - ND_CONFIGFILE=/data/navidrome.toml
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+    networks:
+      - navidrome
+
+networks:
+  navidrome:
