@@ -11,8 +11,6 @@ Minio es un servicio de almacenamiento de alto rendimiento compatible con el sis
 La configuración de Docker para Minio es relativamente sencilla, en el `docker-compose.yml` escribimos lo siguiente:
 
 ```yml
-version: "3"
-
 services:
   minio:
     image: minio/minio

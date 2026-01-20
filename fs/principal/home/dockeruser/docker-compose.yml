@@ -1,5 +1,3 @@
-version: "3.9"
-
 include:
   - formbricks/docker-compose.yml
   - immich/docker-compose.yml

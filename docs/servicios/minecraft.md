@@ -22,8 +22,6 @@ Vamos a empezar creando la base de datos de MariaDB que usarán algunos plugins 
 Desde el usuario `dockeruser`, editamos el `docker-compose.yml` con el contenido:
 
 ```yml
-version: "3"
-
 services:
   mariadb:
     image: mariadb
