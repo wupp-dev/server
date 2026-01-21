@@ -1,10 +1,10 @@
 [Unit]
-Description=Run DDNS update every 14 minutes
+Description=Run DDNS update every 10 minutes
 Requires=ddns-update.service
 
 [Timer]
 Unit=ddns-update.service
-OnUnitInactiveSec=14m
+OnUnitInactiveSec=10m
 AccuracySec=1s
 
 [Install]
