@@ -1,0 +1,8 @@
+[Unit]
+Description=Verificar y desbloquear servidor
+After=network.target
+
+[Service]
+Type=oneshot
+ExecStart=/bin/bash /usr/local/bin/auto_unlock_server.sh
+User=root

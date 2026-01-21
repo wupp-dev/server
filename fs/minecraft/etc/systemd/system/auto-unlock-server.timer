@@ -1,0 +1,11 @@
+[Unit]
+Description=Ejecutar desbloqueo de servidor cada 5 minutos
+
+[Timer]
+# Ejecutar 1 minuto después de arrancar el servidor
+OnBootSec=1min
+# Ejecutar cada 5 minutos después de la última ejecución
+OnUnitActiveSec=5min
+
+[Install]
+WantedBy=timers.target

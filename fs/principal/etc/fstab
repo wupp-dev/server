@@ -7,12 +7,10 @@
 # systemd generates mount units based on this file, see systemd.mount(5).
 # Please run 'systemctl daemon-reload' after making changes here.
 #
-# <file system> <mount point>   <type>  <options>       <dump>  <pass>
-/dev/mapper/server--vg-root /               btrfs   defaults,subvol=@rootfs,ssd,noatime,space_cache,commit=120,compress=zstd,discard=async 0       0
-# /boot was on /dev/sda2 during installation
-UUID=eb777051-9d3a-4bf9-a186-fdfcc9d5c9c0 /boot           ext2    defaults        0       2
-# /boot/efi was on /dev/sda1 during installation
-UUID=E283-990E  /boot/efi       vfat    umask=0077      0       1
-/dev/mapper/server--vg-swap_1 none            swap    sw              0       0
-/dev/sr0        /media/cdrom0   udf,iso9660 user,noauto     0       0
-/dev/mapper/vault /var btrfs defaults,nofail 0 0
+# <file system>                            <mount point>  <type>       <options>                                                                                   <dump> <pass>
+/dev/mapper/server--vg-root                /              btrfs        defaults,subvol=@rootfs,ssd,noatime,space_cache=v2,compress=zstd:2,discard=async,commit=30  0      0
+UUID=eb777051-9d3a-4bf9-a186-fdfcc9d5c9c0  /boot          ext2         defaults                                                                                    0      2
+UUID=E283-990E                             /boot/efi      vfat         umask=0077                                                                                  0      1
+/dev/mapper/server--vg-swap_1              none           swap         sw                                                                                          0      0
+/dev/sr0                                   /media/cdrom0  udf,iso9660  user,noauto                                                                                 0      0
+/dev/mapper/vault                          /var           btrfs        defaults,noatime,space_cache=v2,compress=zstd:3,nofail                                      0      0
