@@ -11,7 +11,7 @@ Esta sección incluye todas las cosas que hay que hacer en el servidor antes de 
 
 Un servidor es un ordenador al que no quieres tenerle conectado ni un monitor ni un teclado _(el ratón no existe)_ porque no deberías tener que tocarlo directamente salvo para el mantenimiento físico y cambios en la UEFI o en el sistema operativo.
 
-Pero sí que hay que conectarse a él habitualmente para instalar y desinstalar software y para configurarlo. Esto lo haremos desde otro dispositivo usando el protocolo _Secure Shell (SSH)_, que nos permitirá ejecutar comandos en el servidor, transferir archivos y otras cosas más chulas que veremos después. Todo ello con una conexión cifrada :D
+Pero sí que hay que conectarse a él habitualmente para instalar y desinstalar software y para configurarlo. Esto lo haremos desde otros dispositivos usando el protocolo _Secure Shell (SSH)_, que nos permitirá ejecutar comandos en el servidor, transferir archivos y otras cosas más chulas que veremos después. Todo ello con una conexión cifrada :D
 
 Es aquí donde se nos plantea un gran problema: Cuando nos podemos conectar al servidor mediante SSH es cuando está encendido _(y con los discos desencriptados)_, pero ¿y si no estamos en casa y el ordenador se ha tenido que reiniciar o ha habido un apagón? Entonces el ordenador se quedaría esperando a que pusiéramos _(¡con un teclado!)_ la contraseña para desencriptar los discos y así poder seguir encendiéndose. Eso no mola. Deberíamos de poder desencriptar el ordenador remotamente también para no tener miedo.
 
@@ -27,14 +27,14 @@ Vamos a empezar dejando lista nuestra vía para poder gestionar remotamente el s
 
 Como lo elegimos a la hora de instalar Debian, el servidor ya viene con OpenSSH Server instalado, que por defecto se ejecuta en el puerto `22`.
 
-::: warning ADVERTENCIA
-Es recomendable no usar el puerto 22 para SSH, porque, al ser el puerto por defecto, muchos ataques automatizados solo intentan conectarse a ese puerto, así que cambiándolo a otro nos quitamos ruido de fondo. Quien quiera averiguar en qué puerto tienes el SSH podrá hacerlo con un escaneo de puertos igualmente, pero ya tendrá que querer atacarte a ti en concreto.
+::: info
+Puedes elegir no usar el puerto 22 para SSH para evitar los ataques automatizados que intentan entrar en los servidores a través de ese puerto por defecto. Sin embargo, si realizas toda la configuración de esta página y limitas la autenticación al uso de claves públicas, no hay ningún problema en usar el puerto 22 salvo porque puedas tener algo más de "ruido" en los logs.
 :::
 
 Sin embargo, si intentamos conectarnos desde otro ordenador, no nos dejará, por dos motivos:
 
-- Tenemos que abrir el puerto en el router.
-- Tenemos que permitirlo en el firewall _(si tenemos)_.
+- Tenemos que abrir el puerto en el router *(si no lo hicimos antes)*.
+- Tenemos que permitirlo en el firewall *(si tenemos uno)*.
 
 Así que lo que hay que hacer es primero abrir el puerto SSH en el router y, si tenemos un firewall, permitirlo también. **Si no tenemos un firewall, vamos a instalarlo porque es necesario.** Para ello ejecutamos los siguientes comandos:
 
@@ -46,7 +46,7 @@ sudo ufw enable
 
 Donde `22` es el puerto de SSH y `tcp` el protocolo. Con esto ya tenemos el firewall configurado para aceptar conexiones SSH.
 
-Ahora ya podríamos conectarnos al servidor desde otro ordenador, con con la contraseña del usuario administrador. Eso quiere decir que alguien que conozca el nombre del usuario puede ponerse a intentar probar contraseñas, cosa que queremos evitar, así que vamos a utilizar la autenticación por clave pública.
+Ahora ya podríamos conectarnos al servidor desde otro ordenador utilizando la contraseña del usuario. Eso quiere decir que alguien (o algo) puede ponerse probar contraseñas a ver si acierta y compromete nuestro servidor, cosa que queremos evitar, así que vamos a utilizar la autenticación por clave pública.
 
 ![Conexión SSH](../images/conexion-ssh.jpg)
 
@@ -54,13 +54,15 @@ Para configurarla en el ordenador del que nos vayamos a conectar, seguiremos [es
 
 ## Reinicios y desencriptación del disco
 
-Para solucionar el problema que planteamos antes, existe un paquete de Debian llamado `dropbear-initramfs` que nos va a permitir hacer justo lo que queremos. **¿Qué es lo que hace?** Pues para eso hay que entender un poco cómo se enciende un ordenador con Linux y los discos encriptados.
+Además de poder configurar el desencriptado automático descrito [aquí](/equipo/sistema-encriptado#desencriptando-el-sistema-automaticamente), tenemos que tener alguna forma de conectarnos y desencriptar el disco remotamente en caso de que el servidor se reinicie o se apague por cualquier motivo y el método automático falle.
+
+Para ello, existe un paquete de Debian llamado `dropbear-initramfs` que nos va a permitir hacer justo lo que queremos. **¿Qué es lo que hace?** Pues para eso hay que entender un poco cómo se enciende un ordenador con Linux y los discos encriptados.
 
 El disco duro realmente no está encriptado del todo, tiene una partición llamada boot que únicamente contiene la información necesaria para decirle al ordenador cuando se intenta encender cómo debe hacerlo. Aquí entra el sistema `initrd`, que son los archivos básicos que se cargan en la RAM cuando el ordenador se enciende y que, junto con el kernel de Linux, se ocupan de gestionar el encendido. Puedes ver una descripción más detallada en [esta página](https://wiki.ubuntu.com/Initramfs).
 
-Teniendo en cuenta lo anterior, `dropbear-initramfs` es un software que permite que el servidor reciba conexiones SSH en esta fase del encendido, justo a tiempo para poner la contraseña para desencriptar los discos.
+Teniendo en cuenta lo anterior, `dropbear-initramfs` es un software que permite que el servidor reciba conexiones SSH en esta fase del encendido, justo a tiempo para introducir la contraseña para desencriptar los discos.
 
-Instalarlo es muy sencillo, solo hay que irse a la terminal del servidor e instalarlo como un paquete normal y corriente escribiendo
+Se instala como cualquier otro paquete normal y corriente escribiendo:
 
 ```sh
 sudo apt install dropbear-initramfs
@@ -68,18 +70,18 @@ sudo apt install dropbear-initramfs
 
 **¿Eso es todo?** Obviamente no, hay que configurarlo.
 
-Vamos a editar el archivo de configuración, que está en `/etc/dropbear-initramfs/config` (o `/etc/dropbear/initramfs/dropbear.conf` dependiendo de la versión) y vamos a descomentar y editar la línea:
+Vamos a editar el archivo de configuración, que está en `/etc/dropbear/initramfs/dropbear.conf` y vamos a descomentar y editar la línea:
 
 ```ssh-config
-DROPBEAR_OPTIONS="-I 300 -j -k -p 22 -s"
+DROPBEAR_OPTIONS="-I 300 -j -k -p 2222 -s"
 ```
 
 ¿Qué significa esto?
 
-- `-i 300` desconecta a quien en 300 segundos no ha realizado ninguna acción.
+- `-I 300` desconecta a quien en 300 segundos no ha realizado ninguna acción.
 - `-j` deshabilita la redirección de puertos locales.
 - `-k` deshabilita la redirección de puertos remotos.
-- `-p 22` indica que se ejecute en el puerto 22.
+- `-p 2222` indica que se ejecute en el puerto 2222. Es recomendable cambiarlo a otro puerto distinto al de OpenSSH Server para evitar conflictos.
 - `-s` deshabilita la autenticación por contraseña.
 
 Como indica el último parámetro, la autenticación por contraseña está deshabilitada, así que utilizaremos también las claves públicas que hayamos autorizado para OpenSSH Server, podemos copiarlas y hacer que los cambios tengan efecto con los comandos:
@@ -89,15 +91,19 @@ sudo cp /home/admin/.ssh/authorized_keys /etc/dropbear-initramfs/
 sudo update-initramfs -u
 ```
 
+::: warning ADVERTENCIA
+Si en algún momento añades o modificar las claves autorizadas para conectarte a OpenSSH Server, recuerda copiar el archivo de nuevo y ejecutar `sudo update-initramfs -u` para que los cambios tengan efecto en Dropbear.
+:::
+
 Esto generará de nuevo en la partición `boot` los archivos de `initramfs` incluyendo los cambios que hemos hecho.
 
-::: tip RELATO
+::: tip MINI-RELATO
 Tras esto descubrí que si el ordenador permanecía mucho tiempo encendido sin que nadie se conectase para desencriptar los discos, dejaba de ser accesible a través de la IP pública o el dominio (aunque sí era posible acceder a través de la IP local). Al principio pensé que era porque había que configurar la IP fija en `initramfs`, pero al intentar hacerlo, como el router ya tenía fijada la IP, se hacían un lío y no funcionaba. Al final se solucionó al poner también ahí el dominio a actualizarse, que es justo lo que viene ahora en la guía.
 :::
 
 ### ¿Y qué pasa con el dominio?
 
-¿No podría ocurrir que, mientras el ordenador está esperando a que alguien se conecte para desencriptar los discos, la IP pública cambie? Pues sería raro, pero podría ocurrir. Y no nos conviene, así que vamos a prevenir que eso pueda pasar.
+¿No podría ocurrir que, tras ese apagón o reinicio, la IP pública cambie? Pues sí, podría ocurrir. Y no nos conviene, así que vamos a asegurarnos de que el dominio se actualice correctamente.
 
 El objetivo es crear una tarea de `crontab` para ir actualizando la IP cada cierto tiempo durante el encendido. El primer problema que nos encontramos para esto es que los comandos disponibles cuando estamos en `ìnitramfs` son muy pocos y no incluyen `crontab`. Concretamente, los comandos que hay disponibles son una versión reducida de [BusyBox](https://busybox.net/) y para poder usar `crontab` necesitamos la versión completa.
 
@@ -107,7 +113,7 @@ El objetivo es crear una tarea de `crontab` para ir actualizando la IP cada cier
 Aunque seguramente no sea el caso, puede ser que al hacer esto se cree una incompatibilidad entre la nueva versión de BusyBox y el resto de componentes de `initramfs`, haciendo que el servidor no pueda encenderse, así que recomiendo hacer una copia de seguridad por si algo sale mal.
 :::
 
-Después de esto `crontab` ya estará disponible, pero no funcionará porque en `initramfs` el directorio donde se guarda por defecto el archivo con los comandos no existe. La forma de resolverlo es creando el archivo `/usr/share/initramfs-tools/hooks/crontab` con este contenido:
+Después de esto `crontab` ya estará disponible, pero no funcionará porque en `initramfs` el directorio donde se guarda por defecto el archivo con la configuración no existe. La forma de resolverlo es creando el archivo `/usr/share/initramfs-tools/hooks/crontab` con este contenido:
 
 ```sh
 #!/bin/sh -e
@@ -127,6 +133,17 @@ Escribimos `sudo chmod +x /usr/share/initramfs-tools/hooks/crontab` para hacer e
 ```
 1,6,11,16,21,26,31,36,41,46,51,56 * * * * sleep 46 ; wget --no-check-certificate -qO- ipinfo.io/ip -O - | xargs -I {} wget --no-check-certificate -qO- "https://dynamicdns.park-your-domain.com/update?host=@&domain=wupp.dev&password=passwd&ip={}" > /tmp/dnsupdate.log 2>&1 &
 ```
+
+Y restringimos los permisos del archivo escribiendo:
+
+```sh
+sudo chown root:root /usr/share/initramfs-tools/crontab
+sudo chmod 600 /usr/share/initramfs-tools/crontab
+```
+
+::: warning ADVERTENCIA
+Por mucho que hayamos restringido los permisos del archivo, se va a guardar en una partición que no está cifrada, así que cualquiera que pueda acceder al disco podrá ver el token y "secuestrar" nuestro dominio para redirigirlo a donde quiera. Tenlo en cuenta.
+:::
 
 Cada vez que ejecutemos `sudo update-initramfs -u` se volverá a crear el directorio y a copiar el archivo, con lo que también nos aseguraremos de que si cambiamos el archivo también se cambiará en `initramfs`, aunque no inmediatamente.
 
@@ -182,7 +199,7 @@ Y lo hacemos ejecutable con `sudo chmod +x /usr/share/initramfs-tools/hooks/dns`
 
 ## Resolviendo problemas
 
-Un problema con el que nos encontramos cuando intentamos conectarnos al servidor por SSH primero para desencriptar los discos y después para el uso normal, es que nos salta este error tras escribir `ssh admin@wupp.dev`:
+Un problema con el que nos podemos encontrar cuando intentamos conectarnos al servidor por SSH primero para desencriptar los discos y después para el uso normal, es que nos salta este error tras escribir `ssh admin@wupp.dev`:
 
 ```
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -208,54 +225,48 @@ Para que nos deje conectarnos es tan sencillo como eliminar el archivo de `known
 
 Por suerte, hay un apaño. Si ponemos Dropbear y OpenSSH Server en puertos distintos en el servidor, podemos utilizar una identidad distinta para cada puerto cuando nos conectemos.
 
-Lo primero para esto es utilizar un puerto distinto para OpenSSH Server al que usamos para Dropbear. Para ello, editamos el archivo `/etc/ssh/sshd_config` y descomentamos la línea `#Port 22` y cambiamos el número, quedando por ejemplo `Port 2222`.
-
-Antes de reiniciar el servidor SSH, debemos asegurarnos de que:
-
-- El nuevo puerto está abierto en el router.
-- El nuevo puerto está permitido por el firewall, en el caso de UFW: `sudo ufw allow 2222/tcp`.
-
-_Nuevamente el puerto es de ejemplo y es recomendable cambiarlo a otro._
-
-Por último, reiniciamos el servidor SSH para que los cambios tengan efecto:
-
-```sh
-sudo systemctl restart ssh
-```
-
-::: tip RELATO
-Iván mientras escribía esto _(desde un sitio lejano a la ubicación del servidor)_ se olvidó de permitir el nuevo puerto en el firewall y pasaron cosas malas, si quieres leer la historia completa puedes hacerlo [aquí](../relatos/bloqueo-ssh).
-:::
-
-A partir de ahora ya no deberíamos tener el problema al conectarnos, lo único que hay que tener en cuenta es que, a la hora de establecer la conexión SSH, tendremos que indicar el puerto:
-
-```sh
-ssh -p 2222 admin@wupp.dev
-```
-
 ## Reforzando la seguridad
 
-Todavía tenemos que desactivar el acceso con usuario y contraseña por SSH, que es muy poco seguro, para restringir el acceso a las claves públicas permitidas. Vamos a editar el archivo `/etc/ssh/sshd_config` y a cambiar las siguientes líneas:
+Todavía tenemos que desactivar el acceso con usuario y contraseña por SSH, que es muy poco seguro, para restringir el acceso únicamente a las claves públicas permitidas. Vamos a modificar la configuración de OpenSSH pero, en lugar de modificar directamente `/etc/ssh/sshd_config`, vamos a crear un archivo nuevo en `/etc/ssh/sshd_config.d/` llamado `99-custom.conf`, que contendrá las líneas que queremos cambiar o añadir. De esta forma, si en el futuro actualizamos OpenSSH Server y se sobreescribe el archivo de configuración principal, no perderemos los cambios que hemos hecho.
+
+Dentro de `/etc/ssh/sshd_config.d/99-custom.conf` introducimos las siguientes líneas:
 
 ```ssh-config
+Port 22
 PasswordAuthentication no
 PermitRootLogin no
 AllowUsers admin
 X11Forwarding no
+KbdInteractiveAuthentication no
+PubkeyAuthentication yes
+AuthorizedKeysFile .ssh/authorized_keys
 ```
 
-Las líneas estarán en distintos sitios del archivo de configuración, solo hay que descomentarlas y editarlas. Además, en nuestro caso no aparecía la línea de `AllowUsers` para permitir la conexión solamente hacia ese usuario, así que la añadimos en cualquier parte del archivo. ¿Qué significa cada línea?
+Veamos qué significa cada línea:
 
-- `PasswordAuthentication no` prohíbe los accesos con contraseña, pudiendo ser únicamente con clave pública.
+- `Port 22` indica el puerto en el que se ejecuta OpenSSH Server.
+- `PasswordAuthentication no` prohíbe los accesos con contraseña.
 - `PermitRootLogin no` evita que se pueda acceder directamente al usuario `root`.
 - `AllowUsers admin` es opcional pero recomendable, restringe los usuarios a los que se puede acceder directamente, se pueden poner varios separándolos por espacios.
 - `X11Forwarding no` evita que se puedan ejecutar aplicaciones gráficas de forma remota, pues es algo que en un principio no vamos a usar.
+- `KbdInteractiveAuthentication no` deshabilita otro método de autenticación que no vamos a usar.
+- `PubkeyAuthentication yes` habilita la autenticación por clave pública.
+- `AuthorizedKeysFile .ssh/authorized_keys` indica la ruta del archivo donde se encuentran las claves públicas autorizadas.
 
 ::: warning ADVERTENCIA
 Antes de hacer efectivos los cambios, tenemos que asegurarnos de que existe el archivo `/home/admin/.ssh/authorized_keys` y que tiene las claves públicas de los dispositivos desde los que nos queramos conectar al servidor, porque si no están no podremos conectarnos.
 :::
 
-Por último, hacemos efectivos los cambios:
+Además, si hemos cambiado el puerto, debemos asegurarnos de que:
+
+- El nuevo puerto está abierto en el router.
+- El nuevo puerto está permitido por el firewall. En el caso de UFW: `sudo ufw allow XXXX/tcp` donde `XXXX` es el nuevo puerto.
+
+::: tip RELATO
+Iván mientras cambiaba el puerto de OpenSSH _(desde un sitio lejano a la ubicación del servidor)_ se olvidó de permitir el nuevo puerto en el firewall y pasaron cosas malas, si quieres leer la historia completa puedes hacerlo [aquí](../relatos/bloqueo-ssh).
+:::
+
+Por último, hacemos efectivos los cambios reiniciando el servicio:
 
 ```sh
 sudo systemctl restart ssh
@@ -263,15 +274,21 @@ sudo systemctl restart ssh
 
 Y ya deberíamos de poder conectarnos sin que nos pida la contraseña del usuario `admin`.
 
+Podemos verificar que se ha deshabilitado el acceso por contraseña intentando conectarnos con `ssh -o PreferredAuthentications=password -o PubkeyAuthentication=no -p 2222 admin@wupp.dev`, que no nos debjará, o conectándonos con `ssh -vvv -p 2222 admin@wupp.dev` y buscando en la salida la línea `Authentications that can continue: publickey`, que indica que solo se permite la autenticación por clave pública.
+
 ## Virtual Network Computing (VNC)
 
-¿Qué mierdas es un VNC? Pues básicamente un entorno gráfico de escritorio remoto. Se utiliza para controlar remotamente otros ordenadores con un escritorio como si fuese realmente tu propio ordenador. ¿No acabamos de desactivar eso en la configuración del servidor SSH? Pues sí, pero vamos a usarlo de otra forma que es más segura y no necesita esa opción activada.
+¿Qué demonios es un VNC? Pues básicamente un entorno gráfico de escritorio remoto. Se utiliza para controlar remotamente otros ordenadores con un escritorio como si fuese realmente tu propio ordenador. ¿No acabamos de desactivar eso en la configuración del servidor SSH? Pues sí, pero vamos a usarlo de otra forma que es más segura y no necesita esa opción activada.
 
 Nosotros seguimos [este tutorial](https://www.digitalocean.com/community/tutorials/how-to-install-and-configure-vnc-on-debian-10). Aunque puede haber algunos más actualizados como [este](https://www.digitalocean.com/community/tutorials/how-to-install-and-configure-vnc-on-debian-11).
 
 Como detalles, no hemos establecido una contraseña para solo vista.
 
 Aquí da igual cambiar o no el puerto por defecto, ya que no estará expuesto directamente a Internet.
+
+::: danger PELIGRO
+Ni se te ocurra exponer el puerto del VNC directamente a Internet. No hay que abrirlo en el router ni permitirlo en el firewall. Siempre hay que conectarse al VNC a través de un túnel SSH.
+:::
 
 En nuestro ordenador podemos instalar `xtightvncviewer` para conectarnos. Solo tendremos que conectarnos mediante SSH al servidor indicando que queremos redirigir el puerto 5901 de nuestro ordenador al 5901 del del servidor. Esto lo podemos hacer con `ssh -L 5901:127.0.0.1:5901 admin@wupp.dev`. Una vez estemos conectados, podemos ejecutar `xtightvncviewer` desde la terminal, conectarnos a `localhost:5901` y poner la contraseña del VNC.
 
@@ -287,24 +304,9 @@ sudo systemctl restart vncserver@1
 ```
 
 ::: info
-Es raro necesitar el servidor VNC, pero justo estoy escribiendo esta parte antes que la de configuración de servidor SSH porque necesito abrir unos puertos en el router y para eso necesito acceder con un navegador desde el servidor.
-Como era de esperar, Debian no venía con navegador instalado, así que para poder usar uno con el VNC instalamos Firefox con `sudo apt install firefox-esr`.
+Es raro necesitar el servidor VNC, pero justo estoy escribiendo esta parte antes que la de configuración de servidor SSH porque necesito abrir unos puertos en el router y para eso necesito acceder con un navegador desde el servidor, porque no estoy en la misma red.
+Como era de esperar, Debian no venía con navegador instalado, así que para poder usar uno con el VNC instalé Firefox con `sudo apt install firefox-esr`.
 :::
-
-## SSH File Transfer Protocol (SFTP)
-
-A veces necesitaremos transferir archivos entre nuestro ordenador y el servidor. La forma más cómoda de hacer eso es a través de SFTP, para lo cual solo necesitaremos tener instalado un cliente como [Filezilla](https://filezilla-project.org/) en nuestro ordenador.
-
-Para activar SFTP en el servidor desde el usuario `admin`, simplemente tendremos que comentar una línea y añadir otra en `/etc/ssh/sshd_config`:
-
-```ssh-config
-#Subsystem      sftp    /usr/lib/openssh/sftp-server
-Subsystem       sftp    internal-sftp
-```
-
-Y reiniciar el servicio con `sudo systemctl restart ssh`.
-
-Si todo va bien, ya podremos conectarnos desde Filezilla (usando nuestra clave privada, aunque antes habrá que importarla en el programa y que nos la convierta a un formato compatible) al puerto SSH del servidor y transferir archivos.
 
 ## Embelleciendo
 
@@ -324,7 +326,7 @@ Last login: Mon May 24 01:23:45 2032 from 192.168.1.1
 
 Que no es muy bonito la verdad, así que podemos hacer unos cambios para que quede un mensaje mucho más lindo.
 
-1. Editamos `/etc/ssh/sshd_config` para cambiar los siguientes ajustes:
+1. Editamos `/etc/ssh/sshd_config.d/99-custom.conf` para añadir las siguientes líneas:
 
 ```ssh-config
 PrintMotd no
@@ -346,7 +348,7 @@ Banner none
 #session    optional     pam_mail.so standard noenv # [1]
 ```
 
-4. Instalamos `figlet` y `lolcat` para tener colores y cabeceras personalizadas `sudo apt update && sudo apt install figlet lolcat`.
+4. Instalamos `figlet`, `lolcat` y `wtmpdb` para tener colores, cabeceras personalizadas y la información de la última conexión `sudo apt update && sudo apt install figlet lolcat wtmpdb`.
 5. Creamos el archivo `~/welcome_message.sh`:
 
 ```sh
