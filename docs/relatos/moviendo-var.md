@@ -6,7 +6,13 @@ order: 5
 
 Optamos por mover toda la carpeta `/var` al disco duro grande por ser una carpeta donde se suelen almacenar logs y archivos más pesados. Para ello, montaremos directamente el disco grande en `/var`.
 
-Empezamos copiando todo el contenido al disco duro con `sudo cp -rf /var/* /mnt/vault/`. Después modificamos `/etc/fstab` para cambiar el punto de montaje del disco duro de `/mnt/vault` a `/var` y tenemos que reiniciar _daemon_ de _systemclt_ con `sudo systemctl daemon-reload`. Ahora podemos mover la actual carpeta a una copia y mantenerla durante un tiempo prudencial `sudo mv /var /var.old`, creamos la nueva carpeta `sudo mkdir /var` y remontamos el disco duro con `sudo umount /mnt/vault` y `sudo mount /dev/mapper/vault`.
+Empezamos copiando todo el contenido al disco duro con `sudo cp -rf /var/* /mnt/vault/`.
+
+::: tip TRUCO
+Puede ser más recomendable utiliza `sudo rsync -aAX --one-file-system /var/ /mnt/vault/` para mantener permisos, enlaces simbólicos y demás.
+:::
+
+Después modificamos `/etc/fstab` para cambiar el punto de montaje del disco duro de `/mnt/vault` a `/var` (ajustando las opciones de montaje) y tenemos que recargamos la configuración de systemd con `sudo systemctl daemon-reload`. Ahora podemos mover la actual carpeta a una copia y mantenerla durante un tiempo prudencial `sudo mv /var /var.old`, creamos la nueva carpeta `sudo mkdir /var` y remontamos el disco duro con `sudo umount /mnt/vault` y `sudo mount /dev/mapper/vault`.
 
 Si después de esto obtuviésemos un error al usar `apt` similar a:
 

@@ -28,7 +28,7 @@ Efectivamente, se le había olvidado permitir el nuevo puerto de SSH en el firew
 
 ## El rescate
 
-Pero, ¿y si no todo estaba perdido? Iván empezo a teorizar una posible forma de recuperar el servidor. Si el servidor se reiniciaba, se quedaría esperando a que se desencriptasen los discos duros con Dropbear, y Dropbear todavía estaba con el puerto 22, así que si desde ahí fuera capaz de editar la configuración de OpenSSH, podría recuperar el servidor. Solo necesitaba a alguien que reiniciase el servidor y ya podría hacer el resto del trabajo.
+Pero, ¿y si no todo estaba perdido? Iván empezó a teorizar una posible forma de recuperar el servidor. Si el servidor se reiniciaba, se quedaría esperando a que se desencriptasen los discos duros con Dropbear, y Dropbear todavía estaba con el puerto 22, así que si desde ahí fuera capaz de editar la configuración de OpenSSH, podría recuperar el servidor. Solo necesitaba a alguien que reiniciase el servidor y ya podría hacer el resto del trabajo.
 
 La persona que podía ir a reiniciar el servidor fue fácil de encontrar. Pero había que hacer pruebas para ver si efectivamente era posible recuperar el servidor desde ese punto.
 
@@ -44,20 +44,20 @@ Esto no dio buenos resultados porque el disco siempre se marcaba como ocupado y 
 
 ### Ahondando en el funcionamiento de Linux
 
-Como esto no funcionaba, tocaba entender mejor cómo funcionaba Initramfs y las fases en las que se dive, que viene bien explicado en la [wiki de Ubuntu](https://wiki.ubuntu.com/Initramfs).
+Como esto no funcionaba, tocaba entender mejor cómo funcionaba Initramfs y las fases en las que se divide, que viene bien explicado en la [wiki de Ubuntu](https://wiki.ubuntu.com/Initramfs).
 
 Además, vi que por defecto el disco duro se montaba en solo lectura desde initramfs y, cuando seguía el proceso de arranque, ya se montaba escribible. Así que tenía que:
 
 - Conseguir que initramfs montase el disco escribible.
 - Conseguir que el, una vez montado, borrase el archivo de configuración de OpenSSH para que se regenerase el por defecto.
 
-Este último enfoque resultó no ser válido, porque OpenSSH no regenera el archivo de configuración, simplemente deja de ejecutarse. Así que el enfoque cambió a borrar el archivo de configuración de UFW, que hace que deje de funcionar y ,por tanto, que todos los puertos estén abiertos desde el servidor.
+Este último enfoque resultó no ser válido, porque OpenSSH no regenera el archivo de configuración, simplemente deja de ejecutarse. Así que el enfoque cambió a borrar el archivo de configuración de UFW, que hace que deje de funcionar y, por tanto, que todos los puertos estén abiertos desde el servidor.
 
 ### Últimos intentos
 
-Intenté modificar los scripts de inicio que se ejecutan después de desencriptar el disco para que montasen el disco en escritura y borrasen el archivo de configuración, pero por mucho que cambiaba los parámetros, parecía no afectar y seguía en solo escritura.
+Intenté modificar los scripts de inicio que se ejecutan después de desencriptar el disco para que montasen el disco en escritura y borrasen el archivo de configuración, pero por mucho que cambiaba los parámetros, parecía no afectar y seguía en solo lectura.
 
-Finalmente, ya con pocas esperanzas, el 6 de agosto decidí cambiar ligeramente el enfoque y editar únicamente el archivo `/init`, que es el que se encarga de llamar a todos los scrips de inicio. Concretamente añadí estas líneas justo antes del comentario `# Move virtual filesystems over to the real filesystem`:
+Finalmente, ya con pocas esperanzas, el 6 de agosto decidí cambiar ligeramente el enfoque y editar únicamente el archivo `/init`, que es el que se encarga de llamar a todos los scripts de inicio. Concretamente añadí estas líneas justo antes del comentario `# Move virtual filesystems over to the real filesystem`:
 
 ```sh
 mount -w -t btrfs -o remount ${ROOT} ${rootmnt}
@@ -68,6 +68,10 @@ unset ROOT
 Borrando `unset ROOT` de más arriba, ya que esa variable contenía el nombre del disco duro con el sistema.
 
 **Funcionó.** Y después de eso solo había que reinstalar y configurar de nuevo UFW.
+
+::: danger PELIGRO
+Esta técnica desactiva completamente el firewall del sistema. Solo debe usarse como último recurso de recuperación y restaurarse inmediatamente tras iniciar el sistema.
+:::
 
 ### Recuperando el servidor
 

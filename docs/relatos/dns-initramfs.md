@@ -8,17 +8,17 @@ De cuando Iván tuvo que enfrentarse a esta tarea sin apenas información en la 
 
 ## Contexto histórico
 
-**6 de septiembre de 2023.** Hasta entonces, el domino `wupp.dev` lo gestionábamos desde [FreeDNS](https://freedns.afraid.org/), pero alcanzamos el límite de 25 subdominios y decidimos gestionarlos desde [Namecheap](https://www.namecheap.com/), que era donde teníamos comprado el dominio. La transición fue bastante sencilla excepto por una cosa, la actualización automática de la IP en el dominio y sus subdominios.
+**6 de septiembre de 2023.** Hasta entonces, el dominio `wupp.dev` lo gestionábamos desde [FreeDNS](https://freedns.afraid.org/), pero alcanzamos el límite de 25 subdominios y decidimos gestionarlos desde [Namecheap](https://www.namecheap.com/), que era donde teníamos comprado el dominio. La transición fue bastante sencilla excepto por una cosa, la actualización automática de la IP en el dominio y sus subdominios.
 
-FreeDNS tenía un enlace para actualizar la IP muy cómo que era `freedns.afraid.org/dynamic/update.php?id`, lo que nos permitía hacer un apaño a no poder resolver dominios en `initramfs` con esta tarea de `crontab`:
+FreeDNS tenía un enlace para actualizar la IP muy cómodo que era `freedns.afraid.org/dynamic/update.php?id`, lo que nos permitía hacer un apaño a no poder resolver dominios en `initramfs` con esta tarea de `crontab`:
 
 ```
 1,6,11,16,21,26,31,36,41,46,51,56 * * * * sleep 46 ; wget --no-check-certificate -O - "https://$(nslookup freedns.afraid.org 1.1.1.1 | awk '/^Address: / { print $2 }')/dynamic/update.php?id" > /tmp/freedns_@_wupp_dev.log 2>&1 &
 ```
 
-Esto básicamente lo que hacía era sustituir `freedns.afraid.org` por la IP a la que apunta.
+Esto lo que hacía era sustituir `freedns.afraid.org` por la IP a la que apunta.
 
-El problema al cambiar a Namecheap fue que ese truco dejó de servir, así que hubo que poner a funcionar la resolución de dominos.
+El problema al cambiar a Namecheap fue que ese truco dejó de servir, así que hubo que poner a funcionar la resolución de dominios.
 
 ## Primeros intentos
 
@@ -43,7 +43,7 @@ sudo chmod +x /usr/share/initramfs-tools/hooks/curl
 sudo update-initramfs -u
 ```
 
-Esto fue porque `curl` sí que tiene una opción para especificar los servidores DNS que utilizar, pero tampoco funcionó.
+Buscaba forzar la resolución (por ejemplo con `--resolve`), pero no me resolvió el problema.
 
 ## El final
 
@@ -130,4 +130,8 @@ sudo chmod +x /usr/share/initramfs-tools/hooks/dns
 sudo update-initramfs -u
 ```
 
-Con esto ya funcionaba la resolución de dominios en `initramfs` y solo faltaba adaptar la tarea de `crontab` al nuevo enlace que era del tipo `https://dynamicdns.park-your-domain.com/update?host=@&domain=wupp.dev&password=passwd&ip=ip`. Este nuevo enlace tenía un problema y era que había que especificarle la nueva IP para el dominio, pero se pudo resolver gracias a la gran cantidad de páginas que permiten conseguir la IP pública (y especialmente a aquellas que te dan la IPv4) con un comando un poquito más complicado `wget --no-check-certificate -qO- ipinfo.io/ip -O - | xargs -I {} wget --no-check-certificate -qO- "https://dynamicdns.park-your-domain.com/update?host=@&domain=wupp.dev&password=passwd&ip={}"`.
+Con esto ya funcionaba la resolución de dominios en `initramfs` y solo faltaba adaptar la tarea de `crontab` al nuevo enlace que era del tipo `https://dynamicdns.park-your-domain.com/update?host=@&domain=wupp.dev&password=passwd&ip=ip`. Este nuevo enlace tenía un problema y era que había que especificarle la nueva IP para el dominio, pero se pudo resolver gracias a la gran cantidad de páginas que permiten conseguir la IP pública (y especialmente a aquellas que te dan la IPv4) con un comando un poquito más complicado:
+
+```sh
+wget --no-check-certificate -qO- ipinfo.io/ip -O - | xargs -I {} wget --no-check-certificate -qO- "https://dynamicdns.park-your-domain.com/update?host=@&domain=wupp.dev&password=passwd&ip={}"
+```
