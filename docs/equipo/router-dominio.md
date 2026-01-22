@@ -187,3 +187,41 @@ El resultado sería algo como esto:
 ::: warning ADVERTENCIA
 Si, para abrir los puertos, eliges usar la IP local del servidor en vez de la dirección MAC, es importante que dejes fija esa IP local al servidor, ya sea desde la configuración del router o desde el propio servidor, porque si no, en algún momento cambiará y los puertos dejarán de estar abiertos para el servidor.
 :::
+
+## Cambiando los servidores DNS del servidor
+
+Hasta ahora hemos hablado del DNS «hacia fuera» (nameservers del dominio). Pero el servidor también usa DNS para resolver nombres (por ejemplo, cuando hace `apt update` o se conecta a servicios externos). Para mejorar privacidad e integridad en la resolución, podemos configurar `systemd-resolved` para usar **DNS-over-TLS (DoT)** con Cloudflare u otro proveedor.
+
+DoT cifra las consultas DNS usando TLS, evitando que terceros en la red local o el operador puedan leer fácilmente qué dominios está resolviendo el servidor.
+
+Para hacer el cambio, creamos el archivo `/etc/systemd/resolved.conf.d/99-cloudflare.conf` con el siguiente contenido:
+
+```sh
+[Resolve]
+DNS=1.1.1.1#one.one.one.one
+DNSOverTLS=yes
+```
+
+El sufijo `#one.one.one.one` fuerza el nombre esperado en el handshake TLS, de forma que la validación del certificado tenga sentido y sea mucho más difícil «hacerse pasar» por Cloudflare.
+
+Aplicamos los cambios con:
+
+```sh
+sudo systemctl restart systemd-resolved
+```
+
+Y comprobamos que todo funciona bien con:
+
+```sh
+resolvectl status
+```
+
+Debiendo ver:
+
+```
+Global
+         Protocols: +LLMNR -mDNS +DNSOverTLS DNSSEC=no/unsupported
+  resolv.conf mode: stub
+Current DNS Server: 1.1.1.1#one.one.one.one
+       DNS Servers: 1.1.1.1#one.one.one.one
+```
