@@ -1,15 +1,12 @@
 [Unit]
-Description=Update DDNS records for Namecheap
+Description=Update DDNS records for Cloudflare
 After=nss-user-lookup.target
 Wants=nss-user-lookup.target
 
 [Service]
-Type=simple
-Environment=NAMECHEAP_DDNS_TOKEN=abcd1234
-Environment=NAMECHEAP_DDNS_DOMAIN=wupp.dev
-Environment=NAMECHEAP_DDNS_SUBDOMAIN=@,amp,analytics,auth,ceebi,cloud,dash,defc,dge,forms,foro,git,home,logs,mail,mc,mcminio,music,photos,pics,send,status,web.mcminio,www,plan.mc,bingo,wp-test,warden,ulp,aqal,translate,plan.ulp,doc,enem,snotes,files.snotes,saved,firmas,hs,netad,recipes,server
-ExecStart=/home/admin/.cargo/bin/namecheap-ddns
-User=admin
+Type=oneshot
+EnvironmentFile=/etc/ddns/cloudflare.env
+ExecStart=/usr/local/sbin/ddns-cloudflare-update.sh
 
 [Install]
 WantedBy=default.target

@@ -83,39 +83,196 @@ Comenzamos creando el registro `A` o `A + Dynamic DNS Record` (funcionan igual) 
 Los registros A asocian un nombre de dominio con una dirección IPv4. En IPv6 se utilizan registros AAAA. Hay muchos más tipos de registros DNS, que puedes ver [aquí](https://www.cloudflare.com/learning/dns/dns-records/).
 :::
 
-Por desgracia, el programa que tiene disponible Namecheap es solo para Windows, pero igualmente existe la posibilidad de utilizar un enlace para actualizar la IP. Aun así, no utilizaremos directamente el enlace, ya que podemos aprovecharnos de la existencia de [este](https://github.com/nickjer/namecheap-ddns) repositorio.
+A continuación se explica cómo configurar la actualización automática de la IP pública en Cloudflare, ya que cambiamos los nameservers a Cloudflare. Si quieres ver lo que hicimos con Namecheap, puedes ver [este relato](../relatos/dyndns-namecheap.md).
 
-Siguiendo su documentación vamos a instalarlo usando `cargo`, así que también tendremos que [instalar Rust](https://www.rust-lang.org/tools/install).
+Tencremos que crear un token de API en Cloudflare con permisos para editar los DNS del dominio. Luego, creamos un archivo para guardarlo:
 
-Una vez instalado Rust, ejecutamos `cargo install namecheap-ddns` y tendremos el ejecutable en `/home/admin/.cargo/bin/namecheap-ddns`.
-
-Siguiendo nuevamente la documentación, vamos a crear un servicio de `systemd` para que se encargue de actualizar la IP del dominio y todos sus subdominios. Creamos el archivo `/etc/systemd/system/ddns-update.service`:
-
+```sh
+sudo install -d -m 700 /etc/ddns
 ```
+
+Creamos el archivo `/etc/ddns/cloudflare.env` con el siguiente contenido:
+
+```dotenv
+CF_API_TOKEN=abcd1234
+ZONE_NAME=wupp.dev
+```
+
+Y restringimos los permisos del archivo para que solo el usuario root pueda leerlo:
+
+```sh
+sudo chmod 600 /etc/ddns/cloudflare.env
+```
+
+Ahora creamos el script que se encargará de actualizar la IP pública en Cloudflare. Creamos el archivo `/usr/local/sbin/ddns-cloudflare-update.sh` con el siguiente contenido:
+
+```sh
+#!/usr/bin/env bash
+set -euo pipefail
+
+: "${CF_API_TOKEN:?Falta CF_API_TOKEN}"
+: "${ZONE_NAME:?Falta ZONE_NAME}"
+
+API="https://api.cloudflare.com/client/v4"
+AUTH=(-H "Authorization: Bearer ${CF_API_TOKEN}" -H "Content-Type: application/json")
+
+STATE_DIR="/var/lib/ddns-cloudflare"
+OLD4_FILE="${STATE_DIR}/old_ipv4"
+OLD6_FILE="${STATE_DIR}/old_ipv6"
+
+mkdir -p "${STATE_DIR}"
+chmod 700 "${STATE_DIR}"
+
+# --- Detecta IP pública actual ---
+NEW4="$(curl -4 -fsS https://api.ipify.org || true)"
+NEW6="$(curl -6 -fsS https://api64.ipify.org || true)"
+
+if [[ -z "${NEW4}" && -z "${NEW6}" ]]; then
+  echo "No he podido detectar IPv4 ni IPv6 pública. Salgo."
+  exit 1
+fi
+
+# --- Obtiene zone_id (por nombre) ---
+ZONE_ID="$(
+  curl -fsS "${AUTH[@]}" \
+    "${API}/zones?name=${ZONE_NAME}&status=active" \
+  | jq -r '.result[0].id // empty'
+)"
+
+if [[ -z "${ZONE_ID}" ]]; then
+  echo "No encuentro la zona ${ZONE_NAME} en Cloudflare (zone_id vacío)."
+  exit 1
+fi
+
+# Función: lista todos los DNS records (paginado) de un tipo
+list_records_by_type() {
+  local rtype="$1"
+  local page=1
+  while :; do
+    local resp
+    resp="$(curl -fsS "${AUTH[@]}" \
+      "${API}/zones/${ZONE_ID}/dns_records?type=${rtype}&per_page=100&page=${page}")"
+
+    echo "${resp}" | jq -c '.result[]'
+
+    local total_pages
+    total_pages="$(echo "${resp}" | jq -r '.result_info.total_pages // 1')"
+    if (( page >= total_pages )); then
+      break
+    fi
+    ((page++))
+  done
+}
+
+# Función: actualiza un record preservando "proxied" y "ttl"
+update_record() {
+  local id="$1" type="$2" name="$3" content="$4" ttl="$5" proxied="$6"
+
+  # ttl=1 significa "auto" (válido en Cloudflare). :contentReference[oaicite:3]{index=3}
+  curl -fsS "${AUTH[@]}" -X PATCH \
+    "${API}/zones/${ZONE_ID}/dns_records/${id}" \
+    --data "$(jq -n \
+      --arg type "$type" \
+      --arg name "$name" \
+      --arg content "$content" \
+      --argjson ttl "$ttl" \
+      --argjson proxied "$proxied" \
+      '{type:$type,name:$name,content:$content,ttl:$ttl,proxied:$proxied}')" >/dev/null
+}
+
+# --- IPv4 (A) ---
+if [[ -n "${NEW4}" ]]; then
+  OLD4=""
+  [[ -f "${OLD4_FILE}" ]] && OLD4="$(cat "${OLD4_FILE}" || true)"
+
+  if [[ -n "${OLD4}" && "${OLD4}" != "${NEW4}" ]]; then
+    echo "IPv4 cambia: ${OLD4} -> ${NEW4}. Actualizando A que apunten a la antigua..."
+
+    mapfile -t A_RECS < <(
+      list_records_by_type "A" \
+      | jq -r --arg old "${OLD4}" 'select(.content == $old) | @base64'
+    )
+
+    for b64 in "${A_RECS[@]}"; do
+      rec="$(echo "$b64" | base64 -d)"
+      id="$(echo "${rec}" | jq -r '.id')"
+      name="$(echo "${rec}" | jq -r '.name')"
+      ttl="$(echo "${rec}" | jq -r '.ttl // 1')"
+      proxied="$(echo "${rec}" | jq -r '.proxied // false')"
+
+      update_record "${id}" "A" "${name}" "${NEW4}" "${ttl}" "${proxied}"
+      echo "  OK A ${name} -> ${NEW4}"
+    done
+  else
+    echo "IPv4: sin cambios (o no había estado previo)."
+  fi
+
+  # Guardamos estado
+  echo -n "${NEW4}" > "${OLD4_FILE}"
+  chmod 600 "${OLD4_FILE}"
+fi
+
+# --- IPv6 (AAAA) ---
+if [[ -n "${NEW6}" ]]; then
+  OLD6=""
+  [[ -f "${OLD6_FILE}" ]] && OLD6="$(cat "${OLD6_FILE}" || true)"
+
+  if [[ -n "${OLD6}" && "${OLD6}" != "${NEW6}" ]]; then
+    echo "IPv6 cambia: ${OLD6} -> ${NEW6}. Actualizando AAAA que apunten a la antigua..."
+
+    mapfile -t AAAA_RECS < <(
+      list_records_by_type "AAAA" \
+      | jq -r --arg old "${OLD6}" 'select(.content == $old) | @base64'
+    )
+
+    for b64 in "${AAAA_RECS[@]}"; do
+      rec="$(echo "$b64" | base64 -d)"
+      id="$(echo "${rec}" | jq -r '.id')"
+      name="$(echo "${rec}" | jq -r '.name')"
+      ttl="$(echo "${rec}" | jq -r '.ttl // 1')"
+      proxied="$(echo "${rec}" | jq -r '.proxied // false')"
+
+      update_record "${id}" "AAAA" "${name}" "${NEW6}" "${ttl}" "${proxied}"
+      echo "  OK AAAA ${name} -> ${NEW6}"
+    done
+  else
+    echo "IPv6: sin cambios (o no había estado previo)."
+  fi
+
+  # Guardamos estado
+  echo -n "${NEW6}" > "${OLD6_FILE}"
+  chmod 600 "${OLD6_FILE}"
+fi
+
+echo "DDNS Cloudflare: terminado."
+```
+
+Y ajustamos los permisos para que sea ejecutable:
+
+```sh
+sudo chmod 755 /usr/local/sbin/ddns-cloudflare-update.sh
+```
+
+Vamos a crear un servicio de `systemd` para que se encargue de actualizar la IP del dominio y todos sus subdominios. Creamos el archivo `/etc/systemd/system/ddns-update.service`:
+
+```ini
 [Unit]
-Description=Update DDNS records for Namecheap
+Description=Update DDNS records for Cloudflare
 After=nss-user-lookup.target
 Wants=nss-user-lookup.target
 
 [Service]
-Type=simple
-Environment=NAMECHEAP_DDNS_TOKEN=passwd
-Environment=NAMECHEAP_DDNS_DOMAIN=wupp.dev
-Environment=NAMECHEAP_DDNS_SUBDOMAIN=@,mc,www
-ExecStart=/home/admin/.cargo/bin/namecheap-ddns
-User=admin
+Type=oneshot
+EnvironmentFile=/etc/ddns/cloudflare.env
+ExecStart=/usr/local/sbin/ddns-cloudflare-update.sh
 
 [Install]
 WantedBy=default.target
 ```
 
-::: warning ADVERTENCIA
-Si no escribimos el `@` al principio de `Environment=NAMECHEAP_DDNS_SUBDOMAIN`, no se nos actualizará el dominio base `wupp.dev`.
-:::
+Y creamos el archivo `/etc/systemd/system/ddns-update.timer` que ejecutará el servicio cada 15 minutos:
 
-Ejecutamos `sudo chmod 600 /etc/systemd/system/ddns-update.service` (esto evita que otros usuarios del sistema puedan leer el token) y creamos el archivo `/etc/systemd/system/ddns-update.timer`:
-
-```
+```ini
 [Unit]
 Description=Run DDNS update every 15 minutes
 Requires=ddns-update.service
