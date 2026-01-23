@@ -68,6 +68,10 @@ Cambiar los nameservers de tu dominio puede tardar varias horas en hacerse efect
 Así se veían los nameservers de nuestro dominio cuando estaban cambiados a FreeDNS:
 ![nameservers](../images/nameservers.png)
 
+::: info
+Recientemente hemos decidido cambiar los nameservers a los de Cloudflare porque el uso de su API es más cómodo y nos permite hacer más cosas.
+:::
+
 ## Actualizando la IP pública en el dominio automáticamente
 
 Lo más común en una casa es que la IP pública que tengamos asignada no sea fija y vaya cambiando con el tiempo. Esto es un problema porque el dominio apunta a la IP, pero si esta cambia quedará inservible y si estamos fuera de casa no tendremos forma de conectarnos al servidor sin saber la nueva IP. Para solucionar eso aprovecharemos que Namecheap nos ofrece la posibilidad de actualizar la IP del dominio (o de sus subdominios) a través de un enlace.
