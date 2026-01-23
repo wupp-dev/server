@@ -1,0 +1,1 @@
+* * * * * sleep 20 ; /usr/local/sbin/telegram-notify.sh >> /tmp/telegram-notify.cron.log 2>&1 &

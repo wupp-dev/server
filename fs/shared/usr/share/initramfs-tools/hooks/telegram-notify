@@ -1,0 +1,15 @@
+#!/bin/sh -e
+
+if [ "$1" = "prereqs" ]; then exit 0; fi
+. /usr/share/initramfs-tools/hook-functions
+
+# Directorios destino
+mkdir -p $DESTDIR/etc
+mkdir -p $DESTDIR/usr/local/sbin
+
+# Config + script
+cp /usr/share/initramfs-tools/telegram.env       $DESTDIR/etc/telegram.env
+cp /usr/share/initramfs-tools/telegram-notify.sh $DESTDIR/usr/local/sbin/telegram-notify.sh
+
+chmod 600 $DESTDIR/etc/telegram.env
+chmod 755 $DESTDIR/usr/local/sbin/telegram-notify.sh

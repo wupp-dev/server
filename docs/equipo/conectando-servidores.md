@@ -9,7 +9,7 @@ Llega un momento en el que un ordenador se queda corto, sobre todo si quieres us
 
 ## Introducción
 
-Lo primero que tendremos que hacer con el nuevo ordenador es seguir toda esta guía para llegar a tenerlo en un punto usable. Eso sí, tendremos que escoger dos nuevos puertos para OpenSSH Server y Dropbear, pero por lo demás es todo igual hasta que llegamos a Nginx. Que no se nos olvide asignarle una IP local fija que, asumiremos que es `192.168.1.144`. Si hacemos referenci a la IP local del servidor principal, asumiremos también que es `192.168.1.133`.
+Lo primero que tendremos que hacer con el nuevo ordenador es seguir toda esta guía para llegar a tenerlo en un punto usable. Eso sí, tendremos que escoger dos nuevos puertos para OpenSSH Server y Dropbear, pero por lo demás es todo igual hasta que llegamos a Nginx. Que no se nos olvide asignarle una IP local fija que, asumiremos que es `192.168.1.144`. Si hacemos referencia a la IP local del servidor principal, asumiremos también que es `192.168.1.133`.
 
 ## Nginx
 

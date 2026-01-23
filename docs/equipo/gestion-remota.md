@@ -105,7 +105,259 @@ Tras esto descubrí que si el ordenador permanecía mucho tiempo encendido sin q
 
 ¿No podría ocurrir que, tras ese apagón o reinicio, la IP pública cambie? Pues sí, podría ocurrir. Y no nos conviene, así que vamos a asegurarnos de que el dominio se actualice correctamente.
 
-El objetivo es crear una tarea de `crontab` para ir actualizando la IP cada cierto tiempo durante el encendido. El primer problema que nos encontramos para esto es que los comandos disponibles cuando estamos en `ìnitramfs` son muy pocos y no incluyen `crontab`. Concretamente, los comandos que hay disponibles son una versión reducida de [BusyBox](https://busybox.net/) y para poder usar `crontab` necesitamos la versión completa.
+Antes teníamos el script para actualizar la IP en `initramfs`, pero hemos decidido cambiar el enfoque por eso de no exponer el token con permisos de modificar el dominio en una partición sin cifrar.
+
+Aun así, si quieres ver cómo estaba montado antes, puedes verlo en [este relato](../relatos/dyndns-namecheap).
+
+El nuevo enfoque es usar un bot de Telegram que se encargue de mandar un mensaje con la IP pública a un grupo cada vez que el servidor se encienda. De esta forma, podemos conectarnos y desencriptarlo. Esto implica exponer el token del bot, pero es mucho menos peligroso que exponer el token con permisos para modificar los DNS del dominio y lo único que puede hacer es mandar mensajes por el grupo, ni siquiera leer los demás.
+
+El primer paso para esto sería crear el bot de Telegram siguiendo [estas instrucciones](https://core.telegram.org/bots#how-do-i-create-a-bot). Apuntamos el token que nos da BotFather, que será algo como `123456789:ABCDefGhIJKlmNoPQRsTUVwxyZ`.
+
+Añadimos el bot al grupo donde queramos que mande los mensajes (sin hacerlo administrador) y, si el bot se llama `@chulo_bot`, mandaremos por el grupo el mensaje `/start@chulo_bot`. Tras eso, en el servidor ejecutamos el siguiente comando sustituyendo `<BOTToken>` por el token del bot:
+
+```sh
+curl -s "https://api.telegram.org/bot<BOTToken>/getUpdates"
+```
+
+Que nos devolverá algo como:
+
+```json
+{
+  "ok": true,
+  "result": [
+    {
+      "update_id": 405123456,
+      "message": {
+        "message_id": 1024,
+        "from": {
+          "id": 987654321,
+          "is_bot": false,
+          "first_name": "Perico",
+          "last_name": "Palotes",
+          "username": "palotes_perico"
+        },
+        "chat": {
+          "id": -1009876543210,
+          "title": "[SERVER] Avisos",
+          "is_forum": true,
+          "type": "supergroup"
+        },
+        "date": 1700000000,
+        "text": "/start@chulo_bot",
+        "entities": [
+          {
+            "offset": 0,
+            "length": 16,
+            "type": "bot_command"
+          }
+        ]
+      }
+    }
+  ]
+}
+```
+
+Y anotamos el ID del chat, que será un número negativo como `-1009876543210`.
+
+Introducimos las siguientes variables en `/usr/share/initramfs-tools/telegram.env`:
+
+```dotenv
+BOT_TOKEN="123456789:ABCDefGhIJKlmNoPQRsTUVwxyZ"
+CHAT_ID="-1009876543210"
+SSH_PORT="1234"
+LABEL="SERVER"
+INTERVAL_MIN="15"
+LOG_FILE="/tmp/telegram-notify.log"
+```
+
+Donde `SSH_PORT` es el puerto de Dropbear y `LABEL` es una etiqueta para identificar el servidor en el mensaje.
+
+Ajustamos los permisos:
+
+```sh
+sudo chown root:root /usr/share/initramfs-tools/telegram.env
+sudo chmod 600 /usr/share/initramfs-tools/telegram.env
+```
+
+Vamos a mandar el mensaje cada 15 minutos y crearemos 4 mensajes distintos, cada cual más agresivo. Comenzará por el primero y, cada vez que se vuelva a mandar pasará al siguiente hasta llegar al último, que será el que se mande a partir de entonces. Los mensajes serán estos:
+
+```markdown
+*SERVER*
+☝️🤓 Mi IP es: `X.X.X.X`
+🫦 Desbloquéame: `ssh -p 1234 root@X.X.X.X`
+```
+
+```markdown
+*SERVER*
+😐 Olvidón, sigo aquí esperando... Mi IP es: `X.X.X.X`
+🔓 Desbloquéame ya: `ssh -p 1234 root@X.X.X.X`
+```
+
+```markdown
+*SERVER*
+🤨 ¿Aqué esperas? Mi IP es: `X.X.X.X`
+🔓 Desbloquéame, que es para hoy: `ssh -p 1234 root@X.X.X.X`
+```
+
+```markdown
+*SERVER*
+😡 O me desbloqueas o tú y yo vamos a a tener un problema.
+📌 IP: `X.X.X.X`
+👉👉👉👉 `ssh -p 1234 root@X.X.X.X`
+```
+
+Vamos a crear el script `/usr/share/initramfs-tools/telegram-notify.sh` con el siguiente contenido:
+
+```sh
+#!/bin/sh
+set -eu
+
+ENV="/etc/telegram.env"
+STATE_LEVEL="/tmp/telegram_nag_level"
+STATE_LAST="/tmp/telegram_last_sent_uptime"
+LOCKDIR="/tmp/telegram-notify.lock"
+
+# Lock simple para evitar envíos dobles si coincide ejecución
+mkdir "$LOCKDIR" 2>/dev/null || exit 0
+trap 'rmdir "$LOCKDIR" 2>/dev/null || true' EXIT
+
+# Carga configuración
+[ -f "$ENV" ] && . "$ENV"
+
+: "${BOT_TOKEN:?Falta BOT_TOKEN en $ENV}"
+: "${CHAT_ID:?Falta CHAT_ID en $ENV}"
+: "${SSH_PORT:=22}"
+: "${LABEL:=SERVER}"
+: "${INTERVAL_MIN:=15}"
+: "${LOG_FILE:=/tmp/telegram-notify.log}"
+
+# Normaliza intervalo
+case "$INTERVAL_MIN" in
+  ''|*[!0-9]*) INTERVAL_MIN="15" ;;
+esac
+[ "$INTERVAL_MIN" -lt 1 ] && INTERVAL_MIN="15"
+INTERVAL_SEC=$((INTERVAL_MIN * 60))
+
+# Uptime (segundos desde boot) -> mejor que hora real en initramfs
+UP="$(cut -d' ' -f1 /proc/uptime 2>/dev/null || echo 0)"
+UP="${UP%.*}"
+case "$UP" in ''|*[!0-9]*) UP="0" ;; esac
+
+# Decide si toca enviar
+LAST="0"
+[ -f "$STATE_LAST" ] && LAST="$(cat "$STATE_LAST" 2>/dev/null || echo 0)"
+case "$LAST" in ''|*[!0-9]*) LAST="0" ;; esac
+
+if [ "$LAST" -ne 0 ]; then
+  DIFF=$((UP - LAST))
+  [ "$DIFF" -lt "$INTERVAL_SEC" ] && exit 0
+fi
+
+# Nivel actual (1..4)
+LEVEL="1"
+[ -f "$STATE_LEVEL" ] && LEVEL="$(cat "$STATE_LEVEL" 2>/dev/null || echo 1)"
+case "$LEVEL" in 1|2|3|4) : ;; *) LEVEL="1" ;; esac
+
+# Obtén IPv4 pública (reintentos suaves)
+IP=""
+i=0
+while [ "$i" -lt 6 ]; do
+  IP="$(wget --no-check-certificate -qO- https://api.ipify.org 2>/dev/null || true)"
+  [ -n "$IP" ] && break
+  sleep 5
+  i=$((i+1))
+done
+
+# Log helper
+log() {
+  # Log con uptime para que tenga sentido en initramfs
+  printf '[uptime=%ss] %s\n' "$UP" "$*" >> "$LOG_FILE" 2>/dev/null || true
+}
+
+if [ -z "$IP" ]; then
+  log "No pude obtener IPv4 pública (ipify)."
+  exit 0
+fi
+
+# Mensajes (Markdown legacy)
+case "$LEVEL" in
+  1)
+    TEXT="*${LABEL}*\\n☝️🤓 Mi IP es: \`${IP}\`\\n🫦 Desbloquéame: \`ssh -p ${SSH_PORT} root@${IP}\`"
+    ;;
+  2)
+    TEXT="*${LABEL}*\\n😐 Olvidón, sigo aquí esperando... Mi IP es: \`${IP}\`\\n🔓 Desbloquéame ya: \`ssh -p ${SSH_PORT} root@${IP}\`"
+    ;;
+  3)
+    TEXT="*${LABEL}*\\n🤨 ¿Aqué esperas? Mi IP es: \`${IP}\`\\n🔓 Desbloquéame, que es para hoy: \`ssh -p ${SSH_PORT} root@${IP}\`"
+    ;;
+  4)
+    TEXT="*${LABEL}*\\n😡 O me desbloqueas o tú y yo vamos a a tener un problema.\\n📌 IP: \`${IP}\`\\n👉👉👉👉 \`ssh -p ${SSH_PORT} root@${IP}\`"
+    ;;
+esac
+
+PAYLOAD="$(printf '{"chat_id":"%s","text":"%s","parse_mode":"Markdown","disable_web_page_preview":true}' "$CHAT_ID" "$TEXT")"
+
+# Envía
+RESP="$(wget --no-check-certificate -qO- \
+  --header="Content-Type: application/json" \
+  --post-data="$PAYLOAD" \
+  "https://api.telegram.org/bot${BOT_TOKEN}/sendMessage" 2>/dev/null || true)"
+
+case "$RESP" in
+  *'"ok":true'*)
+    log "Enviado OK (nivel=$LEVEL, ip=$IP)."
+    ;;
+  *)
+    log "Fallo al enviar (nivel=$LEVEL, ip=$IP). Resp: ${RESP:-<vacío>}"
+    ;;
+esac
+
+# Guarda último envío y sube nivel (hasta 4)
+echo "$UP" > "$STATE_LAST" 2>/dev/null || true
+
+if [ "$LEVEL" -lt 4 ]; then
+  echo $((LEVEL+1)) > "$STATE_LEVEL" 2>/dev/null || true
+else
+  echo 4 > "$STATE_LEVEL" 2>/dev/null || true
+fi
+
+exit 0
+```
+
+Ajustamos los permisos:
+
+```sh
+sudo chown root:root /usr/share/initramfs-tools/telegram-notify.sh
+sudo chmod +x /usr/share/initramfs-tools/telegram-notify.sh
+```
+
+Y creamos un hook para que se incluya en `initramfs`, creando el archivo `/usr/share/initramfs-tools/hooks/telegram-notify` con el contenido:
+
+```sh
+#!/bin/sh -e
+
+if [ "$1" = "prereqs" ]; then exit 0; fi
+. /usr/share/initramfs-tools/hook-functions
+
+# Directorios destino
+mkdir -p $DESTDIR/etc
+mkdir -p $DESTDIR/usr/local/sbin
+
+# Config + script
+cp /usr/share/initramfs-tools/telegram.env       $DESTDIR/etc/telegram.env
+cp /usr/share/initramfs-tools/telegram-notify.sh $DESTDIR/usr/local/sbin/telegram-notify.sh
+
+chmod 600 $DESTDIR/etc/telegram.env
+chmod 755 $DESTDIR/usr/local/sbin/telegram-notify.sh
+```
+
+Ajustamos los permisos:
+
+```sh
+sudo chmod +x /usr/share/initramfs-tools/hooks/telegram-notify
+```
+
+Ahora crearemos una tarea de `crontab` para ejecutar el script. El problema que nos encontramos para esto es que los comandos disponibles cuando estamos en `ìnitramfs` son muy pocos y no incluyen `crontab`. Concretamente, los comandos que hay disponibles son una versión reducida de [BusyBox](https://busybox.net/) y para poder usar `crontab` necesitamos la versión completa.
 
 `initramfs` utiliza la versión de BusyBox que haya instalada en Debian, así que tenemos que cambiarla escribiendo `sudo apt install busybox-static`, que reemplazará a la anterior y se incluirá automáticamente en `initramfs`.
 
@@ -128,26 +380,20 @@ mkdir $DESTDIR/var/spool/cron/crontabs
 cp /usr/share/initramfs-tools/crontab $DESTDIR/var/spool/cron/crontabs/root
 ```
 
-Escribimos `sudo chmod +x /usr/share/initramfs-tools/hooks/crontab` para hacer el archivo ejecutable y esto lo que hará es crear el directorio y copiar un archivo con la configuración de `crontab` que vamos a crear ahora mismo. Escribimos en `/usr/share/initramfs-tools/crontab` la línea necesaria para actualizar únicamente `wupp.dev`, ya que el resto de subdominios nos da igual que se actualicen ahora si no van a poder usarse porque el ordenador no está completamente encendido:
+Escribimos `sudo chmod +x /usr/share/initramfs-tools/hooks/crontab` para hacer el archivo ejecutable y esto lo que hará es crear el directorio y copiar un archivo con la configuración de `crontab` que vamos a crear ahora mismo. Escribimos en `/usr/share/initramfs-tools/crontab` la siguiente línea para ejecutar el script:
 
 ```
-1,6,11,16,21,26,31,36,41,46,51,56 * * * * sleep 46 ; wget --no-check-certificate -qO- ipinfo.io/ip -O - | xargs -I {} wget --no-check-certificate -qO- "https://dynamicdns.park-your-domain.com/update?host=@&domain=wupp.dev&password=passwd&ip={}" > /tmp/dnsupdate.log 2>&1 &
+* * * * * sleep 20 ; /usr/local/sbin/telegram-notify.sh >> /tmp/telegram-notify.cron.log 2>&1 &
 ```
 
-Y restringimos los permisos del archivo escribiendo:
+Ajustamos los permisos:
 
 ```sh
 sudo chown root:root /usr/share/initramfs-tools/crontab
-sudo chmod 600 /usr/share/initramfs-tools/crontab
+sudo chmod 644 /usr/share/initramfs-tools/crontab
 ```
 
-::: warning ADVERTENCIA
-Por mucho que hayamos restringido los permisos del archivo, se va a guardar en una partición que no está cifrada, así que cualquiera que pueda acceder al disco podrá ver el token y "secuestrar" nuestro dominio para redirigirlo a donde quiera. Tenlo en cuenta.
-:::
-
-Cada vez que ejecutemos `sudo update-initramfs -u` se volverá a crear el directorio y a copiar el archivo, con lo que también nos aseguraremos de que si cambiamos el archivo también se cambiará en `initramfs`, aunque no inmediatamente.
-
-Sin embargo, aunque ya podemos usar `crontab` en `initramfs`, nos falta hacer que se empiece a ejecutar, así que tenemos que crear otro archivo que se encargue de iniciar `crond`, que ejecutará lo que haya en `crontab`. Ese archivo será `/usr/share/initramfs-tools/scripts/init-premount/crond` y tendrá este contenido:
+Aunque ya podemos usar `crontab` en `initramfs`, nos falta hacer que se empiece a ejecutar, así que tenemos que crear otro archivo que se encargue de iniciar `crond`, que ejecutará lo que haya en `crontab`. Ese archivo será `/usr/share/initramfs-tools/scripts/init-premount/crond` y tendrá este contenido:
 
 ```sh
 #!/bin/sh
