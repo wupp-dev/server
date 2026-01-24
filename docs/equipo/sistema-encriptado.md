@@ -214,7 +214,7 @@ ls -l /dev/disk/by-uuid
 
 Que en este caso es `60e8d58f-cb05-47f1-85bc-38e5b0a05505`, así que vamos a editar `/etc/crypttab` añadiendo esta línea al final:
 
-```sh
+```
 vault UUID=60e8d58f-cb05-47f1-85bc-38e5b0a05505 /root/hdd_key luks
 ```
 
@@ -222,7 +222,7 @@ Donde lo primero es el nombre que tendrá el volumen, lo segundo su UUID, lo ter
 
 Muy bien, con esto el disco se desencriptará al encenderse el servidor, solo nos queda añadirlo a `/etc/fstab` para que también se monte. Añadimos esta línea al final del archivo:
 
-```sh
+```
 /dev/mapper/vault /mnt/vault btrfs defaults,nofail 0 0
 ```
 
@@ -236,7 +236,7 @@ Ten cuidado con esta parte, ya que una configuración incorrecta puede causar qu
 
 **Si tenemos el sistema operativo en un disco SSD SATA**, como es el caso, hay unos cambios que podemos hacer para mejorar el rendimiento y la durabilidad del disco, tenemos que editar `/etc/fstab`, concretamente la primera línea sin comentar, que debería ser la correspondiente a la partición `root`, añadiendo unas opciones extra para cuando se monte:
 
-```sh
+```
 /dev/mapper/server--vg-root / btrfs  defaults,subvol=@rootfs,ssd,noatime,space_cache=v2,compress=zstd:2,discard=async,commit=30 0 0
 ```
 
@@ -252,7 +252,7 @@ Aquí detallamos lo que hace cada opción:
 
 Para los **discos duros mecánicos con btrfs**, como el que vamos a usar para la partición `/var`, podemos usar estas opciones al montarlo:
 
-```sh
+```
 /dev/mapper/vault /var btrfs  defaults,noatime,space_cache=v2,compress=zstd:3,nofail 0 0
 ```
 
@@ -268,7 +268,7 @@ Si tenemos un TPM 2.0 en el servidor, como es el caso del servidor de Minecraft,
 
 Lo primero es verificar que el disco duro *(la partición donde está el sistema)* está encriptado con LUKS2, para ello usamos:
 
-```sh
+```
 sudo cryptsetup luksDump /dev/sda3 | grep Version
 ```
 
