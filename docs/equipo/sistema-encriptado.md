@@ -192,9 +192,11 @@ lsblk
 Lo primero es que se desencripte, para ello tendremos que añadir el disco a `/etc/crypttab`, pero como ese queremos que se desencripte solo sin tener que ponerle nosotros la contraseña, tendremos que crear un archivo que servirá como contraseña para desencriptar el disco.
 
 ```sh
-sudo dd if=/dev/urandom of=/root/hdd_key bs=1024 count=4
-sudo chmod 0400 /root/hdd_key
-sudo cryptsetup luksAddKey /dev/sdb1 /root/hdd_key
+sudo mkdir -p /etc/cryptsetup-keys.d
+sudo dd if=/dev/urandom of=/etc/cryptsetup-keys.d/vault.key bs=1024 count=4
+sudo chown -R root:root /etc/cryptsetup-keys.d
+sudo chmod 0400 /etc/cryptsetup-keys.d/vault.key
+sudo cryptsetup luksAddKey /dev/sdb1 /etc/cryptsetup-keys.d/vault.key
 ```
 
 Lo que acabamos de hacer es crear un archivo con caracteres aleatorios _(como una contraseña básicamente pero mucho más larga)_ y añadirlo como clave para desencriptar el disco duro, ya que LUKS nos permite tener varias claves.
@@ -215,8 +217,10 @@ ls -l /dev/disk/by-uuid
 Que en este caso es `60e8d58f-cb05-47f1-85bc-38e5b0a05505`, así que vamos a editar `/etc/crypttab` añadiendo esta línea al final:
 
 ```
-vault UUID=60e8d58f-cb05-47f1-85bc-38e5b0a05505 /root/hdd_key luks
+vault UUID=60e8d58f-cb05-47f1-85bc-38e5b0a05505 /etc/cryptsetup-keys.d/vault.key luks,nofail,x-systemd.device-timeout=0
 ```
+
+Las opciones `nofail` y `x-systemd.device-timeout=0` evitan que el sistema bloquee el arranque si no se puede desencriptar el disco.
 
 Donde lo primero es el nombre que tendrá el volumen, lo segundo su UUID, lo tercero el archivo donde está la clave y lo cuarto especifica que utiliza LUKS.
 
@@ -226,7 +230,7 @@ Muy bien, con esto el disco se desencriptará al encenderse el servidor, solo no
 /dev/mapper/vault /mnt/vault btrfs defaults,nofail 0 0
 ```
 
-Que hará que el disco se monte en `/mnt/vault` cuando se encienda el servidor. La opción `nofail` evita que el sistema bloquee el arranque si este disco no está disponible.
+Que hará que el disco se monte en `/mnt/vault` cuando se encienda el servidor.
 
 ## Optimizando discos
 
