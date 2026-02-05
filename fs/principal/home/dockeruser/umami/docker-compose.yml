@@ -1,10 +1,11 @@
 services:
   umami:
-    image: docker.umami.dev/umami-software/umami:mysql-latest
+    image: docker.umami.is/umami-software/umami:3
+    restart: unless-stopped
     depends_on:
       - umami-db
     environment:
-      DATABASE_TYPE: mysql
+      DATABASE_URL: "postgresql://${DB_USER}:${DB_PASSWORD}@umami-db/${DB_DATABASE_NAME}"
     ports:
       - "127.0.0.1:${PORT_UMAMI}:3000"
     networks:
@@ -13,18 +14,18 @@ services:
       - "com.centurylinklabs.watchtower.enable=true"
 
   umami-db:
-    image: mariadb
+    image: postgres:18
     restart: unless-stopped
     environment:
-      - MARIADB_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
-      - MARIADB_USER=${DB_USER}
-      - MARIADB_PASSWORD=${DB_PASSWORD}
-      - MARIADB_DATABASE=${DB_DATABASE_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_DATABASE_NAME}
     volumes:
-      - /var/lib/umami-mysql:/var/lib/mysql
-    command: --transaction-isolation=READ-COMMITTED --log-bin=binlog --binlog-format=ROW
+      - /var/lib/umami/postgres:/var/lib/postgresql:Z
     networks:
       - umami
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
 
 networks:
   umami:
