@@ -21,8 +21,6 @@ Por último, tendremos que irnos al router y abrir los puertos `25`, `143`, `465
 En el `docker-compose.ylm` añadimos la [configuración de ejemplo que tienen en el repositorio](https://github.com/docker-mailserver/docker-mailserver/blob/master/compose.yaml):
 
 ```yml
-version: "3.0"
-
 services:
   mailserver:
     image: mailserver/docker-mailserver

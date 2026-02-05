@@ -98,8 +98,6 @@ sudo usermod -aG docker dockeruser # Añadir el usuario al grupo
 Por fin llegamos al famoso archivo. Este archivo incluye toda la configuración de los servicios a ejecutar con Docker y nos permite cómodamente iniciar todos. En la página de cada servicio se puede encontrar un extracto del contenido del `docker-compose.yml` para ese servicio concreto. Veamos la estructura del archivo:
 
 ```yaml
-version: "3"
-
 services:
   service:
     image: test
@@ -134,13 +132,7 @@ services:
     command: nice
 ```
 
-Obviamente no siempre tendremos que usar tantas opciones para un servicio, pero es útil saber las que hay y tener siempre un orden común. Vemos que el archivo se separa en dos partes:
-
-- **`version`:** algo importará intuyo, pero no creo que mucho así que está la 2 por que lo debí de ver por ahí con el primer servicio que puse y ahí se ha quedado. **Actualización:** Ahora Iván lo ha cambiado a la 3 por el mismo motivo.
-
-- **`services`:** esto es lo importante, aquí declaramos todos los contenedores que se han de crear, en donde se especifican todas las opciones.
-
-Te recomiendo que leas la [documentación oficial de Docker Compose](https://docs.docker.com/compose/) para saber cómo funciona exactamente el archivo.
+Obviamente no siempre tendremos que usar tantas opciones para un servicio, pero es útil saber las que hay y tener siempre un orden común. Te recomiendo que leas la [documentación oficial de Docker Compose](https://docs.docker.com/compose/) para saber cómo funciona exactamente el archivo.
 
 Lo dicho, según vayamos viendo los diferentes servicios se irán mostrando los extractos del archivo para el correspondiente servicio para que así podáis cómodamente seleccionar que servicios queréis.
 

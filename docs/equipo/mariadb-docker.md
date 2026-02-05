@@ -52,11 +52,6 @@ Esta sección del `docker-compose.yaml` nos permite declarar los llamados _secre
 
 En el archivo `docker-compose.yaml` tenemos que declarar el nombre de los _secrets_ que vamos a usar en `secrets`. Estos se declaran indicando su nombre como miembro de `secrets`, i.e. añadiendo el nombre indentado debajo de `secrets` como se puede ver anteriormente y, dado que los vamos a crear manualmente con la CLI de Docker, tenemos que indicar `external: true` para cada uno.
 
-::: warning IMPORTANTE
-
-La versión que se indica con la clave `version` en el archivo ha de ser 3 o superior para que los _secrets_ funcionen
-:::
-
 Procedamos ahora a crear los diferentes _secrets_ que se necesitan. En los siguientes comandos, sustituye el texto entre `<>` (e.g. `<root_password>`) con lo que desees (que recomendamos que sea generado aleatoriamente) y guárdalo en un sitio seguro y que no vayas a perder:
 
 ```bash
