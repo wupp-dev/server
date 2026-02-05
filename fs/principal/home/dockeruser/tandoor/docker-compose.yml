@@ -3,7 +3,7 @@ services:
     restart: unless-stopped
     image: postgres:16-alpine
     volumes:
-      - ${DB_DATA_LOCATION:-/var/tandoor/postgres}:/var/lib/postgresql/data
+      - ${DB_DATA_LOCATION:-/var/lib/tandoor/postgres}:/var/lib/postgresql/data
     networks:
       - tandoor
     labels:
@@ -17,8 +17,8 @@ services:
     ports:
       - 30192:80
     volumes:
-      - ${STATIC_FILES_LOCATION:-/var/tandoor/staticfiles}:/opt/recipes/staticfiles
-      - ${MEDIA_FILES_LOCATION:-/var/tandoor/mediafiles}:/opt/recipes/mediafiles
+      - ${STATIC_FILES_LOCATION:-/var/lib/tandoor/staticfiles}:/opt/recipes/staticfiles
+      - ${MEDIA_FILES_LOCATION:-/var/lib/tandoor/mediafiles}:/opt/recipes/mediafiles
     networks:
       - tandoor
     labels:
