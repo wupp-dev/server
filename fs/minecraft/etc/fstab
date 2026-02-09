@@ -7,9 +7,15 @@
 # systemd generates mount units based on this file, see systemd.mount(5).
 # Please run 'systemctl daemon-reload' after making changes here.
 #
-# <file system>                            <mount point> <type>     <options>                                                                                   <dump> <pass>
-/dev/mapper/mcserver--vg-root              /             btrfs      defaults,subvol=@rootfs,ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,commit=30  0      0
-UUID=84980c45-0a65-4aef-81b3-f082fce26e82  /boot         ext2       defaults                                                                                    0      2
-UUID=81DD-4549                             /boot/efi     vfat       umask=0077                                                                                  0      1
-/dev/mapper/mcserver--vg-swap_1            none          swap       sw                                                                                          0      0
-/dev/mapper/vault                          /var          btrfs      defaults,noatime,space_cache=v2,compress=zstd:3,nofail                                      0      0
+# <file system>                            <mount point>    <type>       <options>                                                                                   <dump> <pass>
+/dev/mapper/mcserver--vg-root              /                btrfs        defaults,subvol=@,ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,commit=30        0      0
+/dev/mapper/mcserver--vg-root              /home            btrfs        defaults,subvol=@home,ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,commit=30    0      0
+/dev/mapper/mcserver--vg-root              /docker          btrfs        defaults,subvol=@docker,ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,commit=30  0      0
+/docker                                    /var/lib/docker  none         bind,x-systemd.requires-mounts-for=/var                                                     0      0
+UUID=84980c45-0a65-4aef-81b3-f082fce26e82  /boot            ext2         defaults                                                                                    0      2
+UUID=81DD-4549                             /boot/efi        vfat         umask=0077                                                                                  0      1
+/dev/mapper/mcserver--vg-swap_1            none             swap         sw                                                                                          0      0
+UUID=538c53d9-4ce3-4ff9-959d-a310c512934b  /var             btrfs        defaults,subvol=@var,noatime,space_cache=v2,compress=zstd:3,nofail                          0      0
+UUID=538c53d9-4ce3-4ff9-959d-a310c512934b  /var/log         btrfs        defaults,subvol=@var_log,noatime,space_cache=v2,compress=zstd:3,nofail                      0      0
+UUID=538c53d9-4ce3-4ff9-959d-a310c512934b  /var/tmp         btrfs        defaults,subvol=@var_tmp,noatime,space_cache=v2,compress=zstd:3,nofail                      0      0
+UUID=538c53d9-4ce3-4ff9-959d-a310c512934b  /var/cache       btrfs        defaults,subvol=@var_cache,noatime,space_cache=v2,compress=zstd:3,nofail                    0      0

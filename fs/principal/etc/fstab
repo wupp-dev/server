@@ -7,10 +7,16 @@
 # systemd generates mount units based on this file, see systemd.mount(5).
 # Please run 'systemctl daemon-reload' after making changes here.
 #
-# <file system>                            <mount point>  <type>       <options>                                                                                   <dump> <pass>
-/dev/mapper/server--vg-root                /              btrfs        defaults,subvol=@rootfs,ssd,noatime,space_cache=v2,compress=zstd:2,discard=async,commit=30  0      0
-UUID=eb777051-9d3a-4bf9-a186-fdfcc9d5c9c0  /boot          ext2         defaults                                                                                    0      2
-UUID=E283-990E                             /boot/efi      vfat         umask=0077                                                                                  0      1
-/dev/mapper/server--vg-swap_1              none           swap         sw                                                                                          0      0
-/dev/sr0                                   /media/cdrom0  udf,iso9660  user,noauto                                                                                 0      0
-/dev/mapper/vault                          /var           btrfs        defaults,noatime,space_cache=v2,compress=zstd:3,nofail                                      0      0
+# <file system>                            <mount point>    <type>       <options>                                                                                   <dump> <pass>
+/dev/mapper/server--vg-root                /                btrfs        defaults,subvol=@,ssd,noatime,space_cache=v2,compress=zstd:2,discard=async,commit=30        0      0
+/dev/mapper/server--vg-root                /home            btrfs        defaults,subvol=@home,ssd,noatime,space_cache=v2,compress=zstd:2,discard=async,commit=30    0      0
+/dev/mapper/server--vg-root                /docker          btrfs        defaults,subvol=@docker,ssd,noatime,space_cache=v2,compress=zstd:2,discard=async,commit=30  0      0
+/docker                                    /var/lib/docker  none         bind,x-systemd.requires-mounts-for=/var                                                     0      0
+UUID=eb777051-9d3a-4bf9-a186-fdfcc9d5c9c0  /boot            ext2         defaults                                                                                    0      2
+UUID=E283-990E                             /boot/efi        vfat         umask=0077                                                                                  0      1
+/dev/mapper/server--vg-swap_1              none             swap         sw                                                                                          0      0
+/dev/sr0                                   /media/cdrom0    udf,iso9660  user,noauto                                                                                 0      0
+/dev/mapper/vault                          /var             btrfs        defaults,subvol=@var,noatime,space_cache=v2,compress=zstd:3,nofail                          0      0
+/dev/mapper/vault                          /var/log         btrfs        defaults,subvol=@var_log,noatime,space_cache=v2,compress=zstd:3,nofail                      0      0
+/dev/mapper/vault                          /var/cache       btrfs        defaults,subvol=@var_cache,noatime,space_cache=v2,compress=zstd:3,nofail                    0      0
+/dev/mapper/vault                          /var/tmp         btrfs        defaults,subvol=@var_tmp,noatime,space_cache=v2,compress=zstd:3,nofail                      0      0

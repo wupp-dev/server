@@ -217,20 +217,18 @@ ls -l /dev/disk/by-uuid
 Que en este caso es `60e8d58f-cb05-47f1-85bc-38e5b0a05505`, así que vamos a editar `/etc/crypttab` añadiendo esta línea al final:
 
 ```
-vault UUID=60e8d58f-cb05-47f1-85bc-38e5b0a05505 /etc/cryptsetup-keys.d/vault.key luks,nofail,x-systemd.device-timeout=0
+vault UUID=60e8d58f-cb05-47f1-85bc-38e5b0a05505 /etc/cryptsetup-keys.d/vault.key luks,noauto,nofail,timeout=1min
 ```
 
-Las opciones `nofail` y `x-systemd.device-timeout=0` evitan que el sistema bloquee el arranque si no se puede desencriptar el disco.
+Donde lo primero es el nombre que tendrá el volumen en `/dev/mapper/`, lo segundo su UUID, lo tercero el archivo donde está la clave y lo cuarto contiene las opciones. Las opciones `noauto`, `nofail` y `timeout=1min` evitan que el arranque falle si no se puede desencriptar el disco y que no se espere indefinidarmente hasta que el usuario desbloquee manualmente el disco (ya que lo desbloquearemos con un archivo de contraseña).
 
-Donde lo primero es el nombre que tendrá el volumen, lo segundo su UUID, lo tercero el archivo donde está la clave y lo cuarto especifica que utiliza LUKS.
-
-Muy bien, con esto el disco se desencriptará al encenderse el servidor, solo nos queda añadirlo a `/etc/fstab` para que también se monte. Añadimos esta línea al final del archivo:
+Muy bien, con esto el disco se podrá desencriptar al encenderse el servidor, solo nos queda añadirlo a `/etc/fstab` para que también se monte. Añadimos esta línea al final del archivo:
 
 ```
 /dev/mapper/vault /mnt/vault btrfs defaults,nofail 0 0
 ```
 
-Que hará que el disco se monte en `/mnt/vault` cuando se encienda el servidor.
+Que hará que el disco se monte en `/mnt/vault` cuando se encienda el servidor. ¡Ojo! Debemos asegurarnos de que el punto de montaje existe o crearlo con `sudo mkdir -p /mnt/vault`.
 
 ## Optimizando discos
 

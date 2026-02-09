@@ -1,2 +1,2 @@
 sda3_crypt UUID=0053a965-9146-4e52-b842-0ba1a756c4c5 none luks,discard
-vault UUID=60e8d58f-cb05-47f1-85bc-38e5b0a05505 /etc/cryptsetup-keys.d/vault.key luks,nofail,x-systemd.device-timeout=0
+vault UUID=60e8d58f-cb05-47f1-85bc-38e5b0a05505 /etc/cryptsetup-keys.d/vault.key luks,noauto,nofail,timeout=1min
