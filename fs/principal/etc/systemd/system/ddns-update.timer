@@ -1,11 +1,12 @@
 [Unit]
-Description=Run DDNS update every 15 minutes
+Description=Run DDNS update every 15 minutes with random delay
 Requires=ddns-update.service
 
 [Timer]
-Unit=ddns-update.service
+OnBootSec=2m
 OnUnitInactiveSec=15m
-AccuracySec=1s
+RandomizedDelaySec=7m
+Persistent=true
 
 [Install]
 WantedBy=timers.target

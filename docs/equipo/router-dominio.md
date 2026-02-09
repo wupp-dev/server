@@ -258,8 +258,8 @@ Vamos a crear un servicio de `systemd` para que se encargue de actualizar la IP 
 ```ini
 [Unit]
 Description=Update DDNS records for Cloudflare
-After=nss-user-lookup.target
-Wants=nss-user-lookup.target
+Wants=network-online.target
+After=network-online.target
 
 [Service]
 Type=oneshot
@@ -267,20 +267,21 @@ EnvironmentFile=/etc/ddns/cloudflare.env
 ExecStart=/usr/local/sbin/ddns-cloudflare-update.sh
 
 [Install]
-WantedBy=default.target
+WantedBy=multi-user.target
 ```
 
 Y creamos el archivo `/etc/systemd/system/ddns-update.timer` que ejecutará el servicio cada 15 minutos:
 
 ```ini
 [Unit]
-Description=Run DDNS update every 15 minutes
+Description=Run DDNS update every 15 minutes with random delay
 Requires=ddns-update.service
 
 [Timer]
-Unit=ddns-update.service
+OnBootSec=2m
 OnUnitInactiveSec=15m
-AccuracySec=1s
+RandomizedDelaySec=7m
+Persistent=true
 
 [Install]
 WantedBy=timers.target
