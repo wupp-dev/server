@@ -34,7 +34,7 @@ Si tenemos Docker, lo mejor es que `/var/lib/docker` esté dentro del SSD, porqu
 sudo mv /var/lib/docker /
 ```
 
-Después, creamos de nuevo la carpeta `/var/lib/docker` y creamos un enlace simbólico apuntando a la nueva ubicación:
+Después, creamos de nuevo la carpeta `/var/lib/docker`:
 
 ```sh
 sudo mkdir -p /var/lib/docker
@@ -49,7 +49,7 @@ mount --bind /docker /var/lib/docker
 Y para asegurar que se monta automáticamente al iniciar el sistema, añadimos esta línea a `/etc/fstab`:
 
 ```
-/docker  /var/lib/docker  none  bind  0  0
+/docker  /var/lib/docker  none  bind,x-systemd.requires-mounts-for=/var  0  0
 ```
 
 Ahora ya podemos iniciar Docker de nuevo con `sudo systemctl start docker`.
@@ -70,7 +70,7 @@ También es posible que, después de eso, nos encontremos con que el servicio `l
 
 Otra de las cosas que pueden ocurrir es que el servicio `binfmt-support` falle también después de un reinicio. Lo podemos solucionar con `mkdir /etc/systemd/system/binfmt-support.service.d` y creando el archivo `/etc/systemd/system/binfmt-support.service.d/override.conf` con:
 
-```
+```ini
 [Unit]
 RequiresMountsFor=/var
 ```
